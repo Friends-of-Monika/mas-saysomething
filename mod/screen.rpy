@@ -175,10 +175,9 @@ init 100 python in _fom_saysomething:
 
     def _position_changed(value):
         """
-        Callback function for position bar. Position index is calculated by
-        ceiling the VALUE * (length of __POSITIONS minus 1).
+        Callback function for position bar.
 
-        If value is greater than 0.5 the GUI is flipped to left side.
+        If value is greater than 5 the GUI is flipped to left side.
 
         IN:
             value -> float:
@@ -186,15 +185,15 @@ init 100 python in _fom_saysomething:
         """
 
         global _position
-        _position = __POSITIONS[math.ceil(value * (len(__POSITIONS) - 1))]
+        _position = __POSITIONS[value]
 
         global _picker_flip
-        _picker_flip = value > 0.5
+        _picker_flip = value > 5
 
     _position = __POSITIONS[4]
     _position_adjustment = ui.adjustment(
-        range=1.0,
-        value=0.4,
+        range=9,
+        value=4,
         adjustable=True,
         changed=_position_changed
     )
@@ -219,6 +218,17 @@ init 100 python in _fom_saysomething:
         renpy.restart_interaction()
 
     _text = ""
+
+
+    # Key callback functions
+
+    def _enter_pressed():
+        # Need one more check since key press isn't covered by 'Say' button
+        # sensitive expression.
+        if len(_text.strip()) > 0:
+            # This is equivalent to using Return(0) action.
+            # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
+            return _text
 
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
@@ -299,21 +309,19 @@ screen fom_saysomething_picker:
             # Position slider panel.
 
             frame:
-                padding (30, 0)
+                padding (30, 5)
 
-                vbox:
-                    spacing 10
+                hbox:
+                    xmaximum 350
+                    xfill True
+                    spacing 25
 
-                    hbox:
-                        xmaximum 350
-                        xfill True
-
-                        text "Position"
-                        bar:
-                            xalign 1.0
-                            yalign 0.5
-                            adjustment _fom_saysomething._position_adjustment
-                            released Return(0)
+                    text "Position"
+                    bar:
+                        xalign 1.0
+                        yalign 0.5
+                        adjustment _fom_saysomething._position_adjustment
+                        released Return(0)
 
         # Confirmation buttons area.
 
@@ -337,7 +345,10 @@ screen fom_saysomething_picker:
                     sensitive len(_fom_saysomething._text.strip()) > 0
                 textbutton "Close" action Return(False) xalign 1.0
 
-    # Text input area styled as textbox.
+    # Text input area styled as textbox and key capture so that Enter key press
+    # is the same as pressing 'Say' button.
+
+    key "K_RETURN" action Function(_fom_saysomething._enter_pressed) capture True
 
     window:
         align (0.5, 0.98)
