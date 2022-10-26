@@ -1,3 +1,10 @@
+# topc.rpy contains event for the 'Can you say something ...?' topic that shows
+# expression/position picker and text input GUI.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
+
 init 5 python:
     addEvent(
         Event(

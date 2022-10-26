@@ -1,3 +1,10 @@
+# screen.rpy contains custom text GUI that shows up when Monika is asked to
+# say something.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
+
 init 100 python in _fom_saysomething:
 
     import store
