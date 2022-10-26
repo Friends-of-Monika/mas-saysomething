@@ -158,18 +158,12 @@ init 100 python in _fom_saysomething:
             # Initially all cursors are at zero (with corresponding expression names.)
             self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
 
+            # Position cursor, an index to POSITIONS list to pick position by.
+            self.position_cursor = 4
+
             # Position object to use when showing Monika at her table. By
             # default, her usual middle screen position.
             self.position = POSITIONS[4][0]
-
-            # Adjustment object to define slider properties for position slider
-            # and handle value changes.
-            self.position_adjustment = ui.adjustment(
-                range=len(POSITIONS) - 1,
-                value=4,
-                adjustable=True,
-                changed=self.on_position_change
-            )
 
             # Flag value for flipping selectors/position GUI to left side of
             # screen if it would mean Monika is behind the GUI and not in user's
@@ -262,6 +256,79 @@ init 100 python in _fom_saysomething:
 
             curr = self.pose_cursors[key][0]
             return EXPR_MAP[key][1][curr][1]
+
+        def position_switch_selector(self, forward):
+            """
+            Switches position forward or backward. If cursor reaches zero or max
+            value, prevents it from going further.
+
+            IN:
+                forward -> bool:
+                    True if to increment, False to decrement.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+
+            new = curr
+            if forward:
+                if curr != _max:
+                    new = curr + 1
+            else:
+                if curr != 0:
+                    new = curr - 1
+
+            self.position_cursor = new
+            self.position = POSITIONS[self.position_cursor]
+            self.gui_flip = self.position_cursor > 4
+            return 0
+
+        def get_position_label(self):
+            """
+            Returns human readable (cursor + 1) position label for position.
+
+            OUT:
+                str:
+                    Position label.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            return "#" + str(self.position_cursor + 1)
+
+        def position_switch_usable(self, forward):
+            """
+            Returns if position switch (backward or forward) is usable and
+            should be sensitive.
+
+            IN:
+                forward -> bool:
+                    True if forward, False if backward.
+
+            OUT:
+                True:
+                    True if can increment/decrement, False otherwise.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+            if forward:
+                return curr < _max
+            else:
+                return curr > 0
 
         def get_sprite_code(self):
             """
@@ -447,20 +514,6 @@ init 100 python in _fom_saysomething:
 
             self.preset_name = ""
             self.preset_cursor = None
-
-        def on_position_change(self, value):
-            """
-            Callback function for position bar.
-
-            If value is greater than 5 the GUI is flipped to left side.
-
-            IN:
-                value -> float:
-                    New value of position bar slider.
-            """
-
-            self.position = POSITIONS[value][0]
-            self.gui_flip = value > 5
 
         def on_text_change(self, value):
             """
@@ -671,7 +724,7 @@ screen fom_saysomething_picker(say=True):
                                     text picker.get_pose_label(key) xalign 0.5
                                     textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
 
-                # Position slider panel.
+                # Position selector panel.
 
                 frame:
                     padding (10, 10)
@@ -680,12 +733,30 @@ screen fom_saysomething_picker(say=True):
                         xmaximum 350
                         xfill True
 
-                        text "Position"
-                        bar:
+                        # Split into two hboxes to align arrows and labels
+                        # properly, so that one can click them without
+                        # missing if label is too big; this layout preserves
+                        # space for big labels.
+
+                        hbox:
+                            xfill True
+                            xmaximum 110
+                            text "Position"
+
+                        hbox:
+                            xmaximum 240
+                            xfill True
                             xalign 1.0
-                            yalign 0.5
-                            adjustment picker.position_adjustment
-                            released Return(_fom_saysomething.RETURN_RENDER)
+
+                            textbutton "<":
+                                xalign 0.0
+                                action Function(picker.position_switch_selector, forward=False)
+                                sensitive picker.position_switch_usable(forward=False)
+                            text picker.get_position_label() xalign 0.5
+                            textbutton ">":
+                                xalign 1.0
+                                action Function(picker.position_switch_selector, forward=True)
+                                sensitive picker.position_switch_usable(forward=True)
 
                 # Buttons tickbox.
 
@@ -868,10 +939,10 @@ screen fom_saysomething_picker(say=True):
         # Text input area styled as textbox and key capture so that Shift+Enter key
         # press is the same as pressing 'Say' button.
 
-        key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
+        key "shift_K_RETURN" action Function(picker.on_shift_enter_press)
 
         # This handles Enter key press and adds a new line.
-        key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
+        key "noshift_K_RETURN" action Function(picker.on_enter_press)
 
         window:
             align (0.5, 0.99)
