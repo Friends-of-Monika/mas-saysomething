@@ -206,11 +206,11 @@ screen fom_saysomething_picker:
 
                             hbox:
                                 xfill True
-                                xmaximum 100
+                                xmaximum 110
                                 text key
 
                             hbox:
-                                xmaximum 250
+                                xmaximum 240
                                 xfill True
                                 xalign 1.0
 

@@ -44,6 +44,7 @@ label fom_saysomething_event:
             $ renpy.say(m, _fom_saysomething._text)
 
             $ mas_DropShield_core()
+            show monika at t11
             m 3tua "Well? {w=0.3}Did I do it good enough?"
             m 1hub "Hope you liked it, ahaha~"
 
