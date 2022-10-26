@@ -24,18 +24,24 @@ label fom_saysomething_event:
         call screen fom_saysomething_picker
         if _return is False:
             $ stop_picker_loop = True
+            m 1eka "Oh, okay."
+
         elif _return is 0:
             $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
+
         else:
+            $ stop_picker_loop = True
+
             m 2dsc "Alright, give me just a moment to prepare{w=0.3}.{w=0.3}.{w=0.3}.{nw}"
             $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
             $ renpy.say(m, _fom_saysomething._text)
-            $ stop_picker_loop = True
+
+            $ mas_DropShield_core()
+            m 3tua "Well? {w=0.3}Did I do it good enough?"
+            m 1hub "Hope you liked it, ahaha~"
 
     show monika at t11
     $ mas_DropShield_core()
     $ HKBShowButtons()
 
-    m 3tua "Well? {w=0.3}Did I do it good enough?"
-    m 1hub "Hope you liked it, ahaha~"
     return
