@@ -26,6 +26,10 @@ label fom_saysomething_event:
     $ HKBHideButtons()
     $ mas_RaiseShield_core()
 
+    # Create new Picker and store it locally.
+    $ _fom_saysomething.picker = _fom_saysomething.Picker()
+    $ picker = _fom_saysomething.picker
+
     # We'll keep looping with screen calls since we need to do Monika rendering
     # out of screen, hence why we'll keep doing it until we get 'nevermind' from
     # the player or we'll get a signal to say something.
@@ -42,7 +46,7 @@ label fom_saysomething_event:
 
         elif _return is 0:
             # Position or pose/expression update is requested, so do it now.
-            $ renpy.show("monika " + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
+            $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
 
         else:
             # An actual text has been typed and expression is set, ready to go.
@@ -53,8 +57,8 @@ label fom_saysomething_event:
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
             # Show Monika with sprite code and at set position and say text.
-            $ renpy.show("monika " + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
-            $ renpy.say(m, _fom_saysomething._text)
+            $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
+            $ renpy.say(m, picker.text)
 
             # Enable textbox buttons and put Monika back on the middle.
             $ mas_DropShield_core()
