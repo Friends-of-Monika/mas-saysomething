@@ -53,9 +53,7 @@ init 100 python in _fom_saysomething:
             ("ts", "Streaming"),
             ("td", "Dried"),
             ("tp", "Pooled"),
-            ("tu", "Tearing up"),
-            ("tl", "Tearing up, left"),
-            ("tr", "Tearing up, right")
+            ("tu", "Tearing up")
         ]),
         ("Sweat", [
             (None, "None"),
@@ -173,6 +171,7 @@ style fom_saysomething_confirm_button_text_dark is generic_button_text_dark:
     text_align 0.5
     layout "subtitle"
 
+
 screen fom_saysomething_picker:
     style_prefix "fom_saysomething_picker"
 
@@ -197,10 +196,19 @@ screen fom_saysomething_picker:
                             xmaximum 350
                             xfill True
 
-                            text key
-                            textbutton "<" action [Function(_fom_saysomething._switch_pose, key, forward=False), Return(0)] xalign 0.0
-                            text _fom_saysomething._pose_label(key) xalign 0.5
-                            textbutton ">" action [Function(_fom_saysomething._switch_pose, key, forward=True), Return(0)] xalign 1.0
+                            hbox:
+                                xfill True
+                                xmaximum 100
+                                text key
+
+                            hbox:
+                                xmaximum 250
+                                xfill True
+                                xalign 1.0
+
+                                textbutton "<" action [Function(_fom_saysomething._switch_pose, key, forward=False), Return(0)] xalign 0.0
+                                text _fom_saysomething._pose_label(key) xalign 0.5
+                                textbutton ">" action [Function(_fom_saysomething._switch_pose, key, forward=True), Return(0)] xalign 1.0
 
             frame:
                 padding (30, 0)
@@ -233,7 +241,7 @@ screen fom_saysomething_picker:
                 style_prefix "fom_saysomething_confirm"
 
                 textbutton "Say" action Return(_fom_saysomething._text)
-                textbutton "Close" action Return(False)
+                textbutton "Close" action Return(False) xalign 1.0
 
     window:
         align (0.5, 0.98)
