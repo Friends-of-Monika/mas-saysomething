@@ -162,6 +162,9 @@ init 100 python in _fom_saysomething:
                     new = curr - 1
 
             self.pose_cursors[key] = (new, EXPR_MAP[key][new][1])
+
+            # This is equivalent to using Return(0) action.
+            # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
             return 0
 
         def get_pose_label(self, key):
@@ -250,7 +253,7 @@ init 100 python in _fom_saysomething:
             # Need one more check since key press isn't covered by 'Say' button
             # sensitive expression.
             if self.is_text_empty():
-                # This is equivalent to using Return(0) action.
+                # This is equivalent to using Return(self.text) action.
                 # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
                 return self.text
 
