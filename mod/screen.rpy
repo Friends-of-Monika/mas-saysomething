@@ -86,7 +86,7 @@ init 100 python in _fom_saysomething:
 
     # Positions list containing Monika table positions from leftmost [0] to
     # rightmost [9]. Items are usable with renpy.show(..., at=list[...]) call.
-     POSITIONS = [
+    POSITIONS = [
         store.t41, #0
         store.t31, #1
         store.t21, #2, usually used in talk menu and scrollable choices
