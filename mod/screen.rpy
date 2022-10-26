@@ -145,6 +145,7 @@ init 100 python in _fom_saysomething:
     def _text_changed(value):
         global _text
         _text = value
+        renpy.restart_interaction()
 
     _text = ""
 
@@ -240,7 +241,9 @@ screen fom_saysomething_picker:
 
                 style_prefix "fom_saysomething_confirm"
 
-                textbutton "Say" action Return(_fom_saysomething._text)
+                textbutton "Say":
+                    action Return(_fom_saysomething._text)
+                    sensitive len(_fom_saysomething._text.strip()) > 0
                 textbutton "Close" action Return(False) xalign 1.0
 
     window:
