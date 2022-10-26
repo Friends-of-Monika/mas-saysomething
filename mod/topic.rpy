@@ -39,7 +39,9 @@ label fom_saysomething_event:
         else:
             $ stop_picker_loop = True
 
-            m 2dsc "Alright, give me just a moment to prepare{w=0.3}.{w=0.3}.{w=0.3}.{nw}"
+            show monika at t11
+            m 1esb "Alright, give me just a moment to prepare."
+            m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
             $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
             $ renpy.say(m, _fom_saysomething._text)
 
