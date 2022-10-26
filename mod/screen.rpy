@@ -16,6 +16,11 @@ init 100 python in _fom_saysomething:
 
     # Pose input
 
+    # Orderect dictionary is used to preserve order when rendering a table of
+    # selectors. This dictionary contains key (human readable name of expression
+    # part) to list of 2-tuples of the following elements:
+    #  [0]: expression code/mnemonic
+    #  [1]: expression human readable description
     __POSE_MAP = OrderedDict([
         ("Pose", [
             ("1", "Rest on hands"),
@@ -79,9 +84,27 @@ init 100 python in _fom_saysomething:
             ("t", "Triangle")
         ])
     ])
+
+    # This dictionary contains key to 2-tuple of:
+    #  [0]: current expression cursor index
+    #  [1]: current expression human readable name
+    # Initially all cursors are at zero (with corresponding expression names.)
     _pose_cursors = {key: (0, __POSE_MAP[key][0][1]) for key in __POSE_MAP.keys()}
 
     def _switch_pose(key, forward):
+        """
+        Switches pose for selector by the specified key, forward or backward. If
+        cursor is zero/max value and is requested to increment/decrement
+        correspondingly, the value is wrapped.
+
+        IN:
+            key -> str:
+                Key of selector to switch. See __POSE_MAP above.
+
+            forward -> bool:
+                True if need to increment cursor, False to decrement.
+        """
+
         curr = _pose_cursors[key][0]
         _max = len(__POSE_MAP[key]) - 1
 
@@ -99,10 +122,31 @@ init 100 python in _fom_saysomething:
         _pose_cursors[key] = (new, __POSE_MAP[key][new][1])
 
     def _pose_label(key):
+        """
+        Returns label for the current value of the specified selector key (see
+        __POSE_MAP above.)
+
+        IN:
+            key -> str:
+                Selector key to return human readable name for.
+
+        OUT:
+            str:
+                Human readable selector item name.
+        """
+
         curr = _pose_cursors[key][0]
         return __POSE_MAP[key][curr][1]
 
     def _get_sprite_code():
+        """
+        Builds sprite code for the current selectors configuration.
+
+        OUT:
+            str:
+                Sprite code for use in renpy.show(...)
+        """
+
         code = list()
         for key, values in __POSE_MAP.items():
             value = values[_pose_cursors[key][0]][0]
@@ -130,6 +174,17 @@ init 100 python in _fom_saysomething:
     ]
 
     def _position_changed(value):
+        """
+        Callback function for position bar. Position index is calculated by
+        ceiling the VALUE * (length of __POSITIONS minus 1).
+
+        If value is greater than 0.5 the GUI is flipped to left side.
+
+        IN:
+            value -> float:
+                New value of position bar slider.
+        """
+
         global _position
         _position = __POSITIONS[math.ceil(value * (len(__POSITIONS) - 1))]
 
@@ -150,12 +205,24 @@ init 100 python in _fom_saysomething:
     # Text input
 
     def _text_changed(value):
+        """
+        Callback for text input prompt. Restarts interaction on every
+        alteration.
+
+        IN:
+            value -> str:
+                New input field value.
+        """
+
         global _text
         _text = value
         renpy.restart_interaction()
 
     _text = ""
 
+
+# GUI elements styling, mostly reused to keep up with MAS theme and style.
+# Some elements have been adjusted for design of this submod's GUI.
 
 style fom_saysomething_picker_frame is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
@@ -180,14 +247,18 @@ style fom_saysomething_confirm_button_text_dark is generic_button_text_dark:
     layout "subtitle"
 
 
+# Expression/pose, location and say text picker GUI screen.
+
 screen fom_saysomething_picker:
     style_prefix "fom_saysomething_picker"
 
     vbox:
+        # Flip GUI to prevent hiding Monika behind it.
         if not _fom_saysomething._picker_flip:
             align (0.95, 0.3)
         else:
             align (0.05, 0.3)
+
         spacing 10
 
         vbox:
@@ -196,6 +267,8 @@ screen fom_saysomething_picker:
             frame:
                 padding (30, 30)
 
+                # Selectors panel.
+
                 vbox:
                     spacing 10
 
@@ -203,6 +276,11 @@ screen fom_saysomething_picker:
                         hbox:
                             xmaximum 350
                             xfill True
+
+                            # Split into two hboxes to align arrows and labels
+                            # properly, so that one can click them without
+                            # missing if label is too big; this layout preserves
+                            # space for big labels.
 
                             hbox:
                                 xfill True
@@ -217,6 +295,8 @@ screen fom_saysomething_picker:
                                 textbutton "<" action [Function(_fom_saysomething._switch_pose, key, forward=False), Return(0)] xalign 0.0
                                 text _fom_saysomething._pose_label(key) xalign 0.5
                                 textbutton ">" action [Function(_fom_saysomething._switch_pose, key, forward=True), Return(0)] xalign 1.0
+
+            # Position slider panel.
 
             frame:
                 padding (30, 0)
@@ -235,6 +315,8 @@ screen fom_saysomething_picker:
                             adjustment _fom_saysomething._position_adjustment
                             released Return(0)
 
+        # Confirmation buttons area.
+
         frame:
             background None
             padding (30, 15)
@@ -248,10 +330,14 @@ screen fom_saysomething_picker:
 
                 style_prefix "fom_saysomething_confirm"
 
+                # Note: this button sensitivity relies on Ren'Py interaction
+                # restart that is done in text input field callback.
                 textbutton "Say":
                     action Return(_fom_saysomething._text)
                     sensitive len(_fom_saysomething._text.strip()) > 0
                 textbutton "Close" action Return(False) xalign 1.0
+
+    # Text input area styled as textbox.
 
     window:
         align (0.5, 0.98)
@@ -262,5 +348,9 @@ screen fom_saysomething_picker:
 
             text "What do you want me to say?~" style "input_prompt"
             input:
+                # Note: in order to always have the most up to date text this
+                # callback updates it internally in _fom_saysomething store
+                # and restarts Ren'Py interaction in order for 'Say' button
+                # to gray out when no text is provided.
                 changed _fom_saysomething._text_changed
                 pixel_width gui.text_width

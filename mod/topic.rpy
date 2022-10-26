@@ -22,7 +22,7 @@ label fom_saysomething_event:
     m 1hub "Of course!"
     m 1eua "Tell me how do you want me to pose and what do you want me to say~"
 
-    show monika 1eua at t11
+    # Disable game menu and hide textbox buttons.
     $ HKBHideButtons()
     $ mas_RaiseShield_core()
 
@@ -30,27 +30,36 @@ label fom_saysomething_event:
     while stop_picker_loop is False:
         call screen fom_saysomething_picker
         if _return is False:
+            # Player has changed their mind, so just stop and put Monika back.
             $ stop_picker_loop = True
+            show monika at t11
+
             m 1eka "Oh, okay."
 
         elif _return is 0:
-            $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
+            # Position or pose/expression update is requested, so do it now.
+            $ renpy.show("monika " + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
 
         else:
+            # An actual text has been typed and expression is set, ready to go.
             $ stop_picker_loop = True
 
             show monika at t11
             m 1esb "Alright, give me just a moment to prepare."
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+            # Show Monika with sprite code and at set position and say text.
             $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
             $ renpy.say(m, _fom_saysomething._text)
 
+            # Enable textbox buttons and put Monika back on the middle.
             $ mas_DropShield_core()
             show monika at t11
+
             m 3tua "Well? {w=0.3}Did I do it good enough?"
             m 1hub "Hope you liked it, ahaha~"
 
-    show monika at t11
+    # Enable textbox buttons (again) and show left-bottom buttons.
     $ mas_DropShield_core()
     $ HKBShowButtons()
 
