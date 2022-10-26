@@ -40,8 +40,8 @@ label fom_saysomething_event:
         if _return is False:
             # Player has changed their mind, so just stop and put Monika back.
             $ stop_picker_loop = True
-            show monika at t11
 
+            show monika 1eka at t11
             m 1eka "Oh, okay."
 
         elif _return is 0:
@@ -52,7 +52,7 @@ label fom_saysomething_event:
             # An actual text has been typed and expression is set, ready to go.
             $ stop_picker_loop = True
 
-            show monika at t11
+            show monika 1esb at t11
             m 1esb "Alright, give me just a moment to prepare."
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
@@ -62,8 +62,8 @@ label fom_saysomething_event:
 
             # Enable textbox buttons and put Monika back on the middle.
             $ mas_DropShield_core()
-            show monika at t11
 
+            show monika 3tua at t11
             m 3tua "Well? {w=0.3}Did I do it good enough?"
             m 1hub "Hope you liked it, ahaha~"
 

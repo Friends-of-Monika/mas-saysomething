@@ -93,13 +93,13 @@ init 100 python in _fom_saysomething:
         store.t42, #3
 
         store.t11, #4, default middle screen position
-        store.t32, #5
-        store.t43, #6
+        #store.t32, formerly #5, same as #4 so no need to keep it here
+        store.t43, #5
 
-        store.t22, #7
-        store.t33, #8
+        store.t22, #6
+        store.t33, #7
 
-        store.t44  #9
+        store.t44  #8
     ]
 
 
@@ -160,10 +160,8 @@ init 100 python in _fom_saysomething:
                     new = _max
                 else:
                     new = curr - 1
-            self.pose_cursors[key] = (new, EXPR_MAP[key][new][1])
 
-            # This is equivalent to using Return(0) action.
-            # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
+            self.pose_cursors[key] = (new, EXPR_MAP[key][new][1])
             return 0
 
         def get_pose_label(self, key):
@@ -304,10 +302,10 @@ screen fom_saysomething_picker:
         vbox:
             spacing 10
 
+            # Selectors panel.
+
             frame:
                 padding (30, 30)
-
-                # Selectors panel.
 
                 vbox:
                     spacing 10
