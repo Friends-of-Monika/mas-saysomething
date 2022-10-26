@@ -243,4 +243,6 @@ screen fom_saysomething_picker:
             spacing 30
 
             text "What do you want me to say?~" style "input_prompt"
-            input changed _fom_saysomething._text_changed
+            input:
+                changed _fom_saysomething._text_changed
+                pixel_width gui.text_width
