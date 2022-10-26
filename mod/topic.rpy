@@ -26,9 +26,13 @@ label fom_saysomething_event:
     $ HKBHideButtons()
     $ mas_RaiseShield_core()
 
+    # We'll keep looping with screen calls since we need to do Monika rendering
+    # out of screen, hence why we'll keep doing it until we get 'nevermind' from
+    # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
     while stop_picker_loop is False:
         call screen fom_saysomething_picker
+
         if _return is False:
             # Player has changed their mind, so just stop and put Monika back.
             $ stop_picker_loop = True
