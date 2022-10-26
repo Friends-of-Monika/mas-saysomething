@@ -53,7 +53,7 @@ label fom_saysomething_event:
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
             # Show Monika with sprite code and at set position and say text.
-            $ renpy.show("monika "  + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
+            $ renpy.show("monika " + _fom_saysomething._get_sprite_code(), [_fom_saysomething._position])
             $ renpy.say(m, _fom_saysomething._text)
 
             # Enable textbox buttons and put Monika back on the middle.
