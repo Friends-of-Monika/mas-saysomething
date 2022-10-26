@@ -122,7 +122,7 @@ init 100 python in _fom_saysomething:
                 range=9,
                 value=4,
                 adjustable=True,
-                changed=self.on_position_changed
+                changed=self.on_position_change
             )
 
             # Flag value for flipping selectors/position GUI to left side of
