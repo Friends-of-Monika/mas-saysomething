@@ -29,6 +29,12 @@
 * Comes with built-in expression changer!
 * Position switch that lets you place your Monika's table wherever you want it.
 
+## 🖼️ Screenshots
+
+![Monika is wondering, what is that menu...][12]
+![Monika greets r/MASFandom users][13]
+![Monika is impressed][14]
+
 ## ❓ Installing
 
 1. Go to [the latest release page][6] and scroll to Assets section.
@@ -75,3 +81,6 @@ of Monika Discord server [here][9].
 [9]: https://mon.icu/discord
 [10]: https://discordapp.com/api/guilds/1029849988953546802/widget.png?style=banner3
 [11]: https://discordapp.com/api/guilds/970747033071804426/widget.png?style=banner3
+[12]: doc/screenshots/1.png
+[13]: doc/screenshots/2.png
+[14]: doc/screenshots/3.png
