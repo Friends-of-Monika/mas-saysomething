@@ -104,8 +104,16 @@ init 100 python in _fom_saysomething:
 
 
     class Picker(object):
+        """
+        Picker represents pose, position and GUI configuration screen with data
+        stored in this object.
+        """
 
         def __init__(self):
+            """
+            Creates a new Picker instance.
+            """
+
             # This dictionary contains key to 2-tuple of:
             #  [0]: current expression cursor index
             #  [1]: current expression human readable name
@@ -269,6 +277,16 @@ init 100 python in _fom_saysomething:
                 self.text += "\n"
 
         def on_buttons_tick(self):
+            """
+            Callback for buttons/GUI tickbox button. Flips it and returns,
+            ending interaction with screen and returning a value for
+            re-rendering.
+
+            OUT:
+                0:
+                    Always returns 0.
+            """
+
             self.show_buttons = not self.show_buttons
             return 0
 
