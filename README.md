@@ -29,7 +29,13 @@
 ## ❓ Installing
 
 1. Go to [the latest release page][6] and scroll to Assets section.
-2. Download `say-something-VERSION.zip` file.
+2. Download `say-something-VERSION-MASVERSION.zip` file for your current MAS
+   version.
+
+   **NOTE:** while `mas-0.12.x-or-older` **will** work on newer versions, it
+   doesn't work the way around! Do not download package for newer MAS version
+   if you're still using old version. We also recommend upgrading to newer
+   version when MAS 0.13.x is out.
 3. Drag and drop `game/` folder from it into your DDLC folder.
 
    **NOTE:** make sure you don't drag it *into `game`*!

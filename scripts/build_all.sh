@@ -14,8 +14,8 @@ build() {
     git switch - >/dev/null 2>&1
 }
 
-build master r8-py39
-build py2 r6-py27
+build master mas-0.12.x-or-older
+build py2 mas-0.13.x-or-newer
 
 rm -rf build
 mv _build build
