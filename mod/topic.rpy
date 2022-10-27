@@ -32,10 +32,6 @@ label fom_saysomething_event_retry:
     # Need a fallthrough here so we can jump back here on retry.
     m 1eua "Tell me how do you want me to pose and what do you want me to say~"
 
-    # Disable game menu and hide textbox buttons.
-    $ HKBHideButtons()
-    $ mas_RaiseShield_core()
-
     # Create new Picker and store it locally.
     $ _fom_saysomething.picker = _fom_saysomething.Picker()
     $ picker = _fom_saysomething.picker
@@ -51,6 +47,10 @@ label fom_saysomething_event_retry:
             # Player has changed their mind, so just stop and put Monika back.
             $ stop_picker_loop = True
 
+            # Show buttons and quick menu if they were hidden.
+            if not picker.show_buttons:
+                call fom_saysomething_event_buttons(_show=True)
+
             show monika 1eka at t11
             m 1eka "Oh, okay."
 
@@ -58,22 +58,31 @@ label fom_saysomething_event_retry:
             # Position or pose/expression update is requested, so do it now.
             $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
 
+            # Hide or show buttons and quick menu.
+            call fom_saysomething_event_buttons(_show=picker.show_buttons)
+
         else:
-            # An actual text has been typed and expression is set, ready to go.
+            # An actual text has been typed and expression is set, stop the loop
+            # and show buttons if they were hidden for preview.
             $ stop_picker_loop = True
+            call fom_saysomething_event_buttons(_show=True)
 
             show monika 1esb at t11
             m 1esb "Alright, give me just a moment to prepare."
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+            # Show or hide buttons depending on user preference.
+            if not picker.show_buttons:
+                call fom_saysomething_event_buttons(_show=False)
 
             # Show Monika with sprite code and at set position and say text.
             $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
             $ quip = picker.text
             m "[quip!q]"
 
-            # Enable textbox buttons and put Monika back on the middle.
-            $ mas_DropShield_core()
-            $ HKBShowButtons()
+            # Anyway, recover buttons after we're done showing.
+            if not picker.show_buttons:
+                call fom_saysomething_event_buttons(_show=True)
 
             show monika 3tua at t11
             m 3tua "Well? {w=0.3}Did I do it good enough?"
@@ -90,8 +99,15 @@ label fom_saysomething_event_retry:
                 "No.":
                     m 1hua "Okay~"
 
-    # Enable textbox buttons (again) and show left-bottom buttons.
-    $ mas_DropShield_core()
-    $ HKBShowButtons()
+label fom_saysomething_event_buttons(_show=True):
+    # Here we're recovering (since show=True when not called) buttons after
+    # player chose to hide them. This is also a callable label we can reuse.
+    if _show:
+        $ quick_menu = True
+        $ HKBShowButtons()
+    else:
+        $ quick_menu = False
+        $ HKBHideButtons()
 
+    # This return also returns from event.
     return

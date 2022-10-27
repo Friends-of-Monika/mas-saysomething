@@ -130,6 +130,9 @@ init 100 python in _fom_saysomething:
             # sight.
             self.gui_flip = False
 
+            # Flag value for showind or hiding buttons and quick menu.
+            self.show_buttons = True
+
             # Variable that stores entered user text prompt.
             self.text = ""
 
@@ -265,6 +268,10 @@ init 100 python in _fom_saysomething:
             if self.text.count("\n") < 2:
                 self.text += "\n"
 
+        def on_buttons_tick(self):
+            self.show_buttons = not self.show_buttons
+            return 0
+
     picker = None
 
 
@@ -316,9 +323,9 @@ screen fom_saysomething_picker:
     vbox:
         # Flip GUI to prevent hiding Monika behind it.
         if not picker.gui_flip:
-            align (0.97, 0.3)
+            align (0.97, 0.23)
         else:
-            align (0.03, 0.3)
+            align (0.03, 0.23)
 
         spacing 10
 
@@ -328,7 +335,7 @@ screen fom_saysomething_picker:
             # Selectors panel.
 
             frame:
-                padding (30, 30)
+                padding (20, 20)
 
                 vbox:
                     spacing 10
@@ -360,7 +367,7 @@ screen fom_saysomething_picker:
             # Position slider panel.
 
             frame:
-                padding (30, 5)
+                padding (20, 5)
 
                 hbox:
                     xmaximum 350
@@ -374,11 +381,27 @@ screen fom_saysomething_picker:
                         adjustment picker.position_adjustment
                         released Return(0)
 
+            # Buttons tickbox.
+
+            frame:
+                padding (20, 5)
+
+                hbox:
+                    style_prefix "check"
+
+                    xmaximum 350
+                    xfill True
+                    spacing 25
+
+                    textbutton "Show buttons and quick menu":
+                        selected picker.show_buttons
+                        action Function(picker.on_buttons_tick)
+
         # Confirmation buttons area.
 
         frame:
             background None
-            padding (30, 0)
+            padding (20, 0)
 
             hbox:
                 align (0.5, 0.5)
@@ -417,26 +440,32 @@ screen fom_saysomething_picker:
             text "What do you want me to say?~"
 
         vbox:
-            align (0.5, 0.59)
+            align (0.5, 0.58)
 
-            # This limits text input in height and width, preventing it from
-            # overflowing the container and getting out of box.
-            ymaximum 80
-            yfill True
-            xmaximum gui.text_width
-            xfill True
+            hbox:
+                # This limits text input in height and width, preventing it from
+                # overflowing the container and getting out of box.
+                ymaximum 80
+                yfill True
+                xmaximum gui.text_width
+                xfill True
 
-            input:
-                # Prevent overflowing by limiting horizontal width of text.
-                pixel_width gui.text_width
+                input:
+                    # Prevent overflowing by limiting horizontal width of text.
+                    pixel_width gui.text_width
 
-                # Align text to left side and prevent it from getting centered.
-                align (0.0, 0.0)
-                text_align 0.0
+                    # Align text to left side and prevent it from getting centered.
+                    align (0.0, 0.0)
+                    text_align 0.0
 
-                # Note: in order to always have the most up to date text this
-                # callback updates it internally in _fom_saysomething store
-                # and restarts Ren'Py interaction in order for 'Say' button
-                # to gray out when no text is provided.
-                changed picker.on_text_change
-                value FieldInputValue(picker, "text", returnable=False)
+                    # Note: in order to always have the most up to date text this
+                    # callback updates it internally in _fom_saysomething store
+                    # and restarts Ren'Py interaction in order for 'Say' button
+                    # to gray out when no text is provided.
+                    changed picker.on_text_change
+                    value FieldInputValue(picker, "text", returnable=False)
+
+        hbox:
+            align (0.5, 1.02)
+
+            use quick_menu
