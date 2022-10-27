@@ -119,7 +119,7 @@ init 100 python in _fom_saysomething:
             # Adjustment object to define slider properties for position slider
             # and handle value changes.
             self.position_adjustment = ui.adjustment(
-                range=9,
+                range=len(POSITIONS) - 1,
                 value=4,
                 adjustable=True,
                 changed=self.on_position_change
