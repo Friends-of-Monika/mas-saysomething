@@ -93,7 +93,7 @@ init 100 python in _fom_saysomething:
         store.t42, #3
 
         store.t11, #4, default middle screen position
-        #store.t32, formerly #5, same as #4 so no need to keep it here
+#       store.t32, # formerly #5, same as #4 so no need to keep it here
         store.t43, #5
 
         store.t22, #6
