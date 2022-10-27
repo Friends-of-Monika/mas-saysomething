@@ -20,6 +20,8 @@ init 5 python:
 
 label fom_saysomething_event:
     m 1hub "Of course!"
+
+label fom_saysomething_event_retry:
     m 1eua "Tell me how do you want me to pose and what do you want me to say~"
 
     # Disable game menu and hide textbox buttons.
@@ -67,6 +69,17 @@ label fom_saysomething_event:
             show monika 3tua at t11
             m 3tua "Well? {w=0.3}Did I do it good enough?"
             m 1hub "Hope you liked it, ahaha~"
+
+            m 3eub "Do you want me to say something else?{nw}"
+            $ _history_list.pop()
+            menu:
+                m "Do you want me to say something else?{fast}"
+
+                "Yes.":
+                    jump fom_saysomething_event_retry
+
+                "No.":
+                    m 1hua "Okay~"
 
     # Enable textbox buttons (again) and show left-bottom buttons.
     $ mas_DropShield_core()
