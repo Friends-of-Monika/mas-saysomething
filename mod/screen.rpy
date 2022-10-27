@@ -378,7 +378,7 @@ screen fom_saysomething_picker:
 
         frame:
             background None
-            padding (30, 15)
+            padding (30, 0)
 
             hbox:
                 align (0.5, 0.5)
