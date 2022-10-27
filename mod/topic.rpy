@@ -13,15 +13,23 @@ init 5 python:
             category=["misc", "monika"],
             prompt="Can you say something for me?",
             pool=True,
-            unlocked=True
+            unlocked=True,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST}
         ),
-        code="EVE"
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
     )
 
 label fom_saysomething_event:
     m 1hub "Of course!"
 
 label fom_saysomething_event_retry:
+    # Need a fallthrough here so we can jump back here on retry.
     m 1eua "Tell me how do you want me to pose and what do you want me to say~"
 
     # Disable game menu and hide textbox buttons.
