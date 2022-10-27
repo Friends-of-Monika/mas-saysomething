@@ -73,6 +73,7 @@ label fom_saysomething_event_retry:
 
             # Enable textbox buttons and put Monika back on the middle.
             $ mas_DropShield_core()
+            $ HKBShowButtons()
 
             show monika 3tua at t11
             m 3tua "Well? {w=0.3}Did I do it good enough?"
