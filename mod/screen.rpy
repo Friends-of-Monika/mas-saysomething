@@ -316,9 +316,9 @@ screen fom_saysomething_picker:
     vbox:
         # Flip GUI to prevent hiding Monika behind it.
         if not picker.gui_flip:
-            align (0.95, 0.3)
+            align (0.97, 0.3)
         else:
-            align (0.05, 0.3)
+            align (0.03, 0.3)
 
         spacing 10
 
