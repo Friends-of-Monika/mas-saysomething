@@ -237,10 +237,10 @@ init 100 python in _fom_saysomething:
             self.text = value
             renpy.restart_interaction()
 
-        def on_enter_press(self):
+        def on_shift_enter_press(self):
             """
-            Callback for Enter key press. Only returns text value when it is not
-            empty (see is_text_empty(...))
+            Callback for Shift+Enter key press. Only returns text value when it
+            is not empty (see is_text_empty(...))
 
             OUT:
                 str:
@@ -256,6 +256,14 @@ init 100 python in _fom_saysomething:
                 # This is equivalent to using Return(self.text) action.
                 # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
                 return self.text
+
+        def on_enter_press(self):
+            """
+            Callback for Enter key press (without Shift.) Adds a line break if
+            there are less than two line breaks in the line already.
+            """
+            if self.text.count("\n") < 2:
+                self.text += "\n"
 
     picker = None
 
@@ -284,6 +292,18 @@ style fom_saysomething_confirm_button_text is generic_button_text_light:
 style fom_saysomething_confirm_button_text_dark is generic_button_text_dark:
     text_align 0.5
     layout "subtitle"
+
+style fom_saysomething_titlebox is default:
+    background Frame("gui/namebox.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
+    padding gui.namebox_borders.padding
+    ypos gui.name_ypos
+    ysize gui.namebox_height
+
+style fom_saysomething_titlebox_dark is default:
+    background Frame("gui/namebox_d.png", gui.namebox_borders, tile=gui.namebox_tile, xalign=gui.name_xalign)
+    padding gui.namebox_borders.padding
+    ypos gui.name_ypos
+    ysize gui.namebox_height
 
 
 # Expression/pose, location and say text picker GUI screen.
@@ -376,23 +396,47 @@ screen fom_saysomething_picker:
                     sensitive picker.is_text_empty()
                 textbutton "Close" action Return(False) xalign 1.0
 
-    # Text input area styled as textbox and key capture so that Enter key press
-    # is the same as pressing 'Say' button.
+    # Text input area styled as textbox and key capture so that Shift+Enter key
+    # press is the same as pressing 'Say' button.
 
-    key "K_RETURN" action Function(picker.on_enter_press) capture True
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
+
+    # This handles Enter key press and adds a new line.
+    key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
 
     window:
-        align (0.5, 0.98)
+        align (0.5, 0.99)
+
+        # This split into two components to prevent title sliding as user keeps
+        # typing the input text.
+
+        window:
+            style "fom_saysomething_titlebox"
+            align(0.5, 0.0)
+
+            text "What do you want me to say?~"
 
         vbox:
-            align (0.5, 0.5)
-            spacing 30
+            align (0.5, 0.59)
 
-            text "What do you want me to say?~" style "input_prompt"
+            # This limits text input in height and width, preventing it from
+            # overflowing the container and getting out of box.
+            ymaximum 80
+            yfill True
+            xmaximum gui.text_width
+            xfill True
+
             input:
+                # Prevent overflowing by limiting horizontal width of text.
+                pixel_width gui.text_width
+
+                # Align text to left side and prevent it from getting centered.
+                align (0.0, 0.0)
+                text_align 0.0
+
                 # Note: in order to always have the most up to date text this
                 # callback updates it internally in _fom_saysomething store
                 # and restarts Ren'Py interaction in order for 'Say' button
                 # to gray out when no text is provided.
                 changed picker.on_text_change
-                pixel_width gui.text_width
+                value FieldInputValue(picker, "text", returnable=False)
