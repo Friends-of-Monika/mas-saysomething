@@ -32,8 +32,7 @@
 ## 🖼️ Screenshots
 
 ![Monika is wondering, what is that menu...][12]
-![Monika greets r/MASFandom users][13]
-![Monika is impressed][14]
+![Monika is impressed][13]
 
 ## ❓ Installing
 
@@ -83,4 +82,3 @@ of Monika Discord server [here][9].
 [11]: https://discordapp.com/api/guilds/970747033071804426/widget.png?style=banner3
 [12]: doc/screenshots/1.png
 [13]: doc/screenshots/2.png
-[14]: doc/screenshots/3.png
