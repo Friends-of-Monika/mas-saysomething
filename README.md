@@ -46,7 +46,7 @@
 Say Something Submod authors, maintainers and contributors express their
 gratitude to the following people:
 * [SteveeWasTaken][1] &mdash; [MAS Custom Text][2] submod and original idea.
-* [MaximusDecimus][2] &mdash; [MAS Custom Text Revamp][3] submod.
+* [MaximusDecimus][3] &mdash; [MAS Custom Text Revamp][4] submod.
 
 Additionally, we thank these people for testing the submod before its public
 release:
