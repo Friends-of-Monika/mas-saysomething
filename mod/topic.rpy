@@ -58,7 +58,8 @@ label fom_saysomething_event:
 
             # Show Monika with sprite code and at set position and say text.
             $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
-            $ renpy.say(m, picker.text)
+            $ quip = picker.text
+            m "[quip!q]"
 
             # Enable textbox buttons and put Monika back on the middle.
             $ mas_DropShield_core()
