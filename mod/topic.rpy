@@ -111,6 +111,10 @@ label fom_saysomething_event_retry:
             if say:
                 $ quip = picker.text
                 m "[quip!q]"
+            else:
+                window hide
+                pause 5.0
+                window show
 
             # Anyway, recover buttons after we're done showing.
             if not picker.show_buttons:
