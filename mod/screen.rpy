@@ -431,9 +431,14 @@ screen fom_saysomething_picker(say=True):
                     xfill True
                     spacing 25
 
-                    textbutton "Show buttons and quick menu":
-                        selected picker.show_buttons
-                        action Function(picker.on_buttons_tick)
+                    if say:
+                        textbutton "Show buttons and quick menu":
+                            selected picker.show_buttons
+                            action Function(picker.on_buttons_tick)
+                    else:
+                        textbutton "Show buttons":
+                            selected picker.show_buttons
+                            action Function(picker.on_buttons_tick)
 
         # Confirmation buttons area.
 
