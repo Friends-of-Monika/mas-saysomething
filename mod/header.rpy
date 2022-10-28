@@ -10,7 +10,7 @@ init -990 python in mas_submod_utils:
         author="Friends of Monika",
         name="Say Something",
         description="Ask your Monika to say something and pose for you~",
-        version="1.2.0"
+        version="1.3.0"
     )
 
 
