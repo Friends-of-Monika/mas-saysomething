@@ -455,7 +455,7 @@ screen fom_saysomething_picker:
                 textbutton "Say":
                     action Return(_fom_saysomething.RETURN_SAY)
                     sensitive not picker.is_text_empty()
-                textbutton "Close" action Return(False) xalign 1.0
+                textbutton "Close" action Return(_fom_saysomething.RETURN_CLOSE) xalign 1.0
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button.
