@@ -43,7 +43,7 @@ label fom_saysomething_event_retry:
     while stop_picker_loop is False:
         call screen fom_saysomething_picker
 
-        if _return is False:
+        if _return == _fom_saysomething.RETURN_CLOSE:
             # Player has changed their mind, so just stop and put Monika back.
             $ stop_picker_loop = True
 
@@ -54,14 +54,14 @@ label fom_saysomething_event_retry:
             show monika 1eka at t11
             m 1eka "Oh, okay."
 
-        elif _return is 0:
+        elif _return == _fom_saysomething.RETURN_RENDER:
             # Position or pose/expression update is requested, so do it now.
             $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
 
             # Hide or show buttons and quick menu.
             call fom_saysomething_event_buttons(_show=picker.show_buttons)
 
-        else:
+        elif _return == _fom_saysomething.RETURN_SAY:
             # An actual text has been typed and expression is set, stop the loop
             # and show buttons if they were hidden for preview.
             $ stop_picker_loop = True

@@ -14,6 +14,18 @@ init 100 python in _fom_saysomething:
     from collections import OrderedDict
 
 
+    # Value to return from picker screen to indicate that it has to be called
+    # again after pose/position/UI change.
+    RETURN_RENDER = -1
+
+    # Value to return frm picker screen to indicate that player wants to close
+    # it without asking Monika to say anything.
+    RETURN_CLOSE = -2
+
+    # Value to return from picker screen to indicate player is done with picking
+    # and typing and it is time to let Monika say and pose.
+    RETURN_SAY = 1
+
     # Orderect dictionary is used to preserve order when rendering a table of
     # selectors. This dictionary contains key (human readable name of expression
     # part) to list of 2-tuples of the following elements:
@@ -156,6 +168,10 @@ init 100 python in _fom_saysomething:
 
                 forward -> bool:
                     True if need to increment cursor, False to decrement.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER constant value.
             """
 
             curr = self.pose_cursors[key][0]
@@ -174,9 +190,9 @@ init 100 python in _fom_saysomething:
 
             self.pose_cursors[key] = (new, EXPR_MAP[key][new][1])
 
-            # This is equivalent to using Return(0) action.
+            # This is equivalent to using Return(RETURN_RENDER) action.
             # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
-            return 0
+            return RETURN_RENDER
 
         def get_pose_label(self, key):
             """
@@ -286,12 +302,12 @@ init 100 python in _fom_saysomething:
             re-rendering.
 
             OUT:
-                0:
-                    Always returns 0.
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER constant.
             """
 
             self.show_buttons = not self.show_buttons
-            return 0
+            return RETURN_RENDER
 
     picker = None
 
@@ -400,7 +416,7 @@ screen fom_saysomething_picker:
                         xalign 1.0
                         yalign 0.5
                         adjustment picker.position_adjustment
-                        released Return(0)
+                        released Return(_fom_saysomething.RETURN_RENDER)
 
             # Buttons tickbox.
 
@@ -436,7 +452,7 @@ screen fom_saysomething_picker:
                 # Note: this button sensitivity relies on Ren'Py interaction
                 # restart that is done in text input field callback.
                 textbutton "Say":
-                    action Return(picker.text)
+                    action Return(_fom_saysomething.RETURN_SAY)
                     sensitive not picker.is_text_empty()
                 textbutton "Close" action Return(False) xalign 1.0
 
