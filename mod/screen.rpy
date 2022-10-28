@@ -217,9 +217,14 @@ init 100 python in _fom_saysomething:
             leading or trailing whitespace.)
 
             OUT:
+                True:
+                    If text is empty.
+
+                False:
+                    If text is not empty.
             """
 
-            return len(self.text.strip()) > 0
+            return len(self.text.strip()) == 0
 
         def on_position_change(self, value):
             """
@@ -263,10 +268,8 @@ init 100 python in _fom_saysomething:
 
             # Need one more check since key press isn't covered by 'Say' button
             # sensitive expression.
-            if self.is_text_empty():
-                # This is equivalent to using Return(self.text) action.
-                # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
-                return self.text
+            if not self.is_text_empty():
+                return RETURN_SAY
 
         def on_enter_press(self):
             """
@@ -434,7 +437,7 @@ screen fom_saysomething_picker:
                 # restart that is done in text input field callback.
                 textbutton "Say":
                     action Return(picker.text)
-                    sensitive picker.is_text_empty()
+                    sensitive not picker.is_text_empty()
                 textbutton "Close" action Return(False) xalign 1.0
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
