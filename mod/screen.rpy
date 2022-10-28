@@ -18,13 +18,14 @@ init 100 python in _fom_saysomething:
     # again after pose/position/UI change.
     RETURN_RENDER = -1
 
-    # Value to return frm picker screen to indicate that player wants to close
+    # Value to return from picker screen to indicate that player wants to close
     # it without asking Monika to say anything.
     RETURN_CLOSE = -2
 
     # Value to return from picker screen to indicate player is done with picking
     # and typing and it is time to let Monika say and pose.
     RETURN_SAY = 1
+
 
     # Orderect dictionary is used to preserve order when rendering a table of
     # selectors. This dictionary contains key (human readable name of expression
