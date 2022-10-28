@@ -269,7 +269,7 @@ init 100 python in _fom_saysomething:
             self.position_cursor = new
             self.position = POSITIONS[self.position_cursor]
             self.gui_flip = self.position_cursor > 4
-            return 0
+            return RETURN_RENDER
 
         def get_position_label(self):
             """
