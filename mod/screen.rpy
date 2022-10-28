@@ -24,7 +24,7 @@ init 100 python in _fom_saysomething:
 
     # Value to return from picker screen to indicate player is done with picking
     # and typing and it is time to let Monika say and pose.
-    RETURN_SAY = 1
+    RETURN_DONE = 1
 
 
     # Orderect dictionary is used to preserve order when rendering a table of
@@ -286,7 +286,7 @@ init 100 python in _fom_saysomething:
             # Need one more check since key press isn't covered by 'Say' button
             # sensitive expression.
             if not self.is_text_empty():
-                return RETURN_SAY
+                return RETURN_DONE
 
         def on_enter_press(self):
             """
@@ -355,7 +355,7 @@ style fom_saysomething_titlebox_dark is default:
 # NOTE: in this screen, picker is referenced directly as it is implied that it
 # is set in fom_saysomething_event event.
 
-screen fom_saysomething_picker:
+screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
 
     vbox:
@@ -431,9 +431,14 @@ screen fom_saysomething_picker:
                     xfill True
                     spacing 25
 
-                    textbutton "Show buttons and quick menu":
-                        selected picker.show_buttons
-                        action Function(picker.on_buttons_tick)
+                    if say:
+                        textbutton "Show buttons and quick menu":
+                            selected picker.show_buttons
+                            action Function(picker.on_buttons_tick)
+                    else:
+                        textbutton "Show buttons":
+                            selected picker.show_buttons
+                            action Function(picker.on_buttons_tick)
 
         # Confirmation buttons area.
 
@@ -450,60 +455,67 @@ screen fom_saysomething_picker:
 
                 style_prefix "fom_saysomething_confirm"
 
-                # Note: this button sensitivity relies on Ren'Py interaction
-                # restart that is done in text input field callback.
-                textbutton "Say":
-                    action Return(_fom_saysomething.RETURN_SAY)
-                    sensitive not picker.is_text_empty()
+                if say:
+                    # Note: this button sensitivity relies on Ren'Py interaction
+                    # restart that is done in text input field callback.
+                    textbutton "Say":
+                        action Return(_fom_saysomething.RETURN_DONE)
+                        sensitive not picker.is_text_empty()
+
+                else:
+                    textbutton "Pose":
+                        action Return(_fom_saysomething.RETURN_DONE)
+
                 textbutton "Close" action Return(_fom_saysomething.RETURN_CLOSE) xalign 1.0
 
-    # Text input area styled as textbox and key capture so that Shift+Enter key
-    # press is the same as pressing 'Say' button.
+    if say:
+        # Text input area styled as textbox and key capture so that Shift+Enter key
+        # press is the same as pressing 'Say' button.
 
-    key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
+        key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
 
-    # This handles Enter key press and adds a new line.
-    key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
-
-    window:
-        align (0.5, 0.99)
-
-        # This split into two components to prevent title sliding as user keeps
-        # typing the input text.
+        # This handles Enter key press and adds a new line.
+        key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
 
         window:
-            style "fom_saysomething_titlebox"
-            align(0.5, 0.0)
+            align (0.5, 0.99)
 
-            text "What do you want me to say?~"
+            # This split into two components to prevent title sliding as user keeps
+            # typing the input text.
 
-        vbox:
-            align (0.5, 0.58)
+            window:
+                style "fom_saysomething_titlebox"
+                align(0.5, 0.0)
+
+                text "What do you want me to say?~"
+
+            vbox:
+                align (0.5, 0.58)
+
+                hbox:
+                    # This limits text input in height and width, preventing it from
+                    # overflowing the container and getting out of box.
+                    ymaximum 80
+                    yfill True
+                    xmaximum gui.text_width
+                    xfill True
+
+                    input:
+                        # Prevent overflowing by limiting horizontal width of text.
+                        pixel_width gui.text_width
+
+                        # Align text to left side and prevent it from getting centered.
+                        align (0.0, 0.0)
+                        text_align 0.0
+
+                        # Note: in order to always have the most up to date text this
+                        # callback updates it internally in _fom_saysomething store
+                        # and restarts Ren'Py interaction in order for 'Say' button
+                        # to gray out when no text is provided.
+                        changed picker.on_text_change
+                        value FieldInputValue(picker, "text", returnable=False)
 
             hbox:
-                # This limits text input in height and width, preventing it from
-                # overflowing the container and getting out of box.
-                ymaximum 80
-                yfill True
-                xmaximum gui.text_width
-                xfill True
+                align (0.5, 1.02)
 
-                input:
-                    # Prevent overflowing by limiting horizontal width of text.
-                    pixel_width gui.text_width
-
-                    # Align text to left side and prevent it from getting centered.
-                    align (0.0, 0.0)
-                    text_align 0.0
-
-                    # Note: in order to always have the most up to date text this
-                    # callback updates it internally in _fom_saysomething store
-                    # and restarts Ren'Py interaction in order for 'Say' button
-                    # to gray out when no text is provided.
-                    changed picker.on_text_change
-                    value FieldInputValue(picker, "text", returnable=False)
-
-        hbox:
-            align (0.5, 1.02)
-
-            use quick_menu
+                use quick_menu
