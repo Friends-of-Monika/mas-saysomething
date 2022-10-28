@@ -26,11 +26,42 @@ init 5 python:
     )
 
 label fom_saysomething_event:
+    call fom_saysomething_event_entry(say=True)
+    return _return
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_event_pose",
+            category=["misc", "monika"],
+            prompt="Can you pose for me?",
+            pool=True,
+            unlocked=True,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST}
+        ),
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
+
+label fom_saysomething_event_pose:
+    call fom_saysomething_event_entry(say=False)
+    return _return
+
+label fom_saysomething_event_entry(say=True):
     m 1hub "Of course!"
 
 label fom_saysomething_event_retry:
     # Need a fallthrough here so we can jump back here on retry.
-    m 1eua "Tell me how do you want me to pose and what do you want me to say~"
+    if say:
+        m 1eua "Tell me how do you want me to pose and what do you want me to say~"
+    else:
+        m 1eua "Tell me how do you want me to pose~"
 
     # Create new Picker and store it locally.
     $ _fom_saysomething.picker = _fom_saysomething.Picker()
@@ -41,7 +72,7 @@ label fom_saysomething_event_retry:
     # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
     while stop_picker_loop is False:
-        call screen fom_saysomething_picker
+        call screen fom_saysomething_picker(say)
 
         if _return == _fom_saysomething.RETURN_CLOSE:
             # Player has changed their mind, so just stop and put Monika back.
@@ -61,7 +92,7 @@ label fom_saysomething_event_retry:
             # Hide or show buttons and quick menu.
             call fom_saysomething_event_buttons(_show=picker.show_buttons)
 
-        elif _return == _fom_saysomething.RETURN_SAY:
+        elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
             # and show buttons if they were hidden for preview.
             $ stop_picker_loop = True
@@ -77,8 +108,9 @@ label fom_saysomething_event_retry:
 
             # Show Monika with sprite code and at set position and say text.
             $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
-            $ quip = picker.text
-            m "[quip!q]"
+            if say:
+                $ quip = picker.text
+                m "[quip!q]"
 
             # Anyway, recover buttons after we're done showing.
             if not picker.show_buttons:
@@ -88,10 +120,15 @@ label fom_saysomething_event_retry:
             m 3tua "Well? {w=0.3}Did I do it good enough?"
             m 1hub "Hope you liked it, ahaha~"
 
-            m 3eub "Do you want me to say something else?{nw}"
+            if say:
+                $ quip = "say something else"
+            else:
+                $ quip = "pose for you again"
+
+            m 3eub "Do you want me to [quip]?{nw}"
             $ _history_list.pop()
             menu:
-                m "Do you want me to say something else?{fast}"
+                m "Do you want me to [quip]?{fast}"
 
                 "Yes.":
                     jump fom_saysomething_event_retry
