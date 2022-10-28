@@ -59,6 +59,7 @@ gratitude to the following people:
 Additionally, we thank these people for testing the submod before its public
 release:
 * [Otter][5] &mdash; early access preview.
+* [DJMayJay][14] &mdash; early access preview.
 * TheGuy &mdash; early access preview.
 
 ## 💬 Join our Discord
@@ -82,3 +83,4 @@ of Monika Discord server [here][9].
 [11]: https://discordapp.com/api/guilds/970747033071804426/widget.png?style=banner3
 [12]: doc/screenshots/1.png
 [13]: doc/screenshots/2.png
+[14]: https://github.com/mayday-mayjay
