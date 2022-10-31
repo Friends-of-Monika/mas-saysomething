@@ -244,6 +244,22 @@ init 100 python in _fom_saysomething:
 
             return len(self.text.strip()) == 0
 
+        def is_show_code(self):
+            """
+            Checks if player is in developer mode and has requested code
+            display.
+
+            OUT:
+                True:
+                    If config.developer is set to True and player has ticked
+                    "Show expression code" option in settings.
+
+                False:
+                    False otherwise.
+            """
+
+            return renpy.config.developer and persistent._fom_saysomething_show_code
+
         def on_position_change(self, value):
             """
             Callback function for position bar.
@@ -383,7 +399,7 @@ screen fom_saysomething_picker(say=True):
                 vbox:
                     spacing 10
 
-                    if persistent._fom_saysomething_show_code:
+                    if picker.is_show_code():
                         hbox:
                             xmaximum 350
                             xfill True
