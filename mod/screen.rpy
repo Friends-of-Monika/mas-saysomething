@@ -279,11 +279,6 @@ init 100 python in _fom_saysomething:
             OUT:
                 str:
                     Position label.
-
-            NOTE:
-                This function (and entire position selector as selector) exists
-                only to provide support for RenPy 6. It will be removed as soon
-                as MAS migrates to RenPy 8.
             """
 
             return "#" + str(self.position_cursor + 1)
