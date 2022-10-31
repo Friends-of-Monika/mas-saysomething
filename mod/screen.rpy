@@ -89,6 +89,7 @@ init 100 python in _fom_saysomething:
             ("c", "Straight"),
             ("d", "Open"),
             ("o", "Gasp"),
+            ("u", "Smug"),
             ("w", "Wide"),
             ("x", "Grit teeth"),
             ("p", "Pout"),
