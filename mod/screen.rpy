@@ -326,22 +326,6 @@ init 100 python in _fom_saysomething:
                     code.append(value)
             return "".join(code)
 
-        def get_position_label(self):
-            """
-            Returns human readable (tXX notation) position label for position.
-
-            OUT:
-                str:
-                    Position label if user wants to display expression codes.
-
-                None:
-                    If user does not need to display expression codes.
-            """
-
-            if self.is_show_code():
-                return POSITIONS[self.position_adjustment.value][1]
-            return None
-
         def is_text_empty(self):
             """
             Checks if stored text is empty (e.g. length is zero not including
