@@ -8,7 +8,7 @@
 init 100 python in _fom_saysomething:
 
     import store
-    from store import ui
+    from store import ui, persistent
 
     import math
     from collections import OrderedDict
