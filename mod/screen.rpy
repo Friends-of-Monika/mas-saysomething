@@ -287,7 +287,7 @@ init 100 python in _fom_saysomething:
                     New value of position bar slider.
             """
 
-            self.position = POSITIONS[value]
+            self.position = POSITIONS[value][0]
             self.gui_flip = value > 5
 
         def on_text_change(self, value):
