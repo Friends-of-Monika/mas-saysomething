@@ -324,11 +324,11 @@ style fom_saysomething_picker_frame_dark is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame_d.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
 
 style fom_saysomething_confirm_button is generic_button_light:
-    xysize (175, None)
+    xysize (180, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_dark is generic_button_dark:
-    xysize (175, None)
+    xysize (180, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_text is generic_button_text_light:
@@ -362,11 +362,15 @@ screen fom_saysomething_picker(say=True):
     vbox:
         # Flip GUI to prevent hiding Monika behind it.
         if not picker.gui_flip:
-            align (0.97, 0.2)
+            if persistent._fom_saysomething_show_code:
+                align (0.99, 0.07)
+            else:
+                align (0.97, 0.2)
         else:
-            align (0.03, 0.2)
-
-        spacing 10
+            if persistent._fom_saysomething_show_code:
+                align (0.01, 0.07)
+            else:
+                align (0.03, 0.2)
 
         vbox:
             spacing 10
@@ -374,10 +378,30 @@ screen fom_saysomething_picker(say=True):
             # Selectors panel.
 
             frame:
-                padding (20, 20)
+                padding (10, 10)
 
                 vbox:
                     spacing 10
+
+                    if persistent._fom_saysomething_show_code:
+                        hbox:
+                            xmaximum 350
+                            xfill True
+
+                            # Split into two hboxes to align arrows and labels
+                            # properly (similar to buttons with the selectors.)
+
+                            hbox:
+                                xfill True
+                                xmaximum 110
+                                text "Expression"
+
+                            hbox:
+                                xmaximum 240
+                                xfill True
+                                xalign 1.0
+
+                                text picker.get_sprite_code() xalign 0.5
 
                     for key, value in _fom_saysomething.EXPR_MAP.items():
                         hbox:
@@ -406,12 +430,11 @@ screen fom_saysomething_picker(say=True):
             # Position slider panel.
 
             frame:
-                padding (20, 5)
+                padding (10, 10)
 
                 hbox:
                     xmaximum 350
                     xfill True
-                    spacing 25
 
                     text "Position"
                     bar:
@@ -423,14 +446,14 @@ screen fom_saysomething_picker(say=True):
             # Buttons tickbox.
 
             frame:
-                padding (20, 5)
+                padding (10, 5)
 
                 hbox:
                     style_prefix "check"
 
                     xmaximum 350
                     xfill True
-                    spacing 25
+                    spacing 10
 
                     if say:
                         textbutton "Show buttons and quick menu":
@@ -444,17 +467,16 @@ screen fom_saysomething_picker(say=True):
         # Confirmation buttons area.
 
         frame:
+            padding(0, 10)
             background None
-            padding (20, 0)
 
             hbox:
-                align (0.5, 0.5)
-
-                xmaximum 250
-                xfill True
-                spacing 10
-
                 style_prefix "fom_saysomething_confirm"
+
+                xmaximum 350
+                xfill True
+
+                spacing 10
 
                 if say:
                     # Note: this button sensitivity relies on Ren'Py interaction
