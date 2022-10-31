@@ -267,7 +267,7 @@ init 100 python in _fom_saysomething:
                     new = curr - 1
 
             self.position_cursor = new
-            self.position = POSITIONS[self.position_cursor]
+            self.position = POSITIONS[self.position_cursor][0]
             self.gui_flip = self.position_cursor > 4
             return RETURN_RENDER
 
@@ -281,6 +281,8 @@ init 100 python in _fom_saysomething:
                     Position label.
             """
 
+            if self.is_show_code():
+                return self.position[self.position_cursor][1]
             return "#" + str(self.position_cursor + 1)
 
         def position_switch_usable(self, forward):
