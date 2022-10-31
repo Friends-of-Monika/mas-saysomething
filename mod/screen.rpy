@@ -136,7 +136,7 @@ init 100 python in _fom_saysomething:
 
             # Position object to use when showing Monika at her table. By
             # default, her usual middle screen position.
-            self.position = POSITIONS[4]
+            self.position = POSITIONS[4][0]
 
             # Adjustment object to define slider properties for position slider
             # and handle value changes.
