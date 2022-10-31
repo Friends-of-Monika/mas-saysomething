@@ -273,7 +273,8 @@ init 100 python in _fom_saysomething:
 
         def get_position_label(self):
             """
-            Returns human readable (cursor + 1) position label for position.
+            Returns human readable (cursor + 1 or tXX notation depending on
+            user preferences) position label for position.
 
             OUT:
                 str:
