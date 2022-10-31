@@ -282,7 +282,7 @@ init 100 python in _fom_saysomething:
             """
 
             if self.is_show_code():
-                return self.position[self.position_cursor][1]
+                return POSITIONS[self.position_cursor][1]
             return "#" + str(self.position_cursor + 1)
 
         def position_switch_usable(self, forward):
