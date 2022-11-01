@@ -394,12 +394,12 @@ screen fom_saysomething_picker(say=True):
     vbox:
         # Flip GUI to prevent hiding Monika behind it.
         if not picker.gui_flip:
-            if persistent._fom_saysomething_show_code:
+            if picker.is_show_code():
                 align (0.99, 0.07)
             else:
                 align (0.97, 0.2)
         else:
-            if persistent._fom_saysomething_show_code:
+            if picker.is_show_code():
                 align (0.01, 0.07)
             else:
                 align (0.03, 0.2)
