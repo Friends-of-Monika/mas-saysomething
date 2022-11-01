@@ -4,11 +4,14 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
+define persistent._fom_saysomething_presets = dict()
+
 
 init 100 python in _fom_saysomething:
 
     import store
     from store import ui, persistent
+    from store import FieldInputValue
 
     import math
     from collections import OrderedDict
@@ -152,11 +155,33 @@ init 100 python in _fom_saysomething:
             # sight.
             self.gui_flip = False
 
-            # Flag value for showind or hiding buttons and quick menu.
+            # Flag value for showing or hiding buttons and quick menu.
             self.show_buttons = True
 
             # Variable that stores entered user text prompt.
             self.text = ""
+
+            # Ren'Py input value to allow disabling text input when needed.
+            self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            # Flag value for showing presets menu instead of selectors panel.
+            self.presets_menu = False
+
+            # Variable that stores entered preset search text prompt.
+            self.presets_search = ""
+
+            # Ren'Py input value to allow enabling search input when needed.
+            self.presets_search_value = FieldInputValue(self, "presets_search", returnable=False)
+
+            # Variable that stores entered preset name in modal.
+            self.preset_name = ""
+
+            # Ren'Py input value to handle text entering in modal (doesn't
+            # work if it's used in screen.)
+            self.preset_name_value = FieldInputValue(self, "preset_name")
+
+            # Preset cursor keeps track of current preset chosen.
+            self.preset_cursor = None
 
         def pose_switch_selector(self, key, forward):
             """
@@ -260,6 +285,21 @@ init 100 python in _fom_saysomething:
 
             return len(self.text.strip()) == 0
 
+        def is_preset_name_empty(self):
+            """
+            Checks if stored preset name is empty (e.g. length is zero not
+            including leading or trailing whitespace.)
+
+            OUT:
+                True:
+                    If preset name is empty.
+
+                False:
+                    If preset name is not empty.
+            """
+
+            return len(self.preset_name.strip()) == 0
+
         def is_show_code(self):
             """
             Checks if player is in developer mode and has requested code
@@ -275,6 +315,85 @@ init 100 python in _fom_saysomething:
             """
 
             return renpy.config.developer and persistent._fom_saysomething_show_code
+
+        def get_presets(self, query):
+            query = query.lower()
+            return [
+                key for key in sorted(persistent._fom_saysomething_presets.keys())
+                if query in key.lower()
+            ]
+
+
+        def save_preset(self, name):
+            """
+            Saves current state of a picker into a preset with the provided
+            name. Also sets current preset cursor to this preset.
+
+            IN:
+                name -> str:
+                    Name to save this preset with.
+            """
+
+            persistent._fom_saysomething_presets[name] = (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text,  #2 - text
+                self.show_buttons,  #3 - buttons
+            )
+
+            self.preset_name = name
+            self.preset_cursor = name
+
+        def load_preset(self, name):
+            """
+            Loads state of a picker from a preset with the provided name. Also
+            sets current preset cursor to this preset.
+
+            IN:
+                name -> str:
+                    Name to load preset with.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns value of RETURN_RENDER constant.
+            """
+
+            pose_cur, pos, text, buttons = persistent._fom_saysomething_presets[name]
+
+            # Load selectors
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][cur][1]) for key, cur in pose_cur.items()}
+
+            # Load position
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            # Load buttons
+            self.show_buttons = buttons
+
+            # Set preset name (for easier overwriting) and cursor (to keep
+            # visual track of current preset.)
+            self.preset_name = name
+            self.preset_cursor = name
+
+            return RETURN_RENDER
+
+        def delete_preset(self, name):
+            """
+            Deletes preset with the provided name. Resets preset cursor.
+
+            IN:
+                name -> str:
+                    Name of a preset to delete.
+            """
+
+            persistent._fom_saysomething_presets.pop(name)
+
+            self.preset_name = ""
+            self.preset_cursor = None
 
         def on_position_change(self, value):
             """
@@ -343,6 +462,41 @@ init 100 python in _fom_saysomething:
             self.show_buttons = not self.show_buttons
             return RETURN_RENDER
 
+        def on_search_input_change(self, value):
+            """
+            Callback for presets menu search input prompt.
+
+            IN:
+                value -> str:
+                    New input field value.
+            """
+
+            self.presets_search = value
+
+        def on_search_adjustment_range(self, adjustment):
+            """
+            Callback for presets menu search input to adjust cursor so it's
+            visible to the user.
+
+            IN:
+                adjustment -> ui.adjustment:
+                    Adjustment that has changed.
+            """
+
+            widget = renpy.get_widget("fom_saysomething_picker", "search_input", "screens")
+            caret_relative_pos = 1.0
+            if widget is not None:
+                caret_pos = widget.caret_pos
+                content_len = len(widget.content)
+
+                if content_len > 0:
+                    caret_relative_pos = caret_pos / float(content_len)
+
+            # This ensures that the caret is always visible (close enough) to the user
+            # when they enter text
+            adjustment.change(adjustment.range * caret_relative_pos)
+
+
     picker = None
 
 
@@ -356,11 +510,11 @@ style fom_saysomething_picker_frame_dark is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame_d.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
 
 style fom_saysomething_confirm_button is generic_button_light:
-    xysize (180, None)
+    xysize (116, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_dark is generic_button_dark:
-    xysize (180, None)
+    xysize (116, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_text is generic_button_text_light:
@@ -407,97 +561,182 @@ screen fom_saysomething_picker(say=True):
         vbox:
             spacing 10
 
-            # Selectors panel.
+            if not picker.presets_menu:
 
-            frame:
-                padding (10, 10)
+                # Selectors panel.
 
-                vbox:
-                    spacing 10
+                frame:
+                    padding (10, 10)
 
-                    if picker.is_show_code():
-                        hbox:
-                            xmaximum 350
-                            xfill True
+                    vbox:
+                        spacing 10
 
-                            # Split into two hboxes to align arrows and labels
-                            # properly (similar to buttons with the selectors.)
-
+                        if picker.is_show_code():
                             hbox:
+                                xmaximum 350
                                 xfill True
-                                xmaximum 110
-                                text "Expression"
 
+                                # Split into two hboxes to align arrows and labels
+                                # properly (similar to buttons with the selectors.)
+
+                                hbox:
+                                    xfill True
+                                    xmaximum 110
+                                    text "Expression"
+
+                                hbox:
+                                    xmaximum 240
+                                    xfill True
+                                    xalign 1.0
+
+                                    if picker.is_show_code():
+                                        text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
+                                    else:
+                                        text picker.get_sprite_code() xalign 0.5
+
+                        for key, value in _fom_saysomething.EXPR_MAP.items():
                             hbox:
-                                xmaximum 240
+                                xmaximum 350
                                 xfill True
-                                xalign 1.0
 
-                                if picker.is_show_code():
-                                    text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
-                                else:
-                                    text picker.get_sprite_code() xalign 0.5
+                                # Split into two hboxes to align arrows and labels
+                                # properly, so that one can click them without
+                                # missing if label is too big; this layout preserves
+                                # space for big labels.
 
-                    for key, value in _fom_saysomething.EXPR_MAP.items():
-                        hbox:
-                            xmaximum 350
-                            xfill True
+                                hbox:
+                                    xfill True
+                                    xmaximum 110
+                                    text key
 
-                            # Split into two hboxes to align arrows and labels
-                            # properly, so that one can click them without
-                            # missing if label is too big; this layout preserves
-                            # space for big labels.
+                                hbox:
+                                    xmaximum 240
+                                    xfill True
+                                    xalign 1.0
 
-                            hbox:
-                                xfill True
-                                xmaximum 110
-                                text key
+                                    textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
+                                    text picker.get_pose_label(key) xalign 0.5
+                                    textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
 
-                            hbox:
-                                xmaximum 240
-                                xfill True
-                                xalign 1.0
+                # Position slider panel.
 
-                                textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
-                                text picker.get_pose_label(key) xalign 0.5
-                                textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
+                frame:
+                    padding (10, 10)
 
-            # Position slider panel.
+                    hbox:
+                        xmaximum 350
+                        xfill True
 
-            frame:
-                padding (10, 10)
+                        text "Position"
+                        bar:
+                            xalign 1.0
+                            yalign 0.5
+                            adjustment picker.position_adjustment
+                            released Return(_fom_saysomething.RETURN_RENDER)
 
-                hbox:
-                    xmaximum 350
-                    xfill True
+                # Buttons tickbox.
 
-                    text "Position"
-                    bar:
-                        xalign 1.0
-                        yalign 0.5
-                        adjustment picker.position_adjustment
-                        released Return(_fom_saysomething.RETURN_RENDER)
+                frame:
+                    padding (10, 5)
 
-            # Buttons tickbox.
+                    hbox:
+                        style_prefix "check"
 
-            frame:
-                padding (10, 5)
+                        xmaximum 350
+                        xfill True
+                        spacing 10
 
-                hbox:
-                    style_prefix "check"
+                        if say:
+                            textbutton "Show buttons and quick menu":
+                                selected picker.show_buttons
+                                action Function(picker.on_buttons_tick)
+                        else:
+                            textbutton "Show buttons":
+                                selected picker.show_buttons
+                                action Function(picker.on_buttons_tick)
 
-                    xmaximum 350
-                    xfill True
-                    spacing 10
+            else:
 
-                    if say:
-                        textbutton "Show buttons and quick menu":
-                            selected picker.show_buttons
-                            action Function(picker.on_buttons_tick)
+                # Presets menu.
+
+                frame:
+                    xsize 370
+                    ysize 40
+
+                    # Text input.
+
+                    background Solid(mas_ui.TEXT_FIELD_BG)
+
+                    viewport:
+                        draggable False
+                        arrowkeys False
+                        mousewheel "horizontal"
+                        xsize 360
+                        ysize 38
+                        xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
+
+                        input:
+                            id "search_input"
+                            style_prefix "input"
+                            length 50
+                            xalign 0.0
+                            layout "nobreak"
+                            changed picker.on_search_input_change
+                            value picker.presets_search_value
+
+                    # Hint text in search box visible if no text is entered.
+
+                    if len(picker.presets_search) == 0:
+                        text "Search for a preset...":
+                            text_align 0.0
+                            layout "nobreak"
+                            color "#EEEEEEB2"
+                            first_indent 10
+                            line_leading 1
+                            outlines []
+
+                # List of presets.
+
+                fixed:
+                    xsize 350
+
+                    if not picker.is_show_code():
+                        ysize 420
                     else:
-                        textbutton "Show buttons":
-                            selected picker.show_buttons
-                            action Function(picker.on_buttons_tick)
+                        ysize 442
+
+                    # Viewport wrapping long list.
+
+                    vbox:
+                        pos (0, 0)
+                        anchor (0, 0)
+
+                        viewport:
+                            id "viewport"
+
+                            yfill False
+                            mousewheel True
+                            arrowkeys True
+
+                            vbox:
+                                spacing 10
+
+                                # Preset buttons; highlit when selected.
+
+                                for _key in picker.get_presets(picker.presets_search):
+                                    textbutton _key:
+                                        style "twopane_scrollable_menu_button"
+                                        xysize (350, None)
+
+                                        action Function(picker.load_preset, _key)
+                                        selected picker.preset_cursor == _key
+
+                    # Scrollbar used by list of presets above.
+
+                    bar:
+                        style "classroom_vscrollbar"
+                        value YScrollValue("viewport")
+                        xalign 1.07
 
         # Confirmation buttons area.
 
@@ -513,18 +752,45 @@ screen fom_saysomething_picker(say=True):
 
                 spacing 10
 
-                if say:
-                    # Note: this button sensitivity relies on Ren'Py interaction
-                    # restart that is done in text input field callback.
-                    textbutton "Say":
-                        action Return(_fom_saysomething.RETURN_DONE)
-                        sensitive not picker.is_text_empty()
+                # Selectors panel buttons.
+
+                if not picker.presets_menu:
+                    if say:
+                        # Note: this button sensitivity relies on Ren'Py interaction
+                        # restart that is done in text input field callback.
+                        textbutton "Say":
+                            action Return(_fom_saysomething.RETURN_DONE)
+                            sensitive not picker.is_text_empty()
+
+                    else:
+                        textbutton "Pose":
+                            action Return(_fom_saysomething.RETURN_DONE)
+
+                    textbutton "Presets":
+                        action [SetField(picker, "presets_menu", True),
+                                DisableAllInputValues()]
+
+                # Presets panel buttons.
 
                 else:
-                    textbutton "Pose":
-                        action Return(_fom_saysomething.RETURN_DONE)
+                    textbutton "Save":
+                        action Show("fom_saysomething_preset_name_input_modal")
+                    textbutton "Delete":
+                        action Show("fom_saysomething_preset_delete_confirm_modal")
+                        sensitive picker.preset_cursor is not None
+                    if picker.preset_cursor is not None:
+                        key "K_DELETE" action Show("fom_saysomething_preset_delete_confirm_modal")
 
-                textbutton "Close" action Return(_fom_saysomething.RETURN_CLOSE) xalign 1.0
+                # 'Close' or 'back' is the same for both panels and can share
+                # the logic. For selectors panel it will close the GUI
+                # altogether, for presets it will take back to selectors.
+
+                textbutton ("Close" if not picker.presets_menu else "Back"):
+                    if not picker.presets_menu:
+                        action Return(_fom_saysomething.RETURN_CLOSE)
+                    else:
+                        action [SetField(picker, "presets_menu", False),
+                                DisableAllInputValues()]
 
     if say:
         # Text input area styled as textbox and key capture so that Shift+Enter key
@@ -543,7 +809,7 @@ screen fom_saysomething_picker(say=True):
 
             window:
                 style "fom_saysomething_titlebox"
-                align(0.5, 0.0)
+                align (0.5, 0.0)
 
                 text "What do you want me to say?~"
 
@@ -571,9 +837,141 @@ screen fom_saysomething_picker(say=True):
                         # and restarts Ren'Py interaction in order for 'Say' button
                         # to gray out when no text is provided.
                         changed picker.on_text_change
-                        value FieldInputValue(picker, "text", returnable=False)
+                        value picker.text_value
 
             hbox:
                 align (0.5, 1.02)
 
                 use quick_menu
+
+
+# Modal screen used for entering new preset name.
+# NOTE: same as main screen refers to picker directly, in global scope.
+
+screen fom_saysomething_preset_name_input_modal:
+    on "show" action picker.preset_name_value.Enable()
+
+    style_prefix "confirm"
+
+    modal True
+    zorder 200
+
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    # Button alternative keybinds.
+
+    # If preset name is not empty, allow pressing Enter to confirm instead
+    # of button click.
+    if not picker.is_preset_name_empty():
+        key "K_RETURN":
+            action [Play("sound", gui.activate_sound),
+                    Function(picker.save_preset, picker.preset_name),
+                    Hide("fom_saysomething_preset_name_input_modal")]
+
+    # Allow pressing Esc to cancel.
+    key "K_ESCAPE":
+        action [Play("sound", gui.activate_sound),
+                Hide("fom_saysomething_preset_name_input_modal")]
+
+    frame:
+        vbox:
+            xmaximum 300
+            xfill True
+
+            align (0.5, 0.5)
+            spacing 30
+
+            # Title.
+
+            text "Save this preset as:":
+                style "confirm_prompt"
+                xalign 0.5
+
+            # Input field.
+
+            input:
+                style_prefix "input"
+
+                xalign 0.0
+                layout "nobreak"
+
+                length 30
+                pixel_width 300
+
+                # NOTE: for some reason this doesn't work if used with value
+                # inside screen; for this reason it is in Picker instance.
+                value picker.preset_name_value
+
+            # Save/cancel buttons.
+
+            hbox:
+                xalign 0.5
+                spacing 10
+
+                # Sensitivity of this button relies on emptiness of entered
+                # preset name.
+                textbutton "Save":
+                    action [Play("sound", gui.activate_sound),
+                            Function(picker.save_preset, picker.preset_name),
+                            Hide("fom_saysomething_preset_name_input_modal")]
+                    sensitive not picker.is_preset_name_empty()
+                textbutton "Cancel":
+                    action [Play("sound", gui.activate_sound),
+                            Hide("fom_saysomething_preset_name_input_modal")]
+
+
+# Modal screen used for confirming preset deletion.
+# NOTE: same as main screen refers to picker directly, in global scope.
+
+screen fom_saysomething_preset_delete_confirm_modal:
+    style_prefix "confirm"
+
+    modal True
+    zorder 200
+
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    # Keybinds alternative to button clicks, pressing Enter will confirm
+    # and Esc will cancel.
+
+    key "K_RETURN":
+        action [Play("sound", gui.activate_sound),
+                Function(picker.delete_preset, picker.preset_name),
+                Hide("fom_saysomething_preset_delete_confirm_modal")]
+
+    key "K_ESCAPE":
+        action [Play("sound", gui.activate_sound),
+                Hide("fom_saysomething_preset_delete_confirm_modal")]
+
+    frame:
+        vbox:
+            xmaximum 300
+            xfill True
+
+            align (0.5, 0.5)
+            spacing 30
+
+            # Title.
+
+            text "Delete this preset?":
+                style "confirm_prompt"
+                xalign 0.5
+
+            # Name of preset chosen for deletion.
+
+            text picker.preset_cursor:
+                xalign 0.5
+
+            # Confirmation and cancellation buttons.
+
+            hbox:
+                xalign 0.5
+                spacing 10
+
+                textbutton "Delete":
+                    action [Play("sound", gui.activate_sound),
+                            Function(picker.delete_preset, picker.preset_cursor),
+                            Hide("fom_saysomething_preset_delete_confirm_modal")]
+                textbutton "Cancel":
+                    action [Play("sound", gui.activate_sound),
+                            Hide("fom_saysomething_preset_delete_confirm_modal")]
