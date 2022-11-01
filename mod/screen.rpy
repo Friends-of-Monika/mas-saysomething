@@ -805,7 +805,7 @@ screen fom_saysomething_picker(say=True):
 
             window:
                 style "fom_saysomething_titlebox"
-                align(0.5, 0.0)
+                align (0.5, 0.0)
 
                 text "What do you want me to say?~"
 
@@ -857,6 +857,10 @@ screen fom_saysomething_preset_name_input_modal:
                     Function(picker.save_preset, picker.preset_name),
                     Hide("fom_saysomething_preset_name_input_modal")]
 
+    key "K_ESCAPE":
+        action [Play("sound", gui.activate_sound),
+                Hide("fom_saysomething_preset_name_input_modal")]
+
     frame:
         vbox:
             xmaximum 300
@@ -904,8 +908,12 @@ screen fom_saysomething_preset_delete_confirm_modal:
     if not picker.is_preset_name_empty():
         key "K_RETURN":
             action [Play("sound", gui.activate_sound),
-                    Function(picker.save_preset, picker.preset_name),
-                    Hide("fom_saysomething_preset_name_input_modal")]
+                    Function(picker.delete_preset, picker.preset_name),
+                    Hide("fom_saysomething_preset_delete_confirm_modal")]
+
+    key "K_ESCAPE":
+        action [Play("sound", gui.activate_sound),
+                Hide("fom_saysomething_preset_delete_confirm_modal")]
 
     frame:
         vbox:
