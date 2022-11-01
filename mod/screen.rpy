@@ -173,6 +173,9 @@ init 100 python in _fom_saysomething:
             # Ren'Py input value to allow enabling search input when needed.
             self.presets_search_value = FieldInputValue(self, "presets_search", returnable=False)
 
+            self.preset_name = ""
+            self.preset_name_value = FieldInputValue(self, "preset_name")
+
         def pose_switch_selector(self, key, forward):
             """
             Switches pose for selector by the specified key, forward or backward. If
@@ -275,6 +278,21 @@ init 100 python in _fom_saysomething:
 
             return len(self.text.strip()) == 0
 
+        def is_preset_name_empty(self):
+            """
+            Checks if stored preset name is empty (e.g. length is zero not
+            including leading or trailing whitespace.)
+
+            OUT:
+                True:
+                    If preset name is empty.
+
+                False:
+                    If preset name is not empty.
+            """
+
+            return len(self.preset_name.strip()) == 0
+
         def is_show_code(self):
             """
             Checks if player is in developer mode and has requested code
@@ -297,6 +315,8 @@ init 100 python in _fom_saysomething:
                 self.position_adjustment.value,  #1 - position
                 self.text  #2 - text
             )
+
+            self.preset_name = ""
 
         def load_preset(self, name):
             pose_cur, pos, text = persistent._fom_saysomething_presets[name]
@@ -410,6 +430,19 @@ init 100 python in _fom_saysomething:
             # This ensures that the caret is always visible (close enough) to the user
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
+
+        def on_preset_name_change(self, value):
+            """
+            Callback for preset name input prompt. Restarts interaction on every
+            alteration.
+
+            IN:
+                value -> str:
+                    New input field value.
+            """
+
+            self.preset_name = value
+            renpy.restart_interaction()
 
 
     picker = None
@@ -681,8 +714,8 @@ screen fom_saysomething_picker(say=True):
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
-                        action [DisableAllInputValues(),
-                                SetField(picker, "presets_menu", False)]
+                        action [SetField(picker, "presets_menu", False),
+                                DisableAllInputValues()]
 
                     xalign 1.0
 
@@ -737,3 +770,54 @@ screen fom_saysomething_picker(say=True):
                 align (0.5, 1.02)
 
                 use quick_menu
+
+screen fom_saysomething_preset_name_input_modal:
+    on "show" action picker.preset_name_value.Enable()
+
+    style_prefix "confirm"
+
+    modal True
+    zorder 200
+
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    if not picker.is_preset_name_empty():
+        key "K_RETURN":
+            action [Play("sound", gui.activate_sound),
+                    Function(picker.save_preset, picker.preset_name),
+                    Hide("fom_saysomething_preset_name_input_modal")]
+
+    frame:
+        vbox:
+            xmaximum 300
+            xfill True
+
+            align (0.5, 0.5)
+            spacing 30
+
+            text "Save this preset as:":
+                style "confirm_prompt"
+                xalign 0.5
+
+            input:
+                style_prefix "input"
+
+                xalign 0.0
+                layout "nobreak"
+
+                length 30
+                pixel_width 300
+                value picker.preset_name_value
+
+            hbox:
+                xalign 0.5
+                spacing 10
+
+                textbutton "Save":
+                    action [Play("sound", gui.activate_sound),
+                            Function(picker.save_preset, picker.preset_name),
+                            Hide("fom_saysomething_preset_name_input_modal")]
+                    sensitive not picker.is_preset_name_empty()
+                textbutton "Exit":
+                    action [Play("sound", gui.activate_sound),
+                            Hide("fom_saysomething_preset_name_input_modal")]
