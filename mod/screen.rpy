@@ -445,7 +445,7 @@ init 100 python in _fom_saysomething:
 
             persistent._fom_saysomething_presets[name] = (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
+                self.position_cursor,  #1 - position
                 self.text,  #2 - text
                 self.show_buttons,  #3 - buttons
             )
@@ -473,7 +473,7 @@ init 100 python in _fom_saysomething:
             self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
 
             # Load position
-            self.position_adjustment.value = pos
+            self.position_cursor = pos
             self.on_position_change(pos)
 
             # Load text
