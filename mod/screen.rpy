@@ -585,6 +585,40 @@ screen fom_saysomething_picker(say=True):
                             line_leading 1
                             outlines []
 
+                fixed:
+                    xsize 350
+
+                    if not picker.is_show_code():
+                        ysize 420
+                    else:
+                        ysize 442
+
+                    vbox:
+                        pos (0, 0)
+                        anchor (0, 0)
+
+                        viewport:
+                            id "viewport"
+
+                            yfill False
+                            mousewheel True
+                            arrowkeys True
+
+                            vbox:
+                                spacing 10
+
+                                for i in range(100):
+                                    textbutton "foobar":
+                                        style "twopane_scrollable_menu_button"
+                                        xysize (350, None)
+
+                                        action NullAction()
+
+                    bar:
+                        style "classroom_vscrollbar"
+                        value YScrollValue("viewport")
+                        xalign 1.07
+
         # Confirmation buttons area.
 
         frame:
@@ -599,23 +633,37 @@ screen fom_saysomething_picker(say=True):
 
                 spacing 10
 
-                if say:
-                    # Note: this button sensitivity relies on Ren'Py interaction
-                    # restart that is done in text input field callback.
-                    textbutton "Say":
-                        action Return(_fom_saysomething.RETURN_DONE)
-                        sensitive not picker.is_text_empty()
+                if not picker.presets_menu:
+                    if say:
+                        # Note: this button sensitivity relies on Ren'Py interaction
+                        # restart that is done in text input field callback.
+                        textbutton "Say":
+                            action Return(_fom_saysomething.RETURN_DONE)
+                            sensitive not picker.is_text_empty()
+
+                    else:
+                        textbutton "Pose":
+                            action Return(_fom_saysomething.RETURN_DONE)
+
+                    textbutton "Presets":
+                        action [SetField(picker, "presets_menu", True),
+                                picker.text_value.Disable(),
+                                picker.presets_search_value.Enable()]
+                        xalign 1.0
 
                 else:
-                    textbutton "Pose":
-                        action Return(_fom_saysomething.RETURN_DONE)
+                    textbutton "Save" action NullAction()
+                    textbutton "Delete" action NullAction()
 
-                textbutton "Presets":
-                    action [SetField(picker, "presets_menu", True),
-                            picker.text_value.Disable(),
-                            picker.presets_search_value.Enable()]
+                textbutton ("Close" if not picker.presets_menu else "Back"):
+                    if not picker.presets_menu:
+                        action Return(_fom_saysomething.RETURN_CLOSE)
+                    else:
+                        action [SetField(picker, "presets_menu", False),
+                                picker.text_value.Enable(),
+                                picker.presets_search_value.Disable()]
+
                     xalign 1.0
-                textbutton "Close" action Return(_fom_saysomething.RETURN_CLOSE) xalign 1.0
 
     if say:
         # Text input area styled as textbox and key capture so that Shift+Enter key
