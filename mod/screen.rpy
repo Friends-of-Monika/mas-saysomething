@@ -173,8 +173,15 @@ init 100 python in _fom_saysomething:
             # Ren'Py input value to allow enabling search input when needed.
             self.presets_search_value = FieldInputValue(self, "presets_search", returnable=False)
 
+            # Variable that stores entered preset name in modal.
             self.preset_name = ""
+
+            # Ren'Py input value to handle text entering in modal (doesn't
+            # work if it's used in screen.)
             self.preset_name_value = FieldInputValue(self, "preset_name")
+
+            # Preset cursor keeps track of current preset chosen.
+            self.preset_cursor = None
 
         def pose_switch_selector(self, key, forward):
             """
@@ -310,25 +317,75 @@ init 100 python in _fom_saysomething:
             return renpy.config.developer and persistent._fom_saysomething_show_code
 
         def save_preset(self, name):
+            """
+            Saves current state of a picker into a preset with the provided
+            name. Also sets current preset cursor to this preset.
+
+            IN:
+                name -> str:
+                    Name to save this preset with.
+            """
+
             persistent._fom_saysomething_presets[name] = (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
                 self.position_adjustment.value,  #1 - position
-                self.text  #2 - text
+                self.text,  #2 - text
+                self.show_buttons,  #3 - buttons
             )
 
-            self.preset_name = ""
+            self.preset_name = name
+            self.preset_cursor = name
 
         def load_preset(self, name):
-            pose_cur, pos, text = persistent._fom_saysomething_presets[name]
+            """
+            Loads state of a picker from a preset with the provided name. Also
+            sets current preset cursor to this preset.
 
+            IN:
+                name -> str:
+                    Name to load preset with.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns value of RETURN_RENDER constant.
+            """
+
+            pose_cur, pos, text, buttons = persistent._fom_saysomething_presets[name]
+
+            # Load selectors
             self.pose_cursors = {key: (cur, EXPR_MAP[key][cur][1]) for key, cur in pose_cur.items()}
 
+            # Load position
             self.position_adjustment.value = pos
             self.on_position_change(pos)
 
+            # Load text
             self.text = text
             self.on_text_change(text)
 
+            # Load buttons
+            self.show_buttons = buttons
+
+            # Set preset name (for easier overwriting) and cursor (to keep
+            # visual track of current preset.)
+            self.preset_name = name
+            self.preset_cursor = name
+
+            return RETURN_RENDER
+
+        def delete_preset(self, name):
+            """
+            Deletes preset with the provided name. Resets preset cursor.
+
+            IN:
+                name -> str:
+                    Name of a preset to delete.
+            """
+
+            persistent._fom_saysomething_presets.pop(name)
+
+            self.preset_name = name
+            self.preset_cursor = None
 
         def on_position_change(self, value):
             """
@@ -661,12 +718,13 @@ screen fom_saysomething_picker(say=True):
                             vbox:
                                 spacing 10
 
-                                for i in range(3):
-                                    textbutton "foobar":
+                                for _key in persistent._fom_saysomething_presets.keys():
+                                    textbutton _key:
                                         style "twopane_scrollable_menu_button"
                                         xysize (350, None)
 
-                                        action NullAction()
+                                        action Function(picker.load_preset, _key)
+                                        selected picker.preset_cursor == _key
 
                     bar:
                         style "classroom_vscrollbar"
@@ -706,9 +764,12 @@ screen fom_saysomething_picker(say=True):
 
                 else:
                     textbutton "Save":
-                        action [Show("fom_saysomething_preset_name_input_modal"),
-                                DisableAllInputValues()]
-                    textbutton "Delete" action NullAction()
+                        action Show("fom_saysomething_preset_name_input_modal")
+                    textbutton "Delete":
+                        action Show("fom_saysomething_preset_delete_confirm_modal")
+                        sensitive picker.preset_cursor is not None
+                    if picker.preset_cursor is not None:
+                        key "K_DELETE" action Show("fom_saysomething_preset_delete_confirm_modal")
 
                 textbutton ("Close" if not picker.presets_menu else "Back"):
                     if not picker.presets_menu:
@@ -771,6 +832,7 @@ screen fom_saysomething_picker(say=True):
 
                 use quick_menu
 
+
 screen fom_saysomething_preset_name_input_modal:
     on "show" action picker.preset_name_value.Enable()
 
@@ -818,6 +880,48 @@ screen fom_saysomething_preset_name_input_modal:
                             Function(picker.save_preset, picker.preset_name),
                             Hide("fom_saysomething_preset_name_input_modal")]
                     sensitive not picker.is_preset_name_empty()
-                textbutton "Exit":
+                textbutton "Cancel":
                     action [Play("sound", gui.activate_sound),
                             Hide("fom_saysomething_preset_name_input_modal")]
+
+
+screen fom_saysomething_preset_delete_confirm_modal:
+    style_prefix "confirm"
+
+    modal True
+    zorder 200
+
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    if not picker.is_preset_name_empty():
+        key "K_RETURN":
+            action [Play("sound", gui.activate_sound),
+                    Function(picker.save_preset, picker.preset_name),
+                    Hide("fom_saysomething_preset_name_input_modal")]
+
+    frame:
+        vbox:
+            xmaximum 300
+            xfill True
+
+            align (0.5, 0.5)
+            spacing 30
+
+            text "Delete this preset?":
+                style "confirm_prompt"
+                xalign 0.5
+
+            text picker.preset_cursor:
+                xalign 0.5
+
+            hbox:
+                xalign 0.5
+                spacing 10
+
+                textbutton "Delete":
+                    action [Play("sound", gui.activate_sound),
+                            Function(picker.delete_preset, picker.preset_cursor),
+                            Hide("fom_saysomething_preset_delete_confirm_modal")]
+                textbutton "Cancel":
+                    action [Play("sound", gui.activate_sound),
+                            Hide("fom_saysomething_preset_delete_confirm_modal")]
