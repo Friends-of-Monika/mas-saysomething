@@ -4,6 +4,8 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
+define persistent._fom_saysomething_presets = dict()
+
 
 init 100 python in _fom_saysomething:
 
@@ -288,6 +290,25 @@ init 100 python in _fom_saysomething:
             """
 
             return renpy.config.developer and persistent._fom_saysomething_show_code
+
+        def save_preset(self, name):
+            persistent._fom_saysomething_presets[name] = (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text  #2 - text
+            )
+
+        def load_preset(self, name):
+            pose_cur, pos, text = persistent._fom_saysomething_presets[name]
+
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][cur][1]) for key, cur in pose_cur.items()}
+
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            self.text = text
+            self.on_text_change(text)
+
 
         def on_position_change(self, value):
             """
@@ -607,7 +628,7 @@ screen fom_saysomething_picker(say=True):
                             vbox:
                                 spacing 10
 
-                                for i in range(100):
+                                for i in range(3):
                                     textbutton "foobar":
                                         style "twopane_scrollable_menu_button"
                                         xysize (350, None)
@@ -647,21 +668,21 @@ screen fom_saysomething_picker(say=True):
 
                     textbutton "Presets":
                         action [SetField(picker, "presets_menu", True),
-                                picker.text_value.Disable(),
-                                picker.presets_search_value.Enable()]
+                                DisableAllInputValues()]
                         xalign 1.0
 
                 else:
-                    textbutton "Save" action NullAction()
+                    textbutton "Save":
+                        action [Show("fom_saysomething_preset_name_input_modal"),
+                                DisableAllInputValues()]
                     textbutton "Delete" action NullAction()
 
                 textbutton ("Close" if not picker.presets_menu else "Back"):
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
-                        action [SetField(picker, "presets_menu", False),
-                                picker.text_value.Enable(),
-                                picker.presets_search_value.Disable()]
+                        action [DisableAllInputValues(),
+                                SetField(picker, "presets_menu", False)]
 
                     xalign 1.0
 
