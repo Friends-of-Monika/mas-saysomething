@@ -26,6 +26,13 @@ define persistent._fom_saysomething_presets = {
 }
 
 
+init -200 python in mas_ui:
+    import store
+
+    if not hasattr(store.mas_ui, "TEXT_FIELD_BG"):
+        TEXT_FIELD_BG = "#ffaa99aa"
+
+
 init 100 python in _fom_saysomething:
     import store
     from store import ui, persistent
