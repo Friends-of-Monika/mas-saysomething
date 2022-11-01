@@ -316,6 +316,14 @@ init 100 python in _fom_saysomething:
 
             return renpy.config.developer and persistent._fom_saysomething_show_code
 
+        def get_presets(self, query):
+            query = query.lower()
+            return [
+                key for key in sorted(persistent._fom_saysomething_presets.keys())
+                if query in key.lower()
+            ]
+
+
         def save_preset(self, name):
             """
             Saves current state of a picker into a preset with the provided
@@ -384,7 +392,7 @@ init 100 python in _fom_saysomething:
 
             persistent._fom_saysomething_presets.pop(name)
 
-            self.preset_name = name
+            self.preset_name = ""
             self.preset_cursor = None
 
         def on_position_change(self, value):
@@ -718,7 +726,7 @@ screen fom_saysomething_picker(say=True):
                             vbox:
                                 spacing 10
 
-                                for _key in persistent._fom_saysomething_presets.keys():
+                                for _key in picker.get_presets(picker.presets_search):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
                                         xysize (350, None)
