@@ -474,7 +474,7 @@ init 100 python in _fom_saysomething:
 
             # Load position
             self.position_cursor = pos
-            self.on_position_change(pos)
+            self.gui_flip = self.position_cursor > 4
 
             # Load text
             self.text = text
