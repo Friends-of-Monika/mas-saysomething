@@ -9,6 +9,7 @@ init 100 python in _fom_saysomething:
 
     import store
     from store import ui, persistent
+    from store import FieldInputValue
 
     import math
     from collections import OrderedDict
@@ -152,11 +153,23 @@ init 100 python in _fom_saysomething:
             # sight.
             self.gui_flip = False
 
-            # Flag value for showind or hiding buttons and quick menu.
+            # Flag value for showing or hiding buttons and quick menu.
             self.show_buttons = True
 
             # Variable that stores entered user text prompt.
             self.text = ""
+
+            # Ren'Py input value to allow disabling text input when needed.
+            self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            # Flag value for showing presets menu instead of selectors panel.
+            self.presets_menu = False
+
+            # Variable that stores entered preset search text prompt.
+            self.presets_search = ""
+
+            # Ren'Py input value to allow enabling search input when needed.
+            self.presets_search_value = FieldInputValue(self, "presets_search", returnable=False)
 
         def pose_switch_selector(self, key, forward):
             """
@@ -343,6 +356,41 @@ init 100 python in _fom_saysomething:
             self.show_buttons = not self.show_buttons
             return RETURN_RENDER
 
+        def on_search_input_change(self, value):
+            """
+            Callback for presets menu search input prompt.
+
+            IN:
+                value -> str:
+                    New input field value.
+            """
+
+            self.presets_search = value
+
+        def on_search_adjustment_range(self, adjustment):
+            """
+            Callback for presets menu search input to adjust cursor so it's
+            visible to the user.
+
+            IN:
+                adjustment -> ui.adjustment:
+                    Adjustment that has changed.
+            """
+
+            widget = renpy.get_widget("fom_saysomething_picker", "search_input", "screens")
+            caret_relative_pos = 1.0
+            if widget is not None:
+                caret_pos = widget.caret_pos
+                content_len = len(widget.content)
+
+                if content_len > 0:
+                    caret_relative_pos = caret_pos / float(content_len)
+
+            # This ensures that the caret is always visible (close enough) to the user
+            # when they enter text
+            adjustment.change(adjustment.range * caret_relative_pos)
+
+
     picker = None
 
 
@@ -356,11 +404,11 @@ style fom_saysomething_picker_frame_dark is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame_d.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
 
 style fom_saysomething_confirm_button is generic_button_light:
-    xysize (180, None)
+    xysize (116, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_dark is generic_button_dark:
-    xysize (180, None)
+    xysize (116, None)
     padding (10, 5, 10, 5)
 
 style fom_saysomething_confirm_button_text is generic_button_text_light:
@@ -407,97 +455,135 @@ screen fom_saysomething_picker(say=True):
         vbox:
             spacing 10
 
-            # Selectors panel.
+            if not picker.presets_menu:
 
-            frame:
-                padding (10, 10)
+                # Selectors panel.
 
-                vbox:
-                    spacing 10
+                frame:
+                    padding (10, 10)
 
-                    if picker.is_show_code():
-                        hbox:
-                            xmaximum 350
-                            xfill True
+                    vbox:
+                        spacing 10
 
-                            # Split into two hboxes to align arrows and labels
-                            # properly (similar to buttons with the selectors.)
-
+                        if picker.is_show_code():
                             hbox:
+                                xmaximum 350
                                 xfill True
-                                xmaximum 110
-                                text "Expression"
 
+                                # Split into two hboxes to align arrows and labels
+                                # properly (similar to buttons with the selectors.)
+
+                                hbox:
+                                    xfill True
+                                    xmaximum 110
+                                    text "Expression"
+
+                                hbox:
+                                    xmaximum 240
+                                    xfill True
+                                    xalign 1.0
+
+                                    if picker.is_show_code():
+                                        text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
+                                    else:
+                                        text picker.get_sprite_code() xalign 0.5
+
+                        for key, value in _fom_saysomething.EXPR_MAP.items():
                             hbox:
-                                xmaximum 240
+                                xmaximum 350
                                 xfill True
-                                xalign 1.0
 
-                                if picker.is_show_code():
-                                    text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
-                                else:
-                                    text picker.get_sprite_code() xalign 0.5
+                                # Split into two hboxes to align arrows and labels
+                                # properly, so that one can click them without
+                                # missing if label is too big; this layout preserves
+                                # space for big labels.
 
-                    for key, value in _fom_saysomething.EXPR_MAP.items():
-                        hbox:
-                            xmaximum 350
-                            xfill True
+                                hbox:
+                                    xfill True
+                                    xmaximum 110
+                                    text key
 
-                            # Split into two hboxes to align arrows and labels
-                            # properly, so that one can click them without
-                            # missing if label is too big; this layout preserves
-                            # space for big labels.
+                                hbox:
+                                    xmaximum 240
+                                    xfill True
+                                    xalign 1.0
 
-                            hbox:
-                                xfill True
-                                xmaximum 110
-                                text key
+                                    textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
+                                    text picker.get_pose_label(key) xalign 0.5
+                                    textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
 
-                            hbox:
-                                xmaximum 240
-                                xfill True
-                                xalign 1.0
+                # Position slider panel.
 
-                                textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
-                                text picker.get_pose_label(key) xalign 0.5
-                                textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
+                frame:
+                    padding (10, 10)
 
-            # Position slider panel.
+                    hbox:
+                        xmaximum 350
+                        xfill True
 
-            frame:
-                padding (10, 10)
+                        text "Position"
+                        bar:
+                            xalign 1.0
+                            yalign 0.5
+                            adjustment picker.position_adjustment
+                            released Return(_fom_saysomething.RETURN_RENDER)
 
-                hbox:
-                    xmaximum 350
-                    xfill True
+                # Buttons tickbox.
 
-                    text "Position"
-                    bar:
-                        xalign 1.0
-                        yalign 0.5
-                        adjustment picker.position_adjustment
-                        released Return(_fom_saysomething.RETURN_RENDER)
+                frame:
+                    padding (10, 5)
 
-            # Buttons tickbox.
+                    hbox:
+                        style_prefix "check"
 
-            frame:
-                padding (10, 5)
+                        xmaximum 350
+                        xfill True
+                        spacing 10
 
-                hbox:
-                    style_prefix "check"
+                        if say:
+                            textbutton "Show buttons and quick menu":
+                                selected picker.show_buttons
+                                action Function(picker.on_buttons_tick)
+                        else:
+                            textbutton "Show buttons":
+                                selected picker.show_buttons
+                                action Function(picker.on_buttons_tick)
 
-                    xmaximum 350
-                    xfill True
-                    spacing 10
+            else:
 
-                    if say:
-                        textbutton "Show buttons and quick menu":
-                            selected picker.show_buttons
-                            action Function(picker.on_buttons_tick)
-                    else:
-                        textbutton "Show buttons":
-                            selected picker.show_buttons
-                            action Function(picker.on_buttons_tick)
+                # Presets menu.
+
+                frame:
+                    xsize 370
+                    ysize 40
+
+                    background Solid(mas_ui.TEXT_FIELD_BG)
+
+                    viewport:
+                        draggable False
+                        arrowkeys False
+                        mousewheel "horizontal"
+                        xsize 360
+                        ysize 38
+                        xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
+
+                        input:
+                            id "search_input"
+                            style_prefix "input"
+                            length 50
+                            xalign 0.0
+                            layout "nobreak"
+                            changed picker.on_search_input_change
+                            value picker.presets_search_value
+
+                    if len(picker.presets_search) == 0:
+                        text "Search for a preset...":
+                            text_align 0.0
+                            layout "nobreak"
+                            color "#EEEEEEB2"
+                            first_indent 10
+                            line_leading 1
+                            outlines []
 
         # Confirmation buttons area.
 
@@ -524,6 +610,11 @@ screen fom_saysomething_picker(say=True):
                     textbutton "Pose":
                         action Return(_fom_saysomething.RETURN_DONE)
 
+                textbutton "Presets":
+                    action [SetField(picker, "presets_menu", True),
+                            picker.text_value.Disable(),
+                            picker.presets_search_value.Enable()]
+                    xalign 1.0
                 textbutton "Close" action Return(_fom_saysomething.RETURN_CLOSE) xalign 1.0
 
     if say:
@@ -571,7 +662,7 @@ screen fom_saysomething_picker(say=True):
                         # and restarts Ren'Py interaction in order for 'Say' button
                         # to gray out when no text is provided.
                         changed picker.on_text_change
-                        value FieldInputValue(picker, "text", returnable=False)
+                        value picker.text_value
 
             hbox:
                 align (0.5, 1.02)
