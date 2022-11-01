@@ -496,19 +496,6 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
-        def on_preset_name_change(self, value):
-            """
-            Callback for preset name input prompt. Restarts interaction on every
-            alteration.
-
-            IN:
-                value -> str:
-                    New input field value.
-            """
-
-            self.preset_name = value
-            renpy.restart_interaction()
-
 
     picker = None
 
@@ -676,6 +663,8 @@ screen fom_saysomething_picker(say=True):
                     xsize 370
                     ysize 40
 
+                    # Text input.
+
                     background Solid(mas_ui.TEXT_FIELD_BG)
 
                     viewport:
@@ -695,6 +684,8 @@ screen fom_saysomething_picker(say=True):
                             changed picker.on_search_input_change
                             value picker.presets_search_value
 
+                    # Hint text in search box visible if no text is entered.
+
                     if len(picker.presets_search) == 0:
                         text "Search for a preset...":
                             text_align 0.0
@@ -704,6 +695,8 @@ screen fom_saysomething_picker(say=True):
                             line_leading 1
                             outlines []
 
+                # List of presets.
+
                 fixed:
                     xsize 350
 
@@ -711,6 +704,8 @@ screen fom_saysomething_picker(say=True):
                         ysize 420
                     else:
                         ysize 442
+
+                    # Viewport wrapping long list.
 
                     vbox:
                         pos (0, 0)
@@ -726,6 +721,8 @@ screen fom_saysomething_picker(say=True):
                             vbox:
                                 spacing 10
 
+                                # Preset buttons; highlit when selected.
+
                                 for _key in picker.get_presets(picker.presets_search):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
@@ -733,6 +730,8 @@ screen fom_saysomething_picker(say=True):
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
+
+                    # Scrollbar used by list of presets above.
 
                     bar:
                         style "classroom_vscrollbar"
@@ -753,6 +752,8 @@ screen fom_saysomething_picker(say=True):
 
                 spacing 10
 
+                # Selectors panel buttons.
+
                 if not picker.presets_menu:
                     if say:
                         # Note: this button sensitivity relies on Ren'Py interaction
@@ -768,7 +769,8 @@ screen fom_saysomething_picker(say=True):
                     textbutton "Presets":
                         action [SetField(picker, "presets_menu", True),
                                 DisableAllInputValues()]
-                        xalign 1.0
+
+                # Presets panel buttons.
 
                 else:
                     textbutton "Save":
@@ -779,14 +781,16 @@ screen fom_saysomething_picker(say=True):
                     if picker.preset_cursor is not None:
                         key "K_DELETE" action Show("fom_saysomething_preset_delete_confirm_modal")
 
+                # 'Close' or 'back' is the same for both panels and can share
+                # the logic. For selectors panel it will close the GUI
+                # altogether, for presets it will take back to selectors.
+
                 textbutton ("Close" if not picker.presets_menu else "Back"):
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
-
-                    xalign 1.0
 
     if say:
         # Text input area styled as textbox and key capture so that Shift+Enter key
@@ -841,6 +845,9 @@ screen fom_saysomething_picker(say=True):
                 use quick_menu
 
 
+# Modal screen used for entering new preset name.
+# NOTE: same as main screen refers to picker directly, in global scope.
+
 screen fom_saysomething_preset_name_input_modal:
     on "show" action picker.preset_name_value.Enable()
 
@@ -851,12 +858,17 @@ screen fom_saysomething_preset_name_input_modal:
 
     add mas_getTimeFile("gui/overlay/confirm.png")
 
+    # Button alternative keybinds.
+
+    # If preset name is not empty, allow pressing Enter to confirm instead
+    # of button click.
     if not picker.is_preset_name_empty():
         key "K_RETURN":
             action [Play("sound", gui.activate_sound),
                     Function(picker.save_preset, picker.preset_name),
                     Hide("fom_saysomething_preset_name_input_modal")]
 
+    # Allow pressing Esc to cancel.
     key "K_ESCAPE":
         action [Play("sound", gui.activate_sound),
                 Hide("fom_saysomething_preset_name_input_modal")]
@@ -869,9 +881,13 @@ screen fom_saysomething_preset_name_input_modal:
             align (0.5, 0.5)
             spacing 30
 
+            # Title.
+
             text "Save this preset as:":
                 style "confirm_prompt"
                 xalign 0.5
+
+            # Input field.
 
             input:
                 style_prefix "input"
@@ -881,12 +897,19 @@ screen fom_saysomething_preset_name_input_modal:
 
                 length 30
                 pixel_width 300
+
+                # NOTE: for some reason this doesn't work if used with value
+                # inside screen; for this reason it is in Picker instance.
                 value picker.preset_name_value
+
+            # Save/cancel buttons.
 
             hbox:
                 xalign 0.5
                 spacing 10
 
+                # Sensitivity of this button relies on emptiness of entered
+                # preset name.
                 textbutton "Save":
                     action [Play("sound", gui.activate_sound),
                             Function(picker.save_preset, picker.preset_name),
@@ -897,6 +920,9 @@ screen fom_saysomething_preset_name_input_modal:
                             Hide("fom_saysomething_preset_name_input_modal")]
 
 
+# Modal screen used for confirming preset deletion.
+# NOTE: same as main screen refers to picker directly, in global scope.
+
 screen fom_saysomething_preset_delete_confirm_modal:
     style_prefix "confirm"
 
@@ -905,11 +931,13 @@ screen fom_saysomething_preset_delete_confirm_modal:
 
     add mas_getTimeFile("gui/overlay/confirm.png")
 
-    if not picker.is_preset_name_empty():
-        key "K_RETURN":
-            action [Play("sound", gui.activate_sound),
-                    Function(picker.delete_preset, picker.preset_name),
-                    Hide("fom_saysomething_preset_delete_confirm_modal")]
+    # Keybinds alternative to button clicks, pressing Enter will confirm
+    # and Esc will cancel.
+
+    key "K_RETURN":
+        action [Play("sound", gui.activate_sound),
+                Function(picker.delete_preset, picker.preset_name),
+                Hide("fom_saysomething_preset_delete_confirm_modal")]
 
     key "K_ESCAPE":
         action [Play("sound", gui.activate_sound),
@@ -923,12 +951,18 @@ screen fom_saysomething_preset_delete_confirm_modal:
             align (0.5, 0.5)
             spacing 30
 
+            # Title.
+
             text "Delete this preset?":
                 style "confirm_prompt"
                 xalign 0.5
 
+            # Name of preset chosen for deletion.
+
             text picker.preset_cursor:
                 xalign 0.5
+
+            # Confirmation and cancellation buttons.
 
             hbox:
                 xalign 0.5
