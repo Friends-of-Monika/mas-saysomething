@@ -4,7 +4,19 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-define persistent._fom_saysomething_presets = dict()
+# Presets dictionary with premade presets.
+define persistent._fom_saysomething_presets = {
+    "Hey, everyone!": ({"Pose": 3, "Eyes": 0, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Hey, everyone!", True),
+    "Sparkly pretty eyes": ({"Pose": 0, "Eyes": 2, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Is this... Is this for me?", True),
+    "Daydreaming": ({"Pose": 4, "Eyes": 8, "Eyebrows": 3, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 0}, 4, "...", True),
+    "Fact of the day": ({"Pose": 6, "Eyes": 7, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Here's another fun fact of the day!", True),
+    "Angry Monika": ({"Pose": 1, "Eyes": 3, "Eyebrows": 1, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 2}, 4, "You should not have done that...", True),
+    "I love you": ({"Pose": 4, "Eyes": 0, "Eyebrows": 2, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 0}, 4, "I... I love you so much...", True),
+    "How embarrassing": ({"Pose": 1, "Eyes": 6, "Eyebrows": 2, "Blush": 0, "Tears": 0, "Sweat": 1, "Mouth": 1}, 4, "I really hope you didn't mind that, ahaha...", True),
+    "Asking you out": ({"Pose": 2, "Eyes": 7, "Eyebrows": 0, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 0}, 4, "Got any plans for this evening?~", True),
+    "Feeling singy": ({"Pose": 0, "Eyes": 8, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Every day, I imagine a future where I can be with you~", True),
+    "Cutest smug in existence": ({"Pose": 0, "Eyes": 9, "Eyebrows": 0, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 5}, 4, "If you know what I mean, ehehe~", True)
+}
 
 
 init 100 python in _fom_saysomething:
