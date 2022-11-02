@@ -896,7 +896,7 @@ screen fom_saysomething_preset_name_input_modal:
     if not picker.is_preset_exists(picker.preset_name):
         $ ok_action = [Play("sound", gui.activate_sound),
                        Function(picker.save_preset, picker.preset_name),
-                       Hide()]
+                       Hide("fom_saysomething_preset_name_input_modal")]
     else:
         $ ok_action = [Play("sound", gui.activate_sound),
                        Show("fom_saysomething_preset_confirm_modal",
@@ -904,9 +904,9 @@ screen fom_saysomething_preset_name_input_modal:
                             message=picker.preset_cursor,
                             ok_button="Overwrite",
                             ok_action=Function(picker.save_preset, picker.preset_cursor)),
-                       Hide()]
+                       Hide("fom_saysomething_preset_name_input_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
-                       Hide()]
+                       Hide("fom_saysomething_preset_name_input_modal")]
 
     # Force enable preset name value (doesn't work otherwise) on show.
     on "show" action picker.preset_name_value.Enable()
@@ -980,9 +980,9 @@ screen fom_saysomething_preset_name_input_modal:
 screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_action):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
-                   Hide()]
+                   Hide("fom_saysomething_preset_confirm_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
-                       Hide()]
+                       Hide("fom_saysomething_preset_confirm_modal")]
 
     style_prefix "confirm"
 
