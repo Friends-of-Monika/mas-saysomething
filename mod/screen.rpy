@@ -317,12 +317,41 @@ init 100 python in _fom_saysomething:
             return renpy.config.developer and persistent._fom_saysomething_show_code
 
         def get_presets(self, query):
+            """
+            Returns list of preset names matching query sorted lexicographically.
+
+            IN:
+                query -> str:
+                    String to find in presets.
+
+            OUT:
+                list of str:
+                    List of presets matching query.
+            """
+
             query = query.lower()
             return [
                 key for key in sorted(persistent._fom_saysomething_presets.keys())
                 if query in key.lower()
             ]
 
+        def is_preset_exists(self, name):
+            """
+            Checks if preset by the provided name exists.
+
+            IN:
+                name -> str:
+                    Name of a preset to check.
+
+            OUT:
+                True:
+                    If exists.
+
+                False:
+                    If does not.
+            """
+
+            return name in persistent._fom_saysomething_presets
 
         def save_preset(self, name):
             """
@@ -767,19 +796,34 @@ screen fom_saysomething_picker(say=True):
                             action Return(_fom_saysomething.RETURN_DONE)
 
                     textbutton "Presets":
+                        # NOTE: DisableAllInputValues will re-focus on search
+                        # text input.
                         action [SetField(picker, "presets_menu", True),
                                 DisableAllInputValues()]
 
                 # Presets panel buttons.
+                # NOTE: selected False because buttons tend to be stuck in
+                # selected state which is unwanted.
 
                 else:
                     textbutton "Save":
-                        action Show("fom_saysomething_preset_name_input_modal")
+                        action [Show("fom_saysomething_preset_name_input_modal"),
+                                picker.presets_search_value.Disable()]
+                        selected False
                     textbutton "Delete":
-                        action Show("fom_saysomething_preset_delete_confirm_modal")
+                        action Show("fom_saysomething_preset_confirm_modal",
+                                    title="Delete this preset?",
+                                    message=picker.preset_name,
+                                    ok_button="Delete",
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
+                        selected False
                     if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_preset_delete_confirm_modal")
+                        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
+                                                   title="Delete this preset?",
+                                                   message=picker.preset_name,
+                                                   ok_button="Delete",
+                                                   ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
@@ -789,6 +833,8 @@ screen fom_saysomething_picker(say=True):
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
+                        # NOTE: DisableAllInputValues will re-focus on say text
+                        # input (in the textbox) again.
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
@@ -849,6 +895,22 @@ screen fom_saysomething_picker(say=True):
 # NOTE: same as main screen refers to picker directly, in global scope.
 
 screen fom_saysomething_preset_name_input_modal:
+    if not picker.is_preset_exists(picker.preset_name):
+        $ ok_action = [Play("sound", gui.activate_sound),
+                       Function(picker.save_preset, picker.preset_name),
+                       Hide()]
+    else:
+        $ ok_action = [Play("sound", gui.activate_sound),
+                       Show("fom_saysomething_preset_confirm_modal",
+                            title="Overwrite this preset?",
+                            message=picker.preset_cursor,
+                            ok_button="Overwrite",
+                            ok_action=Function(picker.save_preset, picker.preset_cursor)),
+                       Hide()]
+    $ cancel_action = [Play("sound", gui.activate_sound),
+                       Hide()]
+
+    # Force enable preset name value (doesn't work otherwise) on show.
     on "show" action picker.preset_name_value.Enable()
 
     style_prefix "confirm"
@@ -864,14 +926,11 @@ screen fom_saysomething_preset_name_input_modal:
     # of button click.
     if not picker.is_preset_name_empty():
         key "K_RETURN":
-            action [Play("sound", gui.activate_sound),
-                    Function(picker.save_preset, picker.preset_name),
-                    Hide("fom_saysomething_preset_name_input_modal")]
+            action ok_action
 
     # Allow pressing Esc to cancel.
     key "K_ESCAPE":
-        action [Play("sound", gui.activate_sound),
-                Hide("fom_saysomething_preset_name_input_modal")]
+        action cancel_action
 
     frame:
         vbox:
@@ -911,19 +970,22 @@ screen fom_saysomething_preset_name_input_modal:
                 # Sensitivity of this button relies on emptiness of entered
                 # preset name.
                 textbutton "Save":
-                    action [Play("sound", gui.activate_sound),
-                            Function(picker.save_preset, picker.preset_name),
-                            Hide("fom_saysomething_preset_name_input_modal")]
+                    action ok_action
                     sensitive not picker.is_preset_name_empty()
                 textbutton "Cancel":
-                    action [Play("sound", gui.activate_sound),
-                            Hide("fom_saysomething_preset_name_input_modal")]
+                    action cancel_action
 
 
-# Modal screen used for confirming preset deletion.
+# Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_preset_delete_confirm_modal:
+screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_action):
+    $ ok_action = [Play("sound", gui.activate_sound),
+                   ok_action,
+                   Hide()]
+    $ cancel_action = [Play("sound", gui.activate_sound),
+                       Hide()]
+
     style_prefix "confirm"
 
     modal True
@@ -935,13 +997,10 @@ screen fom_saysomething_preset_delete_confirm_modal:
     # and Esc will cancel.
 
     key "K_RETURN":
-        action [Play("sound", gui.activate_sound),
-                Function(picker.delete_preset, picker.preset_name),
-                Hide("fom_saysomething_preset_delete_confirm_modal")]
+        action ok_action
 
     key "K_ESCAPE":
-        action [Play("sound", gui.activate_sound),
-                Hide("fom_saysomething_preset_delete_confirm_modal")]
+        action cancel_action
 
     frame:
         vbox:
@@ -953,13 +1012,13 @@ screen fom_saysomething_preset_delete_confirm_modal:
 
             # Title.
 
-            text "Delete this preset?":
+            text title:
                 style "confirm_prompt"
                 xalign 0.5
 
             # Name of preset chosen for deletion.
 
-            text picker.preset_cursor:
+            text message:
                 xalign 0.5
 
             # Confirmation and cancellation buttons.
@@ -968,10 +1027,7 @@ screen fom_saysomething_preset_delete_confirm_modal:
                 xalign 0.5
                 spacing 10
 
-                textbutton "Delete":
-                    action [Play("sound", gui.activate_sound),
-                            Function(picker.delete_preset, picker.preset_cursor),
-                            Hide("fom_saysomething_preset_delete_confirm_modal")]
+                textbutton ok_button:
+                    action ok_action
                 textbutton "Cancel":
-                    action [Play("sound", gui.activate_sound),
-                            Hide("fom_saysomething_preset_delete_confirm_modal")]
+                    action cancel_action
