@@ -641,6 +641,14 @@ style fom_saysomething_titlebox_dark is default:
 screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
 
+    # NOTE: This is placed here because in Ren'Py 6 key object affects spacing.
+    if picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
+                                    title="Delete this preset?",
+                                    message=picker.preset_name,
+                                    ok_button="Delete",
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
+
     vbox:
         # Flip GUI to prevent hiding Monika behind it.
         if not picker.gui_flip:
@@ -905,12 +913,6 @@ screen fom_saysomething_picker(say=True):
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
                         selected False
-                    if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
-                                                   title="Delete this preset?",
-                                                   message=picker.preset_name,
-                                                   ok_button="Delete",
-                                                   ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
