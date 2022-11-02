@@ -29,7 +29,7 @@
 * Comes with built-in expression changer!
 * Position switch that lets you place your Monika's table wherever you want it.
 * Supports multiple lines input~
-* [Allows viewing expression code][15] to aid submod development.
+* Allows viewing expression code to aid submod development.
 
 ## 🖼️ Screenshots
 
@@ -45,26 +45,6 @@
 
    **NOTE:** make sure you don't drag it *into `game`*!
 4. You're all set!~
-
-## 🔧 Enabling expression codes
-
-To enable expression code display, your MAS has to be *in developer mode*. To
-enable this mode, create file `dev_devmode.rpy` in `game/Submods` with the
-following content:
-
-```renpy
-init python:
-    config.developer = True
-```
-
-Save and close this file. Restart the game, and now you'll have 'Show expression
-code' option displayed in Submods settings section, tick it and you'll have
-expression codes shown!~
-
-*Why so complex?* This is done to minimize immersion breaking expression
-selector screen already makes and hide this from users who are not submod
-developers and who do not need some obscure text displaying on their selector
-screen.
 
 ## 🏅 Special thanks
 
@@ -101,4 +81,3 @@ of Monika Discord server [here][9].
 [12]: doc/screenshots/1.png
 [13]: doc/screenshots/2.png
 [14]: https://github.com/mayday-mayjay
-[15]: https://github.com/friends-of-monika/mas-saysomething#-enabling-expression-codes

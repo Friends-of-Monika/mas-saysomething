@@ -302,19 +302,17 @@ init 100 python in _fom_saysomething:
 
         def is_show_code(self):
             """
-            Checks if player is in developer mode and has requested code
-            display.
+            Checks if player has requested code display.
 
             OUT:
                 True:
-                    If config.developer is set to True and player has ticked
-                    "Show expression code" option in settings.
+                    If player has ticked "Show expression code" option in settings.
 
                 False:
                     False otherwise.
             """
 
-            return renpy.config.developer and persistent._fom_saysomething_show_code
+            return persistent._fom_saysomething_show_code
 
         def get_presets(self, query):
             """
