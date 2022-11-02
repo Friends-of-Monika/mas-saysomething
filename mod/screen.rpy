@@ -6,6 +6,7 @@
 
 # Presets dictionary with premade presets.
 define persistent._fom_saysomething_presets = {
+    # Presets by dreamscached
     "Hey, everyone!": ({"Pose": 3, "Eyes": 0, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Hey, everyone!", True),
     "Sparkly pretty eyes": ({"Pose": 0, "Eyes": 2, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Is this... Is this for me?", True),
     "Daydreaming": ({"Pose": 4, "Eyes": 8, "Eyebrows": 3, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 0}, 4, "...", True),
@@ -15,7 +16,13 @@ define persistent._fom_saysomething_presets = {
     "How embarrassing": ({"Pose": 1, "Eyes": 6, "Eyebrows": 2, "Blush": 0, "Tears": 0, "Sweat": 1, "Mouth": 1}, 4, "I really hope you didn't mind that, ahaha...", True),
     "Asking you out": ({"Pose": 2, "Eyes": 7, "Eyebrows": 0, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 0}, 4, "Got any plans for this evening?~", True),
     "Feeling singy": ({"Pose": 0, "Eyes": 8, "Eyebrows": 0, "Blush": 0, "Tears": 0, "Sweat": 0, "Mouth": 1}, 4, "Every day, I imagine a future where I can be with you~", True),
-    "Cutest smug in existence": ({"Pose": 0, "Eyes": 9, "Eyebrows": 0, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 5}, 4, "If you know what I mean, ehehe~", True)
+    "Cutest smug in existence": ({"Pose": 0, "Eyes": 9, "Eyebrows": 0, "Blush": 2, "Tears": 0, "Sweat": 0, "Mouth": 5}, 4, "If you know what I mean, ehehe~", True),
+
+    # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+    "Sulks to you": ({"Eyebrows": 3, "Eyes": 12, "Blush": 2, "Mouth": 8, "Sweat": 0, "Pose": 4, "Tears": 0}, 4, "Hmph...", True),
+    "Thinking deep": ({"Eyebrows": 4, "Eyes": 5, "Blush": 0, "Mouth": 2, "Sweat": 0, "Pose": 4, "Tears": 0}, 4, "Hmm, I wonder...", True),
+    "Bringing up a topic": ({"Eyebrows": 0, "Eyes": 0, "Blush": 0, "Mouth": 3, "Sweat": 0, "Pose": 0, "Tears": 0}, 4, "Darling, have you ever thought of...", True),
+    "In loving worries": ({"Eyebrows": 2, "Eyes": 0, "Blush": 0, "Mouth": 2, "Sweat": 0, "Pose": 1, "Tears": 0}, 4, "Honey, is everything alright?..", True)
 }
 
 
