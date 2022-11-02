@@ -1,3 +1,8 @@
+# settings.rpy contains settings pane (and persistent variables) for the submod.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
 define persistent._fom_saysomething_show_code = False
 
 screen fom_saysomething_settings:
