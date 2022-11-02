@@ -179,6 +179,10 @@ init 100 python in _fom_saysomething:
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
 
+            # Adjustment object to keep scroll state for preset list and prevent
+            # jumping on re-render.
+            self.presets_list_adjustment = ui.adjustment()
+
             # Variable that stores entered preset search text prompt.
             self.presets_search = ""
 
@@ -756,6 +760,8 @@ screen fom_saysomething_picker(say=True):
                             yfill False
                             mousewheel True
                             arrowkeys True
+
+                            yadjustment picker.presets_list_adjustment
 
                             vbox:
                                 spacing 10
