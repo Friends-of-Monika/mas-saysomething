@@ -11,7 +11,10 @@ init -990 python in mas_submod_utils:
         name="Say Something",
         description="Ask your Monika to say something and pose for you~",
         version="1.5.0",
-        settings_pane="fom_saysomething_settings"
+        settings_pane="fom_saysomething_settings",
+        version_updates={
+            "friends_of_monika_say_something_v1_5_0": "friends_of_monika_say_something_v1_5_1"
+        }
     )
 
 

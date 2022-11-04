@@ -50,12 +50,14 @@ init 100 python in _fom_saysomething:
 
 
     # Orderect dictionary is used to preserve order when rendering a table of
-    # selectors. This dictionary contains key (human readable name of expression
-    # part) to list of 2-tuples of the following elements:
-    #  [0]: expression code/mnemonic
-    #  [1]: expression human readable description
+    # selectors. This dictionary has the following structure:
+    #  [key] -> tuple:
+    #    [0]: human-readable selector name
+    #    [1] -> tuple:
+    #      [0]: expression code/mnemonic
+    #      [1]: expression human readable description
     EXPR_MAP = OrderedDict([
-        ("Pose", [
+        ("pose", ("Pose", [
             ("1", "Rest on hands"),
             ("2", "Cross"),
             ("3", "Point right, rest"),
@@ -63,8 +65,8 @@ init 100 python in _fom_saysomething:
             ("5", "Lean"),
             ("6", "Down"),
             ("7", "Point right, down")
-        ]),
-        ("Eyes", [
+        ])),
+        ("eyes", ("Eyes", [
             ("e", "Normal"),
             ("w", "Wide"),
             ("s", "Sparkle"),
@@ -79,33 +81,33 @@ init 100 python in _fom_saysomething:
             ("f", "Soft"),
             ("m", "Smug, left"),
             ("g", "Smug, right")
-        ]),
-        ("Eyebrows", [
+        ])),
+        ("eyebrows", ("Eyebrows", [
             ("u", "Up"),
             ("f", "Furrowed"),
             ("k", "Knit"),
             ("s", "Straight"),
             ("t", "Thinking")
-        ]),
-        ("Blush", [
+        ])),
+        ("blush", ("Blush", [
             (None, "None"),
             ("bl", "Line"),
             ("bs", "Shade"),
             ("bf", "Full")
-        ]),
-        ("Tears", [
+        ])),
+        ("tears", ("Tears", [
             (None, "None"),
             ("ts", "Streaming"),
             ("td", "Dried"),
             ("tp", "Pooled"),
             ("tu", "Tearing up")
-        ]),
-        ("Sweat", [
+        ])),
+        ("sweat", ("Sweat", [
             (None, "None"),
             ("sdl", "Left cheek"),
             ("sdr", "Right cheek"),
-        ]),
-        ("Mouth", [
+        ])),
+        ("mouth", ("Mouth", [
             ("a", "Smile, closed"),
             ("b", "Smile, open"),
             ("c", "Straight"),
@@ -116,7 +118,7 @@ init 100 python in _fom_saysomething:
             ("x", "Grit teeth"),
             ("p", "Pout"),
             ("t", "Triangle")
-        ])
+        ]))
     ])
 
 
@@ -154,7 +156,7 @@ init 100 python in _fom_saysomething:
             #  [0]: current expression cursor index
             #  [1]: current expression human readable name
             # Initially all cursors are at zero (with corresponding expression names.)
-            self.pose_cursors = {key: (0, EXPR_MAP[key][0][1]) for key in EXPR_MAP.keys()}
+            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
 
             # Position object to use when showing Monika at her table. By
             # default, her usual middle screen position.
@@ -225,7 +227,7 @@ init 100 python in _fom_saysomething:
             """
 
             curr = self.pose_cursors[key][0]
-            _max = len(EXPR_MAP[key]) - 1
+            _max = len(EXPR_MAP[key][1]) - 1
 
             if forward:
                 if curr == _max:
@@ -238,7 +240,7 @@ init 100 python in _fom_saysomething:
                 else:
                     new = curr - 1
 
-            self.pose_cursors[key] = (new, EXPR_MAP[key][new][1])
+            self.pose_cursors[key] = (new, EXPR_MAP[key][1][new][1])
 
             # This is equivalent to using Return(RETURN_RENDER) action.
             # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
@@ -259,7 +261,7 @@ init 100 python in _fom_saysomething:
             """
 
             curr = self.pose_cursors[key][0]
-            return EXPR_MAP[key][curr][1]
+            return EXPR_MAP[key][1][curr][1]
 
         def get_sprite_code(self):
             """
@@ -411,7 +413,7 @@ init 100 python in _fom_saysomething:
             pose_cur, pos, text, buttons = persistent._fom_saysomething_presets[name]
 
             # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][cur][1]) for key, cur in pose_cur.items()}
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
 
             # Load position
             self.position_adjustment.value = pos
