@@ -1,3 +1,8 @@
+# updates.rpy contains labels for version update data migration logic.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
 label friends_of_monika_say_something_v1_5_0(version="v1_5_0"):
     return
 

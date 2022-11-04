@@ -1,4 +1,4 @@
-# topc.rpy contains event for the 'Can you say something ...?' topic that shows
+# topic.rpy contains event for the 'Can you say something ...?' topic that shows
 # expression/position picker and text input GUI.
 #
 # This file is part of Say Something (see link below):
