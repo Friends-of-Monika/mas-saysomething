@@ -273,7 +273,8 @@ init 100 python in _fom_saysomething:
             """
 
             code = list()
-            for key, values in EXPR_MAP.items():
+            for key, data in EXPR_MAP.items():
+                _, values = data
                 value = values[self.pose_cursors[key][0]][0]
                 if value is not None:
                     code.append(value)
