@@ -647,7 +647,7 @@ screen fom_saysomething_picker(say=True):
                                     else:
                                         text picker.get_sprite_code() xalign 0.5
 
-                        for key, value in _fom_saysomething.EXPR_MAP.items():
+                        for key, data in _fom_saysomething.EXPR_MAP.items():
                             hbox:
                                 xmaximum 350
                                 xfill True
@@ -660,7 +660,7 @@ screen fom_saysomething_picker(say=True):
                                 hbox:
                                     xfill True
                                     xmaximum 110
-                                    text key
+                                    text data[0]
 
                                 hbox:
                                     xmaximum 240
