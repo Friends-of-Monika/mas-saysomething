@@ -22,5 +22,5 @@ $Mod = "$Mod\$Name"
 
 Copy-Item -Recurse $Dir\mod $Mod
 
-Compress-Archive -Update -Path $Temp\game\Submods -DestinationPath $Build\$Package-$Version.zip
+Compress-Archive -Update -Path $Temp\game -DestinationPath $Build\$Package-$Version.zip
 Remove-Item -Recurse $Temp

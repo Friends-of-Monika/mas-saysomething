@@ -41,7 +41,9 @@
 1. Go to [the latest release page][6] and scroll to Assets section.
 2. Download `say-something-VERSION-MASVERSION.zip` file for your current MAS
    version.
-3. Drag and drop `Submods` folder from it into your `game` folder.
+3. Drag and drop `game/` folder from it into your DDLC folder.
+
+   **NOTE:** make sure you don't drag it *into `game`*!
 4. You're all set!~
 
 ## 🏅 Special thanks
