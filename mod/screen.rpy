@@ -31,6 +31,7 @@ init 100 python in _fom_saysomething:
     import store
     from store import ui, persistent
     from store import FieldInputValue
+    from store import MASMoniBlinkTransform, MASMoniWinkTransform
 
     import math
     from collections import OrderedDict
