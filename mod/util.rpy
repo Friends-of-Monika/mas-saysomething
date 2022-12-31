@@ -4,7 +4,7 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-init python:
+init python in _fom_saysomething:
     def set_eyes_lock(self, exp, lock):
         """
         Locks or unlocks winking (closing then opening left/right eye for
