@@ -34,10 +34,10 @@ init -200 python in mas_ui:
 
 
 init 100 python in _fom_saysomething:
-
     import store
     from store import ui, persistent
     from store import FieldInputValue
+    from store import MASMoniBlinkTransform, MASMoniWinkTransform
 
     import math
     from collections import OrderedDict
@@ -208,6 +208,10 @@ init 100 python in _fom_saysomething:
 
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
+
+            # Boolean variable to tell if Monika is currently posing or not
+            # (used for locking/unlocking winking/blinking.)
+            self.posing = False
 
         def pose_switch_selector(self, key, forward):
             """
@@ -592,8 +596,11 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
-
+    # Declare picker as a variable.
     picker = None
+
+    # Declare posing state as a variable.
+    posing = False
 
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
