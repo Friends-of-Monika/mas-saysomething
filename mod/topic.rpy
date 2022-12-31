@@ -72,7 +72,18 @@ label fom_saysomething_event_retry:
     # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
     while stop_picker_loop is False:
+        # During the pose picking, Monika must not blink or transition from
+        # winking to fully open eyes, so here we lock these transitions.
+        if not persistent._fom_saysomething_allow_winking:
+            $ exp = picker.get_sprite_code()
+            $ picker.set_eyes_lock(exp, True)
+
+        # Show the GUI and await for interaction.
         call screen fom_saysomething_picker(say)
+
+        if not persistent._fom_saysomething_allow_winking:
+            # Once out of GUI, unlock the winking/blinking.
+            $ picker.set_eyes_lock(exp, False)
 
         if _return == _fom_saysomething.RETURN_CLOSE:
             # Player has changed their mind, so just stop and put Monika back.
@@ -106,8 +117,13 @@ label fom_saysomething_event_retry:
             if not picker.show_buttons:
                 call fom_saysomething_event_buttons(_show=False)
 
+            # Lock winking/blinking for the current sprite code.
+            if not persistent._fom_saysomething_allow_winking:
+                $ exp = picker.get_sprite_code()
+                $ picker.set_eyes_lock(exp, True)
+
             # Show Monika with sprite code and at set position and say text.
-            $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
+            $ renpy.show("monika " + exp, [picker.position])
             if say:
                 $ quip = picker.text
                 m "[quip!q]"
@@ -115,6 +131,10 @@ label fom_saysomething_event_retry:
                 window hide
                 pause 5.0
                 window show
+
+            # Unlock winking/blinking.
+            if not picker.show_buttons:
+                $ picker.set_eyes_lock(exp, False)
 
             # Anyway, recover buttons after we're done showing.
             if not picker.show_buttons:
@@ -140,15 +160,15 @@ label fom_saysomething_event_retry:
                 "No.":
                     m 1hua "Okay~"
 
+    call fom_saysomething_event_buttons(_show=True)
+    return
+
 label fom_saysomething_event_buttons(_show=True):
     # Here we're recovering (since show=True when not called) buttons after
-    # player chose to hide them. This is also a callable label we can reuse.
+    # player chose to hide them.
+    $ quick_menu = _show
     if _show:
-        $ quick_menu = True
         $ HKBShowButtons()
     else:
-        $ quick_menu = False
         $ HKBHideButtons()
-
-    # This return also returns from event.
     return
