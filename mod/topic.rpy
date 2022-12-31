@@ -75,17 +75,16 @@ label fom_saysomething_event_retry:
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
         if not persistent._fom_saysomething_allow_winking:
-            $ exp = picker.get_sprite_code()
-            $ picker.set_eyes_lock(exp, True)
+            $ picker.set_eyes_lock(picker.get_sprite_code(), True)
 
         # Show the GUI and await for interaction.
-        $ picker.open = True
+        $ picker.posing = True
         call screen fom_saysomething_picker(say)
-        $ picker.open = False
+        $ picker.posing = False
 
         if not persistent._fom_saysomething_allow_winking:
             # Once out of GUI, unlock the winking/blinking.
-            $ picker.set_eyes_lock(exp, False)
+            $ picker.set_eyes_lock(picker.get_sprite_code(), False)
 
         if _return == _fom_saysomething.RETURN_CLOSE:
             # Player has changed their mind, so just stop and put Monika back.
@@ -124,6 +123,9 @@ label fom_saysomething_event_retry:
                 $ exp = picker.get_sprite_code()
                 $ picker.set_eyes_lock(exp, True)
 
+            # Set flag as posing.
+            $ picker.posing = True
+
             # Show Monika with sprite code and at set position and say text.
             $ renpy.show("monika " + exp, [picker.position])
             if say:
@@ -133,6 +135,9 @@ label fom_saysomething_event_retry:
                 window hide
                 pause 5.0
                 window show
+
+            # No longer posing.
+            $ picker.posing = False
 
             # Unlock winking/blinking.
             if not picker.show_buttons:

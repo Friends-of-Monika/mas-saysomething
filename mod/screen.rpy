@@ -208,8 +208,9 @@ init 100 python in _fom_saysomething:
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
 
-            # Boolean variable to tell if picker is currently displayed or not.
-            self.open = False
+            # Boolean variable to tell if Monika is currently posing or not
+            # (used for locking/unlocking winking/blinking.)
+            self.posing = False
 
         def pose_switch_selector(self, key, forward):
             """
