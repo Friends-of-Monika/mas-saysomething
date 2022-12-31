@@ -26,6 +26,14 @@ screen fom_saysomething_settings:
 
         textbutton "Allow winking/blinking":
             selected persistent._fom_saysomething_allow_winking
-            action ToggleField(persistent, "_fom_saysomething_allow_winking")
+            action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
             hovered SetField(tooltip, "value", "Allow Monika to blink or wink when posing.")
             unhovered SetField(tooltip, "value", tooltip.default)
+
+init python:
+    def _fom_saysomething_allow_winking_callback():
+        if picker is not None and picker.open:
+            # Ensure that when picker is open allowing winking will unlock eyes,
+            # and vice versa; disallowing winking will lock eyes.
+            exp = picker.get_sprite_code()
+            picker.set_eyes_lock(exp, not persistent._fom_saysomething_allow_winking)

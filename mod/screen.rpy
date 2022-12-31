@@ -27,7 +27,6 @@ define persistent._fom_saysomething_presets = {
 
 
 init 100 python in _fom_saysomething:
-
     import store
     from store import ui, persistent
     from store import FieldInputValue
@@ -208,6 +207,9 @@ init 100 python in _fom_saysomething:
 
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
+
+            # Boolean variable to tell if picker is currently displayed or not.
+            self.open = False
 
         def pose_switch_selector(self, key, forward):
             """
@@ -550,7 +552,7 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
-
+    # Declare picker as a variable.
     picker = None
 
 

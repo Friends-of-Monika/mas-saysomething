@@ -79,7 +79,9 @@ label fom_saysomething_event_retry:
             $ picker.set_eyes_lock(exp, True)
 
         # Show the GUI and await for interaction.
+        $ picker.open = True
         call screen fom_saysomething_picker(say)
+        $ picker.open = False
 
         if not persistent._fom_saysomething_allow_winking:
             # Once out of GUI, unlock the winking/blinking.
