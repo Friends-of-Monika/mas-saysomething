@@ -4,6 +4,7 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 define persistent._fom_saysomething_show_code = False
+define persistent._fom_saysomething_allow_winking = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -22,3 +23,21 @@ screen fom_saysomething_settings:
             action ToggleField(persistent, "_fom_saysomething_show_code")
             hovered SetField(tooltip, "value", "Enable display of expression code.")
             unhovered SetField(tooltip, "value", tooltip.default)
+
+        textbutton "Allow winking/blinking":
+            selected persistent._fom_saysomething_allow_winking
+            action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
+            hovered SetField(tooltip, "value", "Allow Monika to blink or wink when posing.")
+            unhovered SetField(tooltip, "value", tooltip.default)
+
+init python:
+    def _fom_saysomething_allow_winking_callback():
+        from store._fom_saysomething import picker
+        from store._fom_saysomething import posing
+        from store._fom_saysomething import set_eyes_lock
+
+        if picker is not None and posing:
+            # Ensure that when Monika is posing allowing winking will unlock
+            # eyes, and vice versa; disallowing winking will lock eyes.
+            exp = picker.get_sprite_code()
+            set_eyes_lock(exp, not persistent._fom_saysomething_allow_winking)
