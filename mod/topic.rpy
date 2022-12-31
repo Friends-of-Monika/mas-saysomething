@@ -144,7 +144,7 @@ label fom_saysomething_event_retry:
             # Lock winking/blinking for the current sprite code.
             if not persistent._fom_saysomething_allow_winking:
                 $ exp = picker.get_sprite_code()
-                $ picker.set_eyes_lock(exp, True)
+                $ set_eyes_lock(exp, True)
 
             # Set flag as posing.
             $ _fom_saysomething.posing = True
