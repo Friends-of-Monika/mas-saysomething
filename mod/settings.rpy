@@ -32,6 +32,7 @@ screen fom_saysomething_settings:
 
 init python:
     def _fom_saysomething_allow_winking_callback():
+        picker = _fom_saysomething.picker
         if picker is not None and picker.open:
             # Ensure that when picker is open allowing winking will unlock eyes,
             # and vice versa; disallowing winking will lock eyes.
