@@ -5,7 +5,7 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 init python in _fom_saysomething:
-    def set_eyes_lock(self, exp, lock):
+    def set_eyes_lock(exp, lock):
         """
         Locks or unlocks winking (closing then opening left/right eye for
         one second) and blinking (quickly closing and opening both eyes
