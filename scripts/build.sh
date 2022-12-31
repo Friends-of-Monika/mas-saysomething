@@ -15,4 +15,4 @@ mkdir -p "$mod"
 
 cp -r "$dir/mod"/* "$mod"
 
-(cd "$temp/game" || exit 1; find Submods | zip -9@q "$build/$package-$version.zip" && rm -rf "$temp")
+(cd "$temp" || exit 1; find game | zip -9@q "$build/$package-$version.zip" && rm -rf "$temp")
