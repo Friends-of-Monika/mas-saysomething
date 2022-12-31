@@ -32,9 +32,12 @@ screen fom_saysomething_settings:
 
 init python:
     def _fom_saysomething_allow_winking_callback():
-        picker = _fom_saysomething.picker
-        if picker is not None and picker.posing:
+        from _fom_saysomething import picker
+        from _fom_saysomething import posing
+        from _fom_saysomething import set_eyes_lock
+
+        if picker is not None and posing:
             # Ensure that when Monika is posing allowing winking will unlock
             # eyes, and vice versa; disallowing winking will lock eyes.
             exp = picker.get_sprite_code()
-            picker.set_eyes_lock(exp, not persistent._fom_saysomething_allow_winking)
+            set_eyes_lock(exp, not persistent._fom_saysomething_allow_winking)

@@ -556,6 +556,9 @@ init 100 python in _fom_saysomething:
     # Declare picker as a variable.
     picker = None
 
+    # Declare posing state as a variable.
+    posing = False
+
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
 # Some elements have been adjusted for design of this submod's GUI.
