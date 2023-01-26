@@ -205,9 +205,7 @@ init 100 python in _fom_saysomething:
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
 
-            # Boolean variable to tell if Monika is currently posing or not
-            # (used for locking/unlocking winking/blinking.)
-            self.posing = False
+            self.session = None
 
         def pose_switch_selector(self, key, forward):
             """
@@ -445,6 +443,9 @@ init 100 python in _fom_saysomething:
             self.preset_name = ""
             self.preset_cursor = None
 
+        def enable_session_mode(self):
+            pass
+
         def on_position_change(self, value):
             """
             Callback function for position bar.
@@ -673,26 +674,29 @@ screen fom_saysomething_picker(say=True):
                             adjustment picker.position_adjustment
                             released Return(_fom_saysomething.RETURN_RENDER)
 
-                # Buttons tickbox.
+                # Speech/session mode button.
 
-                # frame:
-                #     padding (10, 5)
+                frame:
+                    background None
+                    padding (0, 0)
 
-                #     hbox:
-                #         style_prefix "check"
+                    hbox:
+                        style_prefix "fom_saysomething_confirm"
 
-                #         xmaximum 350
-                #         xfill True
-                #         spacing 10
+                        xmaximum 350
+                        xfill True
 
-                #         if say:
-                #             textbutton "Show buttons and quick menu":
-                #                 selected picker.show_buttons
-                #                 action Function(picker.on_buttons_tick)
-                #         else:
-                #             textbutton "Show buttons":
-                #                 selected picker.show_buttons
-                #                 action Function(picker.on_buttons_tick)
+                        spacing 10
+
+                        if picker.session is None:
+                            textbutton "Enable session mode":
+                                xysize (370, None)
+                                action Show("fom_saysomething_preset_confirm_modal",
+                                            title="Enable session mode?",
+                                            message="You will be able to save multiple sayings "
+                                                    "for Monika to say them one after another.",
+                                            ok_button="OK",
+                                            ok_action=Function(picker.enable_session_mode))
 
             else:
 
@@ -782,8 +786,8 @@ screen fom_saysomething_picker(say=True):
         # Confirmation buttons area.
 
         frame:
-            padding(0, 10)
             background None
+            padding (0, 10)
 
             hbox:
                 style_prefix "fom_saysomething_confirm"
@@ -832,10 +836,10 @@ screen fom_saysomething_picker(say=True):
                         selected False
                     if picker.preset_cursor is not None:
                         key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
-                                                   title="Delete this preset?",
-                                                   message=picker.preset_name,
-                                                   ok_button="Delete",
-                                                   ok_action=Function(picker.delete_preset, picker.preset_name))
+                                                    title="Delete this preset?",
+                                                    message=picker.preset_name,
+                                                    ok_button="Delete",
+                                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
@@ -1016,7 +1020,7 @@ screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_actio
 
     frame:
         vbox:
-            xmaximum 300
+            xmaximum 400
             xfill True
 
             align (0.5, 0.5)
