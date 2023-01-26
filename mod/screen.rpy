@@ -610,7 +610,8 @@ init 100 python in _fom_saysomething:
     # Declare picker as a variable.
     picker = None
 
-    # Declare posing state as a variable.
+    # Boolean variable to tell if Monika is currently posing or not
+    # (used for locking/unlocking winking/blinking.)
     posing = False
 
 
