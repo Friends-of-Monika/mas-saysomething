@@ -152,35 +152,12 @@ init 100 python in _fom_saysomething:
             Creates a new Picker instance.
             """
 
-            # This dictionary contains key to 2-tuple of:
-            #  [0]: current expression cursor index
-            #  [1]: current expression human readable name
-            # Initially all cursors are at zero (with corresponding expression names.)
-            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
-
-            # Position object to use when showing Monika at her table. By
-            # default, her usual middle screen position.
-            self.position = POSITIONS[4][0]
-
-            # Adjustment object to define slider properties for position slider
-            # and handle value changes.
-            self.position_adjustment = ui.adjustment(
-                range=len(POSITIONS) - 1,
-                value=4,
-                adjustable=True,
-                changed=self.on_position_change
-            )
+            self._reset_state()
 
             # Flag value for flipping selectors/position GUI to left side of
             # screen if it would mean Monika is behind the GUI and not in user's
             # sight.
             self.gui_flip = False
-
-            # Variable that stores entered user text prompt.
-            self.text = ""
-
-            # Ren'Py input value to allow disabling text input when needed.
-            self.text_value = FieldInputValue(self, "text", returnable=False)
 
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
@@ -375,6 +352,34 @@ init 100 python in _fom_saysomething:
             """
 
             return name in persistent._fom_saysomething_presets
+
+        def _reset_state(self):
+            # This dictionary contains key to 2-tuple of:
+            #  [0]: current expression cursor index
+            #  [1]: current expression human readable name
+            # Initially all cursors are at zero (with corresponding expression names.)
+            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+
+            # Position object to use when showing Monika at her table. By
+            # default, her usual middle screen position.
+            self.position = POSITIONS[4][0]
+
+            # Adjustment object to define slider properties for position slider
+            # and handle value changes.
+            self.position_adjustment = ui.adjustment(
+                range=len(POSITIONS) - 1,
+                value=4,
+                adjustable=True,
+                changed=self.on_position_change
+            )
+
+            # Variable that stores entered user text prompt.
+            self.text = ""
+
+            # Ren'Py input value to allow disabling text input when needed.
+            self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            return RETURN_RENDER
 
         def save_preset(self, name):
             """
