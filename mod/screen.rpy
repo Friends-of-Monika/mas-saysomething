@@ -183,6 +183,7 @@ init 100 python in _fom_saysomething:
             self.preset_cursor = None
 
             self.session = None
+            self.session_cursor = 0
 
         def pose_switch_selector(self, key, forward):
             """
@@ -381,6 +382,29 @@ init 100 python in _fom_saysomething:
 
             return RETURN_RENDER
 
+        def _save_state(self):
+            return (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text  #2 - text
+            )
+
+        def _load_state(self, state):
+            pose_cur, pos, text = state
+
+            # Load selectors
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
+
+            # Load position
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            return RETURN_RENDER
+
         def save_preset(self, name):
             """
             Saves current state of a picker into a preset with the provided
@@ -391,11 +415,7 @@ init 100 python in _fom_saysomething:
                     Name to save this preset with.
             """
 
-            persistent._fom_saysomething_presets[name] = (
-                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
-                self.text  #2 - text
-            )
+            persistent._fom_saysomething_presets[name] = self._save_state()
 
             self.preset_name = name
             self.preset_cursor = name
@@ -414,25 +434,12 @@ init 100 python in _fom_saysomething:
                     Always returns value of RETURN_RENDER constant.
             """
 
-            pose_cur, pos, text = persistent._fom_saysomething_presets[name]
-
-            # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
-
-            # Load position
-            self.position_adjustment.value = pos
-            self.on_position_change(pos)
-
-            # Load text
-            self.text = text
-            self.on_text_change(text)
-
             # Set preset name (for easier overwriting) and cursor (to keep
             # visual track of current preset.)
             self.preset_name = name
             self.preset_cursor = name
 
-            return RETURN_RENDER
+            return self._load_state(persistent._fom_saysomething_presets[name])
 
         def delete_preset(self, name):
             """
@@ -449,7 +456,69 @@ init 100 python in _fom_saysomething:
             self.preset_cursor = None
 
         def enable_session_mode(self):
-            pass
+            self.session = list()
+
+        def session_switch_usable(self, forward):
+            if forward:
+                return self.session is not None and self.session_cursor < len(self.session)
+            else:
+                return self.session is not None and self.session_cursor > 0
+
+        def session_switch_cursor(self, forward):
+            if self.session is None or len(self.session) == 0:
+                return
+
+            if forward:
+                if self.session_cursor + 1 < len(self.session):
+                    self.session_cursor += 1
+                    self._load_state(self.session[self.session_cursor])
+                else:
+                    self.session_cursor = len(self.session)
+                    self._reset_state()
+                return RETURN_RENDER
+            else:
+                if self.session_cursor > 0:
+                    self.session_cursor -= 1
+                else:
+                    self.session_cursor = 0
+                self._load_state(self.session[self.session_cursor])
+                return RETURN_RENDER
+
+        def add_session_item(self):
+            self.session.append(self._save_state())
+            self.session_cursor += 1
+            self._reset_state()
+            return RETURN_RENDER
+
+        def edit_session_item(self):
+            self.session[self.session_cursor] = self._save_state()
+
+        def remove_session_item(self):
+            if self.session_cursor > len(self.session) - 1:
+                self.session.pop(len(self.session) - 1)
+                self.session_cursor = len(self.session)
+                self._load_state(self.session[self.session_cursor])
+
+            elif self.session_cursor < 0:
+                self.session.pop(0)
+                self.session_cursor = 0
+
+            else:
+                self.session.pop(self.session_cursor)
+
+            if self.session_cursor < len(self.session):
+                self._load_state(self.session[self.session_cursor])
+            else:
+                self._reset_state()
+            return RETURN_RENDER
+
+        def can_remove_session(self):
+            return self.session_cursor >= 0 and self.session_cursor < len(self.session)
+
+        def is_editing_session_item(self):
+            if self.session_cursor == 0 and len(self.session) == 0:
+                return False
+            return self.session_cursor != len(self.session)
 
         def on_position_change(self, value):
             """
@@ -698,10 +767,34 @@ screen fom_saysomething_picker(say=True):
                                 xysize (370, None)
                                 action Show("fom_saysomething_preset_confirm_modal",
                                             title="Enable session mode?",
-                                            message="You will be able to save multiple sayings "
-                                                    "for Monika to say them one after another.",
+                                            message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
+                                                    "for Monika to do them one after another in a row.\n\n"
+                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.",
                                             ok_button="OK",
                                             ok_action=Function(picker.enable_session_mode))
+
+                        else:
+                            textbutton ("Add" if not picker.is_editing_session_item() else "Edit"):
+                                sensitive not picker.is_text_empty()
+                                if picker.is_editing_session_item():
+                                    action Function(picker.edit_session_item)
+                                else:
+                                    action Function(picker.add_session_item)
+
+                            textbutton "Remove":
+                                sensitive picker.can_remove_session()
+                                action Function(picker.remove_session_item)
+
+                            textbutton "<":
+                                xysize (54, None)
+                                sensitive picker.session_switch_usable(forward=False)
+                                action Function(picker.session_switch_cursor, forward=False)
+
+                            textbutton ">":
+                                xysize (54, None)
+                                sensitive picker.session_switch_usable(forward=True)
+                                action Function(picker.session_switch_cursor, forward=True)
+
 
             else:
 
