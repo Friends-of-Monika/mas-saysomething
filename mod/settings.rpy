@@ -34,9 +34,10 @@ screen fom_saysomething_settings:
 
         hbox:
              textbutton "Show buttons and quick menu":
+                sensitive _fom_saysomething.picker is not None and _fom_saysomething.picker.posing
                 selected not persistent._fom_saysomething_hide_quick_buttons
                 action ToggleField(persistent, "_fom_saysomething_hide_quick_buttons")
-                hovered SetField(tooltip, "value", "Show quick menu and menu buttons.")
+                hovered SetField(tooltip, "value", "Show quick menu and menu buttons (can be only toggled when in say/pose menu.)")
                 unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:
