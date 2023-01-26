@@ -91,7 +91,7 @@ label fom_saysomething_event_retry:
             $ stop_picker_loop = True
 
             # Show buttons and quick menu if they were hidden.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=True)
 
             if not persistent._fom_saysomething_allow_winking:
@@ -120,7 +120,7 @@ label fom_saysomething_event_retry:
                 $ set_eyes_lock(exp, False)
 
             # Hide or show buttons and quick menu.
-            call fom_saysomething_event_buttons(_show=picker.show_buttons)
+            call fom_saysomething_event_buttons(_show=not persistent._fom_saysomething_hide_quick_buttons)
 
         elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
@@ -138,7 +138,7 @@ label fom_saysomething_event_retry:
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
             # Show or hide buttons depending on user preference.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=False)
 
             # Lock winking/blinking for the current sprite code.
@@ -166,11 +166,11 @@ label fom_saysomething_event_retry:
             $ _fom_saysomething.posing = False
 
             # Unlock winking/blinking.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 $ set_eyes_lock(exp, False)
 
             # Anyway, recover buttons after we're done showing.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=True)
 
             show monika 3tua at t11
