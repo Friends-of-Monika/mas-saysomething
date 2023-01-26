@@ -945,6 +945,7 @@ screen fom_saysomething_picker(say=True):
                 # altogether, for presets it will take back to selectors.
 
                 textbutton ("Close" if not picker.presets_menu else "Back"):
+                    xysize (118, None)
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
