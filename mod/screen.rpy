@@ -176,9 +176,6 @@ init 100 python in _fom_saysomething:
             # sight.
             self.gui_flip = False
 
-            # Flag value for showing or hiding buttons and quick menu.
-            self.show_buttons = True
-
             # Variable that stores entered user text prompt.
             self.text = ""
 
@@ -394,8 +391,7 @@ init 100 python in _fom_saysomething:
             persistent._fom_saysomething_presets[name] = (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
                 self.position_adjustment.value,  #1 - position
-                self.text,  #2 - text
-                self.show_buttons,  #3 - buttons
+                self.text  #2 - text
             )
 
             self.preset_name = name
@@ -415,7 +411,7 @@ init 100 python in _fom_saysomething:
                     Always returns value of RETURN_RENDER constant.
             """
 
-            pose_cur, pos, text, buttons = persistent._fom_saysomething_presets[name]
+            pose_cur, pos, text = persistent._fom_saysomething_presets[name]
 
             # Load selectors
             self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
@@ -427,9 +423,6 @@ init 100 python in _fom_saysomething:
             # Load text
             self.text = text
             self.on_text_change(text)
-
-            # Load buttons
-            self.show_buttons = buttons
 
             # Set preset name (for easier overwriting) and cursor (to keep
             # visual track of current preset.)
@@ -504,20 +497,6 @@ init 100 python in _fom_saysomething:
             """
             if self.text.count("\n") < 2:
                 self.text += "\n"
-
-        def on_buttons_tick(self):
-            """
-            Callback for buttons/GUI tickbox button. Flips it and returns,
-            ending interaction with screen and returning a value for
-            re-rendering.
-
-            OUT:
-                RETURN_RENDER:
-                    Always returns RETURN_RENDER constant.
-            """
-
-            self.show_buttons = not self.show_buttons
-            return RETURN_RENDER
 
         def on_search_input_change(self, value):
             """
@@ -696,24 +675,24 @@ screen fom_saysomething_picker(say=True):
 
                 # Buttons tickbox.
 
-                frame:
-                    padding (10, 5)
+                # frame:
+                #     padding (10, 5)
 
-                    hbox:
-                        style_prefix "check"
+                #     hbox:
+                #         style_prefix "check"
 
-                        xmaximum 350
-                        xfill True
-                        spacing 10
+                #         xmaximum 350
+                #         xfill True
+                #         spacing 10
 
-                        if say:
-                            textbutton "Show buttons and quick menu":
-                                selected picker.show_buttons
-                                action Function(picker.on_buttons_tick)
-                        else:
-                            textbutton "Show buttons":
-                                selected picker.show_buttons
-                                action Function(picker.on_buttons_tick)
+                #         if say:
+                #             textbutton "Show buttons and quick menu":
+                #                 selected picker.show_buttons
+                #                 action Function(picker.on_buttons_tick)
+                #         else:
+                #             textbutton "Show buttons":
+                #                 selected picker.show_buttons
+                #                 action Function(picker.on_buttons_tick)
 
             else:
 
