@@ -189,7 +189,7 @@ label fom_saysomething_event_retry:
                     m "[quip!q]"
                 else:
                     window hide
-                    pause 5.0
+                    pause picker.pose_delay
                     window show
 
             # Cleanup.

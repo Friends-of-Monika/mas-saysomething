@@ -182,8 +182,12 @@ init 100 python in _fom_saysomething:
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
 
+            # Session states and current state cursor.
             self.session = None
             self.session_cursor = 0
+
+            # Delay between changing poses.
+            self.pose_delay = persistent._fom_saysomething_pose_pause
 
         def pose_switch_selector(self, key, forward):
             """
