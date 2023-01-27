@@ -162,9 +162,11 @@ label fom_saysomething_event_retry:
                         $ renpy.notify("You can take a screenshot by pressing " + scr_key + ".")
                     $ del scr_key
 
+                # Get current expression after it was changed.
+                $ exp = picker.get_sprite_code()
+
                 # Lock winking/blinking for the current sprite code.
                 if not persistent._fom_saysomething_allow_winking:
-                    $ exp = picker.get_sprite_code()
                     $ set_eyes_lock(exp, True)
 
                 # Set flag as posing.
