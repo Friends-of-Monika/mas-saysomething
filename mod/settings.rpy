@@ -7,6 +7,7 @@ define persistent._fom_saysomething_show_code = False
 define persistent._fom_saysomething_allow_winking = False
 define persistent._fom_saysomething_hide_quick_buttons = False
 define persistent._fom_saysomething_seen_screenshot_hint = False
+define persistent._fom_saysomething_speech_mode_default = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -42,6 +43,12 @@ screen fom_saysomething_settings:
                 action ToggleField(persistent, "_fom_saysomething_seen_screenshot_hint")
                 hovered SetField(tooltip, "value", "Show a hint with screenshot key when saying or posing.")
                 unhovered SetField(tooltip, "value", tooltip.default)
+
+        textbutton "Enable speech/session mode by default":
+            selected not persistent._fom_saysomething_speech_mode_default
+            action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
+            hovered SetField(tooltip, "value", "Always enable speech/session mode without asking.")
+            unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:
     def _fom_saysomething_allow_winking_callback():

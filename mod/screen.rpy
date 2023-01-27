@@ -867,7 +867,8 @@ screen fom_saysomething_picker(say=True):
                                             title="Enable " + ("speech" if say else "session") + " mode?",
                                             message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
                                                     "for Monika to do them one after another in a row.\n\n"
-                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.",
+                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.\n\n"
+                                                    "{i}You can enable " + ("speech" if say else "session") + " mode by default in submod settings.{/i}",
                                             ok_button="OK",
                                             ok_action=Function(picker.enable_session_mode))
 

@@ -67,6 +67,10 @@ label fom_saysomething_event_retry:
     $ _fom_saysomething.picker = _fom_saysomething.Picker()
     $ picker = _fom_saysomething.picker
 
+    # If player wants speech/session mode by default, enable it now.
+    if persistent._fom_saysomething_speech_mode_default:
+        $ picker.enable_session_mode()
+
     # 'Import' set_eyes_lock.
     $ set_eyes_lock = _fom_saysomething.set_eyes_lock
 
