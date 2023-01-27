@@ -502,8 +502,10 @@ init 100 python in _fom_saysomething:
             Callback for Enter key press (without Shift.) Adds a line break if
             there are less than two line breaks in the line already.
             """
+
             if self.text.count("\n") < 2:
                 self.text += "\n"
+            return RETURN_RENDER
 
         def on_buttons_tick(self):
             """
