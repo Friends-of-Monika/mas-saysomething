@@ -172,16 +172,24 @@ label fom_saysomething_event_retry:
                 $ _fom_saysomething.posing = True
 
                 # Show Monika with sprite code and at set position, optionally lock
-                # eyes blinking and say text.
-                $ renpy.show("monika " + exp, [picker.position])
-                if not persistent._fom_saysomething_allow_winking:
-                    $ set_eyes_lock(exp, True)
+                # eyes blinking and say text. For entering and exiting 5-pose
+                # apply transition.
+                $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
+                if exp.startswith("5") in "exp_5" in globals():
+                    $ renpy.with_statement(dissolve_monika)
+                    if "exp_5" not in globals():
+                        $ exp_5 = True
+                    else:
+                        $ del exp_5
+
+                # Finally, say text or show pose for 5 seconds.
+                # TODO: Configure pause in submods menu.
                 if say:
                     $ quip = picker.text
                     m "[quip!q]"
                 else:
                     window hide
-                    pause 5.0
+                    pause picker.pose_delay
                     window show
 
             # Cleanup.

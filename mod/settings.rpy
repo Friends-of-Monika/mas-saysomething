@@ -8,9 +8,11 @@ define persistent._fom_saysomething_allow_winking = False
 define persistent._fom_saysomething_hide_quick_buttons = False
 define persistent._fom_saysomething_seen_screenshot_hint = False
 define persistent._fom_saysomething_speech_mode_default = False
+define persistent._fom_saysomething_pose_pause = 5.0
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
+    $ pose_delay = "{:.2f}".format(persistent._fom_saysomething_pose_pause)
 
     vbox:
         box_wrap False
@@ -48,6 +50,17 @@ screen fom_saysomething_settings:
             selected persistent._fom_saysomething_speech_mode_default
             action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
             hovered SetField(tooltip, "value", "Always enable speech/session mode without asking.")
+            unhovered SetField(tooltip, "value", tooltip.default)
+
+        hbox:
+            xfill True
+            text "Pose delay: [pose_delay]":
+                style "slider_label"
+
+        bar:
+            style "slider_slider"
+            value FieldValue(persistent, "_fom_saysomething_pose_pause", range=7.0, step=0.1)
+            hovered SetField(tooltip, "value", "Delay between changing poses when asking Monika to pose.")
             unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:
