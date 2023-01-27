@@ -174,7 +174,7 @@ label fom_saysomething_event_retry:
                 # Show Monika with sprite code and at set position, optionally lock
                 # eyes blinking and say text. For entering and exiting 5-pose
                 # apply transition.
-                $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
+                $ renpy.show("monika " + exp, [picker.position])
                 if exp.startswith("5") or "exp_5" in globals():
                     $ renpy.with_statement(dissolve_monika)
                     if "exp_5" not in globals():
