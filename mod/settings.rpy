@@ -16,9 +16,8 @@ screen fom_saysomething_settings:
         xfill True
         xmaximum 800
 
-        hbox:
+        grid 2 2:
             style_prefix "check"
-            box_wrap False
 
             textbutton "Show expression code":
                 selected persistent._fom_saysomething_show_code
