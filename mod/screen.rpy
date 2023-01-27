@@ -456,17 +456,44 @@ init 100 python in _fom_saysomething:
             self.preset_cursor = None
 
         def enable_session_mode(self):
+            """
+            Activates session mode and sets session list. This action should be
+            irreversible for the current picker interaction.
+            """
+
             self.session = list()
 
         def session_switch_usable(self, forward):
+            """
+            Checks if session state switch is usable for backward/forward
+            movement.
+
+            IN:
+                forward -> bool:
+                    True if moving forward, False if backward.
+
+            OUT:
+                True if allowed to navigate to previous/next session state,
+                False otherwise.
+            """
+
             if forward:
                 return self.session is not None and self.session_cursor < len(self.session)
             else:
                 return self.session is not None and self.session_cursor > 0
 
         def session_switch_cursor(self, forward):
-            if self.session is None or len(self.session) == 0:
-                return
+            """
+            Switches current session state to previous/next one.
+
+            IN:
+                forward -> bool:
+                    True if moving forward, False if backward.
+
+            OUT:
+                RETURN_RENDER:
+                    Returned always.
+            """
 
             if forward:
                 if self.session_cursor + 1 < len(self.session):
@@ -485,15 +512,36 @@ init 100 python in _fom_saysomething:
                 return RETURN_RENDER
 
         def add_session_item(self):
+            """
+            Saves current session state and appends it to session.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER.
+            """
+
             self.session.append(self._save_state())
             self.session_cursor += 1
             self._reset_state()
+
             return RETURN_RENDER
 
         def edit_session_item(self):
+            """
+            Changes current session state and saves it to session.
+            """
+
             self.session[self.session_cursor] = self._save_state()
 
         def remove_session_item(self):
+            """
+            Removes current session state.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returned.
+            """
+
             if self.session_cursor > len(self.session) - 1:
                 self.session.pop(len(self.session) - 1)
                 self.session_cursor = len(self.session)
@@ -513,9 +561,31 @@ init 100 python in _fom_saysomething:
             return RETURN_RENDER
 
         def can_remove_session(self):
+            """
+            Checks if it is possible to remove currently showing session state.
+
+            OUT:
+                True:
+                    If possible to remove current session state.
+
+                False:
+                    If not.
+            """
+
             return self.session_cursor >= 0 and self.session_cursor < len(self.session)
 
         def is_editing_session_item(self):
+            """
+            Checks if session cursor is currently behind its head.
+
+            OUT:
+                True:
+                    If user is editing previous state and not adding new one.
+
+                False:
+                    If user is adding new state.
+            """
+
             if self.session_cursor == 0 and len(self.session) == 0:
                 return False
             return self.session_cursor != len(self.session)
