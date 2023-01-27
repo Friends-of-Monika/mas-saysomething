@@ -429,7 +429,6 @@ init 100 python in _fom_saysomething:
 
             # Position cursor, an index to POSITIONS list to pick position by.
             self.position_cursor = 4
-            self.gui_flip = self.position_cursor > 5
 
             # Set GUI flip.
             self.gui_flip = self.position_cursor > 5
