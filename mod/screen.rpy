@@ -1001,11 +1001,12 @@ screen fom_saysomething_picker(say=True):
                         # restart that is done in text input field callback.
                         textbutton "Say":
                             action Return(_fom_saysomething.RETURN_DONE)
-                            sensitive not picker.is_text_empty()
+                            sensitive picker.session is None and not picker.is_text_empty() or len(picker.session) > 0
 
                     else:
                         textbutton "Pose":
                             action Return(_fom_saysomething.RETURN_DONE)
+                            sensitive picker.session is None or len(picker.session) > 0
 
                     textbutton "Presets":
                         # NOTE: DisableAllInputValues will re-focus on search
