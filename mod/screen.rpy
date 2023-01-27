@@ -981,7 +981,7 @@ screen fom_saysomething_picker(say=True):
     # of pressing 'Pose'. When in session mode, this will add current state to
     # the session.
 
-    key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say) capture True
 
     if say:
         # This handles Enter key press and adds a new line.
