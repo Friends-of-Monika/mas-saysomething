@@ -1115,13 +1115,6 @@ screen fom_saysomething_picker(say=True):
                         sensitive picker.preset_cursor is not None
                         selected False
 
-                    if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
-                                                    title="Delete this preset?",
-                                                    message=picker.preset_name,
-                                                    ok_button="Delete",
-                                                    ok_action=Function(picker.delete_preset, picker.preset_name))
-
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
                 # altogether, for presets it will take back to selectors.
@@ -1190,6 +1183,14 @@ screen fom_saysomething_picker(say=True):
 
                 use quick_menu
 
+    # This is here because 'key' somehow affects spacing.
+
+    if picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
+                                    title="Delete this preset?",
+                                    message=picker.preset_name,
+                                    ok_button="Delete",
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
 # Modal screen used for entering new preset name.
 # NOTE: same as main screen refers to picker directly, in global scope.
