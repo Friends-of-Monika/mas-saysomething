@@ -111,7 +111,7 @@ label fom_saysomething_event_retry:
             $ new_exp = picker.get_sprite_code()
 
             # Position or pose/expression update is requested, so do it now.
-            $ renpy.show("monika " + new_exp, [picker.position])
+            $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
 
             # Lock winking/blinking on the new image.
             if not persistent._fom_saysomething_allow_winking:
@@ -176,7 +176,7 @@ label fom_saysomething_event_retry:
                 # eyes blinking and say text. For entering and exiting 5-pose
                 # apply transition.
                 $ exp_5 = False
-                $ renpy.show("monika " + exp, [picker.position])
+                $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
                 if exp.startswith("5") or exp_5:
                     $ renpy.with_statement(dissolve_monika)
                     $ exp_5 = not exp_5
