@@ -776,7 +776,7 @@ screen fom_saysomething_picker(say=True):
 
                         else:
                             textbutton ("Add" if not picker.is_editing_session_item() else "Edit"):
-                                sensitive not picker.is_text_empty()
+                                sensitive not say or not picker.is_text_empty()
                                 if picker.is_editing_session_item():
                                     action Function(picker.edit_session_item)
                                 else:
