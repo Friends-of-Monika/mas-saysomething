@@ -45,7 +45,7 @@ screen fom_saysomething_settings:
                 unhovered SetField(tooltip, "value", tooltip.default)
 
         textbutton "Enable speech/session mode by default":
-            selected not persistent._fom_saysomething_speech_mode_default
+            selected persistent._fom_saysomething_speech_mode_default
             action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
             hovered SetField(tooltip, "value", "Always enable speech/session mode without asking.")
             unhovered SetField(tooltip, "value", tooltip.default)
