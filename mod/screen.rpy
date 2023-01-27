@@ -427,14 +427,8 @@ init 100 python in _fom_saysomething:
             # default, her usual middle screen position.
             self.position = POSITIONS[4][0]
 
-            # Adjustment object to define slider properties for position slider
-            # and handle value changes.
-            self.position_adjustment = ui.adjustment(
-                range=len(POSITIONS) - 1,
-                value=4,
-                adjustable=True,
-                changed=self.on_position_change
-            )
+            # Position cursor, an index to POSITIONS list to pick position by.
+            self.position_cursor = 4
 
             # Set GUI flip.
             self.gui_flip = self.position_adjustment.value > 5
