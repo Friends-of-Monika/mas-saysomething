@@ -100,9 +100,8 @@ label fom_saysomething_event_retry:
             if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=True)
 
-            if not persistent._fom_saysomething_allow_winking:
-                # Unlock expression picker had before closing.
-                $ set_eyes_lock(picker.get_sprite_code(), False)
+            # Unlock expression picker had before closing.
+            $ set_eyes_lock(picker.get_sprite_code(), False)
 
             show monika 1eka at t11
             m 1eka "Oh, okay."
@@ -118,9 +117,9 @@ label fom_saysomething_event_retry:
                 # Lock new expression.
                 $ set_eyes_lock(new_exp, True)
 
-                # Once out of GUI, unlock the winking/blinking on the previous
-                # sprite. This would also unlock expression locked when in GUI.
-                $ set_eyes_lock(exp, False)
+            # Once out of GUI, unlock the winking/blinking on the previous
+            # sprite. This would also unlock expression locked when in GUI.
+            $ set_eyes_lock(exp, False)
 
         elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
@@ -128,10 +127,9 @@ label fom_saysomething_event_retry:
             $ stop_picker_loop = True
             call fom_saysomething_event_buttons(_show=True)
 
-            if not persistent._fom_saysomething_allow_winking:
-                # Here it's safe to just take a sprite code as it's already
-                # rendered and respective image is loaded into memory.
-                $ set_eyes_lock(picker.get_sprite_code(), False)
+            # Here it's safe to just take a sprite code as it's already
+            # rendered and respective image is loaded into memory.
+            $ set_eyes_lock(picker.get_sprite_code(), False)
 
             show monika 1esb at t11
             m 1esb "Alright, give me just a moment to prepare."
@@ -197,8 +195,7 @@ label fom_saysomething_event_retry:
             $ _fom_saysomething.posing = False
 
             # Unlock winking/blinking.
-            if not persistent._fom_saysomething_allow_winking:
-                $ set_eyes_lock(exp, False)
+            $ set_eyes_lock(exp, False)
 
             # Anyway, recover buttons after we're done showing.
             if persistent._fom_saysomething_hide_quick_buttons:
