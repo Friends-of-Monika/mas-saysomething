@@ -786,10 +786,10 @@ screen fom_saysomething_picker(say=True):
                         spacing 10
 
                         if picker.session is None:
-                            textbutton "Enable session mode":
+                            textbutton "Enable " + ("speech" if say else "session") + " mode":
                                 xysize (370, None)
-                                action Show("fom_saysomething_preset_confirm_modal",
-                                            title="Enable session mode?",
+                                action Show("fom_saysomething_confirm_modal",
+                                            title="Enable " + ("speech" if say else "session") + " mode?",
                                             message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
                                                     "for Monika to do them one after another in a row.\n\n"
                                                     "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.",
@@ -948,7 +948,7 @@ screen fom_saysomething_picker(say=True):
                                 picker.presets_search_value.Disable()]
                         selected False
                     textbutton "Delete":
-                        action Show("fom_saysomething_preset_confirm_modal",
+                        action Show("fom_saysomething_confirm_modal",
                                     title="Delete this preset?",
                                     message=picker.preset_name,
                                     ok_button="Delete",
@@ -956,7 +956,7 @@ screen fom_saysomething_picker(say=True):
                         sensitive picker.preset_cursor is not None
                         selected False
                     if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
+                        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
                                                     title="Delete this preset?",
                                                     message=picker.preset_name,
                                                     ok_button="Delete",
@@ -1041,7 +1041,7 @@ screen fom_saysomething_preset_name_input_modal:
                        Hide("fom_saysomething_preset_name_input_modal")]
     else:
         $ ok_action = [Play("sound", gui.activate_sound),
-                       Show("fom_saysomething_preset_confirm_modal",
+                       Show("fom_saysomething_confirm_modal",
                             title="Overwrite this preset?",
                             message=picker.preset_cursor,
                             ok_button="Overwrite",
@@ -1119,12 +1119,12 @@ screen fom_saysomething_preset_name_input_modal:
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_action):
+screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
-                   Hide("fom_saysomething_preset_confirm_modal")]
+                   Hide("fom_saysomething_confirm_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
-                       Hide("fom_saysomething_preset_confirm_modal")]
+                       Hide("fom_saysomething_confirm_modal")]
 
     style_prefix "confirm"
 
@@ -1155,10 +1155,11 @@ screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_actio
                 style "confirm_prompt"
                 xalign 0.5
 
-            # Name of preset chosen for deletion.
+            # Text.
 
             text message:
                 xalign 0.5
+                text_align 0.5
 
             # Confirmation and cancellation buttons.
 
