@@ -5,6 +5,7 @@
 
 define persistent._fom_saysomething_show_code = False
 define persistent._fom_saysomething_allow_winking = False
+define persistent._fom_saysomething_hide_quick_buttons = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -14,21 +15,27 @@ screen fom_saysomething_settings:
         xfill True
         xmaximum 800
 
-    hbox:
-        style_prefix "check"
-        box_wrap False
+        hbox:
+            style_prefix "check"
+            box_wrap False
 
-        textbutton "Show expression code":
-            selected persistent._fom_saysomething_show_code
-            action ToggleField(persistent, "_fom_saysomething_show_code")
-            hovered SetField(tooltip, "value", "Enable display of expression code.")
-            unhovered SetField(tooltip, "value", tooltip.default)
+            textbutton "Show expression code":
+                selected persistent._fom_saysomething_show_code
+                action ToggleField(persistent, "_fom_saysomething_show_code")
+                hovered SetField(tooltip, "value", "Enable display of expression code.")
+                unhovered SetField(tooltip, "value", tooltip.default)
 
-        textbutton "Allow winking/blinking":
-            selected persistent._fom_saysomething_allow_winking
-            action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
-            hovered SetField(tooltip, "value", "Allow Monika to blink or wink when posing.")
-            unhovered SetField(tooltip, "value", tooltip.default)
+            textbutton "Show buttons and quick menu":
+                selected not persistent._fom_saysomething_hide_quick_buttons
+                action ToggleField(persistent, "_fom_saysomething_hide_quick_buttons")
+                hovered SetField(tooltip, "value", "Show quick menu and menu buttons (can be only toggled when in say/pose menu.)")
+                unhovered SetField(tooltip, "value", tooltip.default)
+
+            textbutton "Allow winking/blinking":
+                selected persistent._fom_saysomething_allow_winking
+                action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
+                hovered SetField(tooltip, "value", "Allow Monika to blink or wink when posing.")
+                unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:
     def _fom_saysomething_allow_winking_callback():

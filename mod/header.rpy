@@ -13,7 +13,8 @@ init -990 python in mas_submod_utils:
         version="1.6.0",
         settings_pane="fom_saysomething_settings",
         version_updates={
-            "friends_of_monika_say_something_v1_5_0": "friends_of_monika_say_something_v1_5_1"
+            "friends_of_monika_say_something_v1_5_0": "friends_of_monika_say_something_v1_5_1",
+            "friends_of_monika_say_something_v1_6_0": "friends_of_monika_say_something_v1_7_0"
         }
     )
 

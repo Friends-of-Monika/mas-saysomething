@@ -91,7 +91,7 @@ label fom_saysomething_event_retry:
             $ stop_picker_loop = True
 
             # Show buttons and quick menu if they were hidden.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=True)
 
             if not persistent._fom_saysomething_allow_winking:
@@ -119,9 +119,6 @@ label fom_saysomething_event_retry:
                 # 'allow winking' option.
                 $ set_eyes_lock(exp, False)
 
-            # Hide or show buttons and quick menu.
-            call fom_saysomething_event_buttons(_show=picker.show_buttons)
-
         elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
             # and show buttons if they were hidden for preview.
@@ -138,39 +135,55 @@ label fom_saysomething_event_retry:
             m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
             # Show or hide buttons depending on user preference.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=False)
 
-            # Lock winking/blinking for the current sprite code.
-            if not persistent._fom_saysomething_allow_winking:
-                $ exp = picker.get_sprite_code()
-                $ set_eyes_lock(exp, True)
+            # Pick up session items from the picker.
+            # When not in session mode, session is None, so we should fall back
+            # to creating an array of states with just the current state in it.
+            $ picker_session = picker.session
+            if picker_session is None:
+                $ picker_session = [picker._save_state()]
 
-            # Set flag as posing.
-            $ _fom_saysomething.posing = True
+            # Ren'Py has no 'for' statement, so use 'while'.
+            $ state_i = 0
+            while state_i < len(picker_session):
+                $ picker._load_state(picker_session[state_i])
+                $ state_i += 1
 
-            # Show Monika with sprite code and at set position, optionally lock
-            # eyes blinking and say text.
-            $ renpy.show("monika " + exp, [picker.position])
-            if not persistent._fom_saysomething_allow_winking:
-                $ set_eyes_lock(exp, True)
-            if say:
-                $ quip = picker.text
-                m "[quip!q]"
-            else:
-                window hide
-                pause 5.0
-                window show
+                # Lock winking/blinking for the current sprite code.
+                if not persistent._fom_saysomething_allow_winking:
+                    $ exp = picker.get_sprite_code()
+                    $ set_eyes_lock(exp, True)
+
+                # Set flag as posing.
+                $ _fom_saysomething.posing = True
+
+                # Show Monika with sprite code and at set position, optionally lock
+                # eyes blinking and say text.
+                $ renpy.show("monika " + exp, [picker.position])
+                if not persistent._fom_saysomething_allow_winking:
+                    $ set_eyes_lock(exp, True)
+                if say:
+                    $ quip = picker.text
+                    m "[quip!q]"
+                else:
+                    window hide
+                    pause 5.0
+                    window show
+
+            # Cleanup.
+            $ del state_i, picker_session
 
             # No longer posing.
             $ _fom_saysomething.posing = False
 
             # Unlock winking/blinking.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 $ set_eyes_lock(exp, False)
 
             # Anyway, recover buttons after we're done showing.
-            if not picker.show_buttons:
+            if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=True)
 
             show monika 3tua at t11
