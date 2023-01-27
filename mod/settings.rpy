@@ -17,9 +17,9 @@ screen fom_saysomething_settings:
         xfill True
         xmaximum 800
 
-        grid 2 2:
-            style_prefix "check"
+        style_prefix "check"
 
+        grid 2 2:
             textbutton "Show expression code":
                 selected persistent._fom_saysomething_show_code
                 action ToggleField(persistent, "_fom_saysomething_show_code")
