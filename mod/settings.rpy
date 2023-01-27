@@ -73,4 +73,4 @@ init python:
             # Ensure that when Monika is posing allowing winking will unlock
             # eyes, and vice versa; disallowing winking will lock eyes.
             exp = picker.get_sprite_code()
-            set_eyes_lock(exp, not persistent._fom_saysomething_allow_winking)
+            set_eyes_lock(exp, lock=not persistent._fom_saysomething_allow_winking)
