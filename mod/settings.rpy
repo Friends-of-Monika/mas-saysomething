@@ -59,7 +59,7 @@ screen fom_saysomething_settings:
 
         bar:
             style "slider_slider"
-            value FieldValue(persistent, "_fom_saysomething_pose_pause", range=7.0, step=0.1)
+            value FieldValue(persistent, "_fom_saysomething_pose_pause", offset=1.0, range=6.0, step=0.1)
             hovered SetField(tooltip, "value", "Delay between changing poses when asking Monika to pose.")
             unhovered SetField(tooltip, "value", tooltip.default)
 
