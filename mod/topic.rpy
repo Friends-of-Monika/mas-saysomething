@@ -79,10 +79,12 @@ label fom_saysomething_event_retry:
     # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
     while stop_picker_loop is False:
+        # Get expression from picker.
+        $ exp = picker.get_sprite_code()
+
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
         if not persistent._fom_saysomething_allow_winking:
-            $ exp = picker.get_sprite_code()
             $ set_eyes_lock(exp, True)
 
         # Show the GUI and await for interaction.
@@ -99,8 +101,7 @@ label fom_saysomething_event_retry:
                 call fom_saysomething_event_buttons(_show=True)
 
             if not persistent._fom_saysomething_allow_winking:
-                # Here it's safe to just take a sprite code as it's already
-                # rendered and respective image is loaded into memory.
+                # Unlock expression picker had before closing.
                 $ set_eyes_lock(picker.get_sprite_code(), False)
 
             show monika 1eka at t11
@@ -114,13 +115,11 @@ label fom_saysomething_event_retry:
 
             # Lock winking/blinking on the new image.
             if not persistent._fom_saysomething_allow_winking:
+                # Lock new expression.
                 $ set_eyes_lock(new_exp, True)
 
-            if not persistent._fom_saysomething_allow_winking and "exp" in globals():
                 # Once out of GUI, unlock the winking/blinking on the previous
-                # sprite, but ONLY if it was previously locked (exp variable is
-                # declared) as it could be locked from menu by unselecting
-                # 'allow winking' option.
+                # sprite. This would also unlock expression locked when in GUI.
                 $ set_eyes_lock(exp, False)
 
         elif _return == _fom_saysomething.RETURN_DONE:
@@ -174,13 +173,11 @@ label fom_saysomething_event_retry:
                 # Show Monika with sprite code and at set position, optionally lock
                 # eyes blinking and say text. For entering and exiting 5-pose
                 # apply transition.
-                $ renpy.show("monika " + picker.get_sprite_code(), [picker.position])
-                if exp.startswith("5") or "exp_5" in globals():
+                $ exp_5 = False
+                $ renpy.show("monika " + exp, [picker.position])
+                if exp.startswith("5") or exp_5:
                     $ renpy.with_statement(dissolve_monika)
-                    if "exp_5" not in globals():
-                        $ exp_5 = True
-                    else:
-                        $ del exp_5
+                    $ exp_5 = not exp_5
 
                 # Finally, say text or show pose for 5 seconds.
                 if say:
