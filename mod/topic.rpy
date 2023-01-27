@@ -175,7 +175,7 @@ label fom_saysomething_event_retry:
                 # eyes blinking and say text. For entering and exiting 5-pose
                 # apply transition.
                 $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
-                if exp.startswith("5") in "exp_5" in globals():
+                if exp.startswith("5") or "exp_5" in globals():
                     $ renpy.with_statement(dissolve_monika)
                     if "exp_5" not in globals():
                         $ exp_5 = True
