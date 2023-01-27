@@ -547,10 +547,14 @@ init 100 python in _fom_saysomething:
             self.text = value
             renpy.restart_interaction()
 
-        def on_shift_enter_press(self):
+        def on_shift_enter_press(self, say):
             """
             Callback for Shift+Enter key press. Only returns text value when it
             is not empty (see is_text_empty(...))
+
+            IN:
+                say -> bool:
+                    True if in say mode, False if in pose mode.
 
             OUT:
                 str:
@@ -560,10 +564,28 @@ init 100 python in _fom_saysomething:
                     If text is empty.
             """
 
-            # Need one more check since key press isn't covered by 'Say' button
-            # sensitive expression.
-            if not self.is_text_empty():
-                return RETURN_DONE
+            if say:
+                # Need one more check since key press isn't covered by 'Say' button
+                # sensitive expression.
+                if not self.is_text_empty():
+                    # When in session mode, save session state and re-render.
+                    if self.session is not None:
+                        self.add_session_item()
+                        return RETURN_RENDER
+
+                    # Say something.
+                    else:
+                        return RETURN_DONE
+
+            else:
+                # If in session mode, add session state and re-render.
+                if self.session is not None:
+                    self.add_session_item()
+                    return RETURN_RENDER
+
+                # If not, just pose.
+                else:
+                    return RETURN_DONE
 
         def on_enter_press(self):
             """
@@ -954,12 +976,14 @@ screen fom_saysomething_picker(say=True):
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
+    # Text input area styled as textbox and key capture so that Shift+Enter key
+    # press is the same as pressing 'Say' button. For posing, it is equivalent
+    # of pressing 'Pose'. When in session mode, this will add current state to
+    # the session.
+
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
+
     if say:
-        # Text input area styled as textbox and key capture so that Shift+Enter key
-        # press is the same as pressing 'Say' button.
-
-        key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
-
         # This handles Enter key press and adds a new line.
         key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
 
