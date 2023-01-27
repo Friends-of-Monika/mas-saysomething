@@ -6,6 +6,7 @@
 define persistent._fom_saysomething_show_code = False
 define persistent._fom_saysomething_allow_winking = False
 define persistent._fom_saysomething_hide_quick_buttons = False
+define persistent._fom_saysomething_seen_screenshot_hint = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -35,6 +36,12 @@ screen fom_saysomething_settings:
                 selected persistent._fom_saysomething_allow_winking
                 action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
                 hovered SetField(tooltip, "value", "Allow Monika to blink or wink when posing.")
+                unhovered SetField(tooltip, "value", tooltip.default)
+
+            textbutton "Show screenshot key hint":
+                selected not persistent._fom_saysomething_seen_screenshot_hint
+                action ToggleField(persistent, "_fom_saysomething_seen_screenshot_hint")
+                hovered SetField(tooltip, "value", "Show a hint with screenshot key when saying or posing.")
                 unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:

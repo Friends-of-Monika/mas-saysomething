@@ -151,26 +151,34 @@ label fom_saysomething_event_retry:
                 $ picker._load_state(picker_session[state_i])
                 $ state_i += 1
 
-                # Lock winking/blinking for the current sprite code.
-                if not persistent._fom_saysomething_allow_winking:
-                    $ exp = picker.get_sprite_code()
-                    $ set_eyes_lock(exp, True)
+            # Show screenshot hint.
+            if not persistent._fom_saysomething_seen_screenshot_hint:
+                $ scr_key = _fom_saysomething.get_screenshot_key()
+                if scr_key is not None:
+                    $ persistent._fom_saysomething_seen_screenshot_hint = True
+                    $ renpy.notify("You can take a screenshot by pressing " + scr_key + ".")
+                $ del scr_key
 
-                # Set flag as posing.
-                $ _fom_saysomething.posing = True
+            # Lock winking/blinking for the current sprite code.
+            if not persistent._fom_saysomething_allow_winking:
+                $ exp = picker.get_sprite_code()
+                $ set_eyes_lock(exp, True)
 
-                # Show Monika with sprite code and at set position, optionally lock
-                # eyes blinking and say text.
-                $ renpy.show("monika " + exp, [picker.position])
-                if not persistent._fom_saysomething_allow_winking:
-                    $ set_eyes_lock(exp, True)
-                if say:
-                    $ quip = picker.text
-                    m "[quip!q]"
-                else:
-                    window hide
-                    pause 5.0
-                    window show
+            # Set flag as posing.
+            $ _fom_saysomething.posing = True
+
+            # Show Monika with sprite code and at set position, optionally lock
+            # eyes blinking and say text.
+            $ renpy.show("monika " + exp, [picker.position])
+            if not persistent._fom_saysomething_allow_winking:
+                $ set_eyes_lock(exp, True)
+            if say:
+                $ quip = picker.text
+                m "[quip!q]"
+            else:
+                window hide
+                pause 5.0
+                window show
 
             # Cleanup.
             $ del state_i, picker_session

@@ -5,6 +5,8 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 init python in _fom_saysomething:
+    import pygame
+
     def set_eyes_lock(exp, lock):
         """
         Locks or unlocks winking (closing then opening left/right eye for
@@ -43,3 +45,52 @@ init python in _fom_saysomething:
 
             elif isinstance(disp, MASMoniWinkTransform):
                 disp.wink_into_open_eyes_dis.new_widget = disp.open_eyes_img
+
+    def get_screenshot_key():
+        """
+        Retrieves user-friendly key combination for a screenshot.
+        If keymap is not configured for screenshots, returns None.
+
+        OUT:
+            str:
+                User-friendly key combination.
+
+            None:
+                If keymap is not configured for taking screenshots.
+        """
+
+        # May be not set or be empty here.
+        key = renpy.config.keymap.get("screenshot")
+        if key is None or len(key) == 0:
+            return None
+
+        # Take first key.
+        key = key[0]
+
+        # May have PyGame K_-constant.
+        if "K_" in key:
+            # Extract constant and check if it exists.
+            sym = key[key.index("K_"):]
+            if not hasattr(pygame, sym):
+                return None
+
+            # Fetch name of key from PyGame by constant and extract modifiers.
+            sym = pygame.key.name(getattr(pygame, sym)).decode()
+            mod = key[:key.index("K_") - 1].split("_")
+
+        else:
+            # Split key name into keysym and modifiers.
+            sym = key.split("_")[-1]
+            mod = key.split("_")[:-1]
+
+        # Ignore noshift.
+        if "noshift" in mod:
+            mod.remove("noshift")
+
+        # Construct combination of keysym and optionally modifiers, all
+        # converted to title case.
+        name = sym.title()
+        if len(mod) > 0:
+            name = "+".join(map(str.title, mod)) + "+" + name
+
+        return name
