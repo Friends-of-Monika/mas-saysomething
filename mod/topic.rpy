@@ -138,11 +138,14 @@ label fom_saysomething_event_retry:
             if persistent._fom_saysomething_hide_quick_buttons:
                 call fom_saysomething_event_buttons(_show=False)
 
+            # Pick up session items from the picker.
+            # When not in session mode, session is None, so we should fall back
+            # to creating an array of states with just the current state in it.
             $ picker_session = picker.session
-
             if picker_session is None:
                 $ picker_session = [picker._save_state()]
 
+            # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
                 $ picker._load_state(picker_session[state_i])
@@ -169,6 +172,7 @@ label fom_saysomething_event_retry:
                     pause 5.0
                     window show
 
+            # Cleanup.
             $ del state_i, picker_session
 
             # No longer posing.
