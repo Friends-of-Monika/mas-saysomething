@@ -7,22 +7,22 @@
 # Presets dictionary with premade presets.
 define persistent._fom_saysomething_presets = {
     # Presets by dreamscached
-    "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!", True),
-    "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?", True),
-    "Daydreaming": ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "...", True),
-    "Fact of the day": ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!", True),
-    "Angry Monika": ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that...", True),
-    "I love you": ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much...", True),
-    "How embarrassing": ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha...", True),
-    "Asking you out": ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~", True),
-    "Feeling singy": ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~", True),
-    "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~", True),
+    "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
+    "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
+    "Daydreaming": ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
+    "Fact of the day": ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!"),
+    "Angry Monika": ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that..."),
+    "I love you": ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much..."),
+    "How embarrassing": ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha..."),
+    "Asking you out": ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~"),
+    "Feeling singy": ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
+    "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
     # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
-    "Sulks to you": ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph...", True),
-    "Thinking deep": ({"eyebrows": 4, "eyes": 5, "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder...", True),
-    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0, "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of...", True),
-    "In loving worries": ({"eyebrows": 2, "eyes": 0, "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..", True)
+    "Sulks to you": ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
+    "Thinking deep": ({"eyebrows": 4, "eyes": 5, "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
+    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0, "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
+    "In loving worries": ({"eyebrows": 2, "eyes": 0, "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..")
 }
 
 
@@ -152,38 +152,12 @@ init 100 python in _fom_saysomething:
             Creates a new Picker instance.
             """
 
-            # This dictionary contains key to 2-tuple of:
-            #  [0]: current expression cursor index
-            #  [1]: current expression human readable name
-            # Initially all cursors are at zero (with corresponding expression names.)
-            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
-
-            # Position object to use when showing Monika at her table. By
-            # default, her usual middle screen position.
-            self.position = POSITIONS[4][0]
-
-            # Adjustment object to define slider properties for position slider
-            # and handle value changes.
-            self.position_adjustment = ui.adjustment(
-                range=len(POSITIONS) - 1,
-                value=4,
-                adjustable=True,
-                changed=self.on_position_change
-            )
+            self._reset_state()
 
             # Flag value for flipping selectors/position GUI to left side of
             # screen if it would mean Monika is behind the GUI and not in user's
             # sight.
             self.gui_flip = False
-
-            # Flag value for showing or hiding buttons and quick menu.
-            self.show_buttons = True
-
-            # Variable that stores entered user text prompt.
-            self.text = ""
-
-            # Ren'Py input value to allow disabling text input when needed.
-            self.text_value = FieldInputValue(self, "text", returnable=False)
 
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
@@ -208,9 +182,8 @@ init 100 python in _fom_saysomething:
             # Preset cursor keeps track of current preset chosen.
             self.preset_cursor = None
 
-            # Boolean variable to tell if Monika is currently posing or not
-            # (used for locking/unlocking winking/blinking.)
-            self.posing = False
+            self.session = None
+            self.session_cursor = 0
 
         def pose_switch_selector(self, key, forward):
             """
@@ -381,6 +354,57 @@ init 100 python in _fom_saysomething:
 
             return name in persistent._fom_saysomething_presets
 
+        def _reset_state(self):
+            # This dictionary contains key to 2-tuple of:
+            #  [0]: current expression cursor index
+            #  [1]: current expression human readable name
+            # Initially all cursors are at zero (with corresponding expression names.)
+            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+
+            # Position object to use when showing Monika at her table. By
+            # default, her usual middle screen position.
+            self.position = POSITIONS[4][0]
+
+            # Adjustment object to define slider properties for position slider
+            # and handle value changes.
+            self.position_adjustment = ui.adjustment(
+                range=len(POSITIONS) - 1,
+                value=4,
+                adjustable=True,
+                changed=self.on_position_change
+            )
+
+            # Variable that stores entered user text prompt.
+            self.text = ""
+
+            # Ren'Py input value to allow disabling text input when needed.
+            self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            return RETURN_RENDER
+
+        def _save_state(self):
+            return (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text  #2 - text
+            )
+
+        def _load_state(self, state):
+            pose_cur, pos, text = state
+
+            # Load selectors
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
+
+            # Load position
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            return RETURN_RENDER
+
         def save_preset(self, name):
             """
             Saves current state of a picker into a preset with the provided
@@ -391,12 +415,7 @@ init 100 python in _fom_saysomething:
                     Name to save this preset with.
             """
 
-            persistent._fom_saysomething_presets[name] = (
-                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
-                self.text,  #2 - text
-                self.show_buttons,  #3 - buttons
-            )
+            persistent._fom_saysomething_presets[name] = self._save_state()
 
             self.preset_name = name
             self.preset_cursor = name
@@ -415,28 +434,12 @@ init 100 python in _fom_saysomething:
                     Always returns value of RETURN_RENDER constant.
             """
 
-            pose_cur, pos, text, buttons = persistent._fom_saysomething_presets[name]
-
-            # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
-
-            # Load position
-            self.position_adjustment.value = pos
-            self.on_position_change(pos)
-
-            # Load text
-            self.text = text
-            self.on_text_change(text)
-
-            # Load buttons
-            self.show_buttons = buttons
-
             # Set preset name (for easier overwriting) and cursor (to keep
             # visual track of current preset.)
             self.preset_name = name
             self.preset_cursor = name
 
-            return RETURN_RENDER
+            return self._load_state(persistent._fom_saysomething_presets[name])
 
         def delete_preset(self, name):
             """
@@ -451,6 +454,141 @@ init 100 python in _fom_saysomething:
 
             self.preset_name = ""
             self.preset_cursor = None
+
+        def enable_session_mode(self):
+            """
+            Activates session mode and sets session list. This action should be
+            irreversible for the current picker interaction.
+            """
+
+            self.session = list()
+
+        def session_switch_usable(self, forward):
+            """
+            Checks if session state switch is usable for backward/forward
+            movement.
+
+            IN:
+                forward -> bool:
+                    True if moving forward, False if backward.
+
+            OUT:
+                True if allowed to navigate to previous/next session state,
+                False otherwise.
+            """
+
+            if forward:
+                return self.session is not None and self.session_cursor < len(self.session)
+            else:
+                return self.session is not None and self.session_cursor > 0
+
+        def session_switch_cursor(self, forward):
+            """
+            Switches current session state to previous/next one.
+
+            IN:
+                forward -> bool:
+                    True if moving forward, False if backward.
+
+            OUT:
+                RETURN_RENDER:
+                    Returned always.
+            """
+
+            if forward:
+                if self.session_cursor + 1 < len(self.session):
+                    self.session_cursor += 1
+                    self._load_state(self.session[self.session_cursor])
+                else:
+                    self.session_cursor = len(self.session)
+                    self._reset_state()
+                return RETURN_RENDER
+            else:
+                if self.session_cursor > 0:
+                    self.session_cursor -= 1
+                else:
+                    self.session_cursor = 0
+                self._load_state(self.session[self.session_cursor])
+                return RETURN_RENDER
+
+        def add_session_item(self):
+            """
+            Saves current session state and appends it to session.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER.
+            """
+
+            self.session.append(self._save_state())
+            self.session_cursor += 1
+            self._reset_state()
+
+            return RETURN_RENDER
+
+        def edit_session_item(self):
+            """
+            Changes current session state and saves it to session.
+            """
+
+            self.session[self.session_cursor] = self._save_state()
+
+        def remove_session_item(self):
+            """
+            Removes current session state.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returned.
+            """
+
+            if self.session_cursor > len(self.session) - 1:
+                self.session.pop(len(self.session) - 1)
+                self.session_cursor = len(self.session)
+                self._load_state(self.session[self.session_cursor])
+
+            elif self.session_cursor < 0:
+                self.session.pop(0)
+                self.session_cursor = 0
+
+            else:
+                self.session.pop(self.session_cursor)
+
+            if self.session_cursor < len(self.session):
+                self._load_state(self.session[self.session_cursor])
+            else:
+                self._reset_state()
+            return RETURN_RENDER
+
+        def can_remove_session(self):
+            """
+            Checks if it is possible to remove currently showing session state.
+
+            OUT:
+                True:
+                    If possible to remove current session state.
+
+                False:
+                    If not.
+            """
+
+            return self.session_cursor >= 0 and self.session_cursor < len(self.session)
+
+        def is_editing_session_item(self):
+            """
+            Checks if session cursor is currently behind its head.
+
+            OUT:
+                True:
+                    If user is editing previous state and not adding new one.
+
+                False:
+                    If user is adding new state.
+            """
+
+            if self.session_cursor == 0 and len(self.session) == 0:
+                return False
+            return self.session_cursor != len(self.session)
 
         def on_position_change(self, value):
             """
@@ -479,10 +617,14 @@ init 100 python in _fom_saysomething:
             self.text = value
             renpy.restart_interaction()
 
-        def on_shift_enter_press(self):
+        def on_shift_enter_press(self, say):
             """
             Callback for Shift+Enter key press. Only returns text value when it
             is not empty (see is_text_empty(...))
+
+            IN:
+                say -> bool:
+                    True if in say mode, False if in pose mode.
 
             OUT:
                 str:
@@ -492,31 +634,37 @@ init 100 python in _fom_saysomething:
                     If text is empty.
             """
 
-            # Need one more check since key press isn't covered by 'Say' button
-            # sensitive expression.
-            if not self.is_text_empty():
-                return RETURN_DONE
+            if say:
+                # Need one more check since key press isn't covered by 'Say' button
+                # sensitive expression.
+                if not self.is_text_empty():
+                    # When in session mode, save session state and re-render.
+                    if self.session is not None:
+                        self.add_session_item()
+                        return RETURN_RENDER
+
+                    # Say something.
+                    else:
+                        return RETURN_DONE
+
+            else:
+                # If in session mode, add session state and re-render.
+                if self.session is not None:
+                    self.add_session_item()
+                    return RETURN_RENDER
+
+                # If not, just pose.
+                else:
+                    return RETURN_DONE
 
         def on_enter_press(self):
             """
             Callback for Enter key press (without Shift.) Adds a line break if
             there are less than two line breaks in the line already.
             """
+
             if self.text.count("\n") < 2:
                 self.text += "\n"
-
-        def on_buttons_tick(self):
-            """
-            Callback for buttons/GUI tickbox button. Flips it and returns,
-            ending interaction with screen and returning a value for
-            re-rendering.
-
-            OUT:
-                RETURN_RENDER:
-                    Always returns RETURN_RENDER constant.
-            """
-
-            self.show_buttons = not self.show_buttons
             return RETURN_RENDER
 
         def on_search_input_change(self, value):
@@ -556,7 +704,8 @@ init 100 python in _fom_saysomething:
     # Declare picker as a variable.
     picker = None
 
-    # Declare posing state as a variable.
+    # Boolean variable to tell if Monika is currently posing or not
+    # (used for locking/unlocking winking/blinking.)
     posing = False
 
 
@@ -694,26 +843,53 @@ screen fom_saysomething_picker(say=True):
                             adjustment picker.position_adjustment
                             released Return(_fom_saysomething.RETURN_RENDER)
 
-                # Buttons tickbox.
+                # Speech/session mode button.
 
                 frame:
-                    padding (10, 5)
+                    background None
+                    padding (0, 0)
 
                     hbox:
-                        style_prefix "check"
+                        style_prefix "fom_saysomething_confirm"
 
                         xmaximum 350
                         xfill True
+
                         spacing 10
 
-                        if say:
-                            textbutton "Show buttons and quick menu":
-                                selected picker.show_buttons
-                                action Function(picker.on_buttons_tick)
+                        if picker.session is None:
+                            textbutton "Enable " + ("speech" if say else "session") + " mode":
+                                xysize (370, None)
+                                action Show("fom_saysomething_confirm_modal",
+                                            title="Enable " + ("speech" if say else "session") + " mode?",
+                                            message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
+                                                    "for Monika to do them one after another in a row.\n\n"
+                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.",
+                                            ok_button="OK",
+                                            ok_action=Function(picker.enable_session_mode))
+
                         else:
-                            textbutton "Show buttons":
-                                selected picker.show_buttons
-                                action Function(picker.on_buttons_tick)
+                            textbutton ("Add" if not picker.is_editing_session_item() else "Edit"):
+                                sensitive not say or not picker.is_text_empty()
+                                if picker.is_editing_session_item():
+                                    action Function(picker.edit_session_item)
+                                else:
+                                    action Function(picker.add_session_item)
+
+                            textbutton "Remove":
+                                sensitive picker.can_remove_session()
+                                action Function(picker.remove_session_item)
+
+                            textbutton "<":
+                                xysize (54, None)
+                                sensitive picker.session_switch_usable(forward=False)
+                                action Function(picker.session_switch_cursor, forward=False)
+
+                            textbutton ">":
+                                xysize (54, None)
+                                sensitive picker.session_switch_usable(forward=True)
+                                action Function(picker.session_switch_cursor, forward=True)
+
 
             else:
 
@@ -803,8 +979,8 @@ screen fom_saysomething_picker(say=True):
         # Confirmation buttons area.
 
         frame:
-            padding(0, 10)
             background None
+            padding (0, 10)
 
             hbox:
                 style_prefix "fom_saysomething_confirm"
@@ -844,7 +1020,7 @@ screen fom_saysomething_picker(say=True):
                                 picker.presets_search_value.Disable()]
                         selected False
                     textbutton "Delete":
-                        action Show("fom_saysomething_preset_confirm_modal",
+                        action Show("fom_saysomething_confirm_modal",
                                     title="Delete this preset?",
                                     message=picker.preset_name,
                                     ok_button="Delete",
@@ -852,17 +1028,18 @@ screen fom_saysomething_picker(say=True):
                         sensitive picker.preset_cursor is not None
                         selected False
                     if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
-                                                   title="Delete this preset?",
-                                                   message=picker.preset_name,
-                                                   ok_button="Delete",
-                                                   ok_action=Function(picker.delete_preset, picker.preset_name))
+                        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
+                                                    title="Delete this preset?",
+                                                    message=picker.preset_name,
+                                                    ok_button="Delete",
+                                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
                 # altogether, for presets it will take back to selectors.
 
                 textbutton ("Close" if not picker.presets_menu else "Back"):
+                    xysize (118, None)
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
@@ -871,12 +1048,14 @@ screen fom_saysomething_picker(say=True):
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
+    # Text input area styled as textbox and key capture so that Shift+Enter key
+    # press is the same as pressing 'Say' button. For posing, it is equivalent
+    # of pressing 'Pose'. When in session mode, this will add current state to
+    # the session.
+
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say) capture True
+
     if say:
-        # Text input area styled as textbox and key capture so that Shift+Enter key
-        # press is the same as pressing 'Say' button.
-
-        key "shift_K_RETURN" action Function(picker.on_shift_enter_press) capture True
-
         # This handles Enter key press and adds a new line.
         key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
 
@@ -934,7 +1113,7 @@ screen fom_saysomething_preset_name_input_modal:
                        Hide("fom_saysomething_preset_name_input_modal")]
     else:
         $ ok_action = [Play("sound", gui.activate_sound),
-                       Show("fom_saysomething_preset_confirm_modal",
+                       Show("fom_saysomething_confirm_modal",
                             title="Overwrite this preset?",
                             message=picker.preset_cursor,
                             ok_button="Overwrite",
@@ -1012,12 +1191,12 @@ screen fom_saysomething_preset_name_input_modal:
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_action):
+screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
-                   Hide("fom_saysomething_preset_confirm_modal")]
+                   Hide("fom_saysomething_confirm_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
-                       Hide("fom_saysomething_preset_confirm_modal")]
+                       Hide("fom_saysomething_confirm_modal")]
 
     style_prefix "confirm"
 
@@ -1037,8 +1216,7 @@ screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_actio
 
     frame:
         vbox:
-            xmaximum 300
-            xfill True
+            xmaximum 500
 
             align (0.5, 0.5)
             spacing 30
@@ -1049,10 +1227,11 @@ screen fom_saysomething_preset_confirm_modal(title, message, ok_button, ok_actio
                 style "confirm_prompt"
                 xalign 0.5
 
-            # Name of preset chosen for deletion.
+            # Text.
 
             text message:
                 xalign 0.5
+                text_align 0.5
 
             # Confirmation and cancellation buttons.
 

@@ -14,3 +14,9 @@ label friends_of_monika_say_something_v1_5_1(version="v1_5_1"):
                 sel[sel_key.lower()] = sel.pop(sel_key)
             persistent._fom_saysomething_presets[name] = (sel, pos, text, buttons)
     return
+
+label friends_of_monika_say_something_v1_7_0(version="v1_7_0"):
+    python:
+        for name in list(persistent._fom_saysomething_presets.keys()):
+            persistent._fom_saysomething_presets[name] = persistent._fom_saysomething_presets[name][:-1]
+    return
