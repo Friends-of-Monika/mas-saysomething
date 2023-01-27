@@ -183,7 +183,6 @@ label fom_saysomething_event_retry:
                         $ del exp_5
 
                 # Finally, say text or show pose for 5 seconds.
-                # TODO: Configure pause in submods menu.
                 if say:
                     $ quip = picker.text
                     m "[quip!q]"
