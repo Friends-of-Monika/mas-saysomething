@@ -61,6 +61,19 @@ init python in _fom_saysomething:
         """
         return ("monika", exp) in renpy.display.image.images
 
+    def remove_renpy_images_bulk(exps):
+        """
+        Removes multiple images from the Ren'Py image cache in a single call.
+
+        IN:
+            exps -> list of str:
+                A list of expression codes for the images to be removed from the
+                cache. Each image is identified by a tuple ("monika", exp).
+        """
+
+        for exp in exps:
+            remove_renpy_image(exp)
+
     def remove_renpy_image(exp):
         """
         Removes a specified image from the Ren'Py image cache. No-op if the

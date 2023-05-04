@@ -87,8 +87,7 @@ label fom_saysomething_event_retry:
 
         # If there were too many images saved in cache, free them all.
         if len(created_expressions) > 200:
-            for exp in created_expressions:
-                $ _fom_saysomething.remove_renpy_image(exp)
+            $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
 
         # If the spritecode isn't in cache already, mark it for removal.
         if _fom_saysomething.is_renpy_image_cached(exp):
@@ -240,8 +239,7 @@ label fom_saysomething_event_retry:
 
     # Once done with all the speech/posing, remove the images saved in cache
     # that weren't cached before (so that we don't touch MAS sprites.)
-    for exp in created_expressions:
-        $ _fom_saysomething.remove_renpy_image(exp)
+    $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
 
     call fom_saysomething_event_buttons(_show=True)
     return
