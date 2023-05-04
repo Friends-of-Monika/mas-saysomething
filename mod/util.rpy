@@ -77,7 +77,8 @@ init python in _fom_saysomething:
     def remove_renpy_image(exp):
         """
         Removes a specified image from the Ren'Py image cache. No-op if the
-        spritecode does not exist in Ren'Py cache.
+        spritecode does not exist in Ren'Py cache. Static images
+        (i.e. "1eua_static")
 
         IN:
             exp -> str:
@@ -85,9 +86,10 @@ init python in _fom_saysomething:
                 image is identified by a tuple ("monika", exp).
         """
 
-        tup = ("monika", exp)
-        if tup in renpy.display.image.images:
-            del renpy.display.image.images[tup]
+        for cur_exp in [exp, exp + "_static"]:
+            tup = ("monika", cur_exp)
+            if tup in renpy.display.image.images:
+                del renpy.display.image.images[tup]
 
     def get_screenshot_key():
         """
