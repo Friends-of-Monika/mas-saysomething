@@ -240,6 +240,7 @@ label fom_saysomething_event_retry:
     # Once done with all the speech/posing, remove the images saved in cache
     # that weren't cached before (so that we don't touch MAS sprites.)
     $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
+    $ del created_expressions
 
     call fom_saysomething_event_buttons(_show=True)
     return
