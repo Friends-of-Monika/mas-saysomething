@@ -46,6 +46,36 @@ init python in _fom_saysomething:
             elif isinstance(disp, MASMoniWinkTransform):
                 disp.wink_into_open_eyes_dis.new_widget = disp.open_eyes_img
 
+    def is_renpy_image_cached(exp):
+        """
+        Checks if a specified image is present in the Ren'Py image cache.
+
+        IN:
+            exp -> str:
+                Expression code of the image to be checked. The image is identified
+                by a tuple ("monika", exp).
+
+        OUT:
+            bool:
+                True if the image is present in the cache, False otherwise.
+        """
+        return ("monika", exp) in renpy.display.image.images
+
+    def remove_renpy_image(exp):
+        """
+        Removes a specified image from the Ren'Py image cache. No-op if the
+        spritecode does not exist in Ren'Py cache.
+
+        IN:
+            exp -> str:
+                Expression code of the image to be removed from the cache. The
+                image is identified by a tuple ("monika", exp).
+        """
+
+        tup = ("monika", exp)
+        if tup in renpy.display.image.images:
+            del renpy.display.image.images[tup]
+
     def get_screenshot_key():
         """
         Retrieves user-friendly key combination for a screenshot.

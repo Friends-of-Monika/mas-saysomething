@@ -74,6 +74,9 @@ label fom_saysomething_event_retry:
     # 'Import' set_eyes_lock.
     $ set_eyes_lock = _fom_saysomething.set_eyes_lock
 
+    # Set of expressions to remove from Ren'Py image cache after we're done.
+    $ created_expressions = set()
+
     # We'll keep looping with screen calls since we need to do Monika rendering
     # out of screen, hence why we'll keep doing it until we get 'nevermind' from
     # the player or we'll get a signal to say something.
@@ -81,6 +84,10 @@ label fom_saysomething_event_retry:
     while stop_picker_loop is False:
         # Get expression from picker.
         $ exp = picker.get_sprite_code()
+
+        # If the spritecode isn't in cache already, mark it for removal.
+        if _fom_saysomething.is_renpy_image_cached(exp):
+            $ created_expressions.add(exp)
 
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
@@ -108,6 +115,11 @@ label fom_saysomething_event_retry:
 
         elif _return == _fom_saysomething.RETURN_RENDER:
             $ new_exp = picker.get_sprite_code()
+
+            # Before rendering, check if the sprite that was already cached
+            # before render in pose picker; mark for removal later.
+            if _fom_saysomething.is_renpy_image_cached(exp):
+                $ created_expressions.add(exp)
 
             # Position or pose/expression update is requested, so do it now.
             $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
@@ -220,6 +232,11 @@ label fom_saysomething_event_retry:
 
                 "No.":
                     m 1hua "Okay~"
+
+    # Once done with all the speech/posing, remove the images saved in cache
+    # that weren't cached before (so that we don't touch MAS sprites.)
+    for exp in created_expressions:
+        $ _fom_saysomething.remove_renpy_image(exp)
 
     call fom_saysomething_event_buttons(_show=True)
     return
