@@ -85,6 +85,11 @@ label fom_saysomething_event_retry:
         # Get expression from picker.
         $ exp = picker.get_sprite_code()
 
+        # If there were too many images saved in cache, free them all.
+        if len(created_expressions) > 200:
+            for exp in created_expressions:
+                $ _fom_saysomething.remove_renpy_image(exp)
+
         # If the spritecode isn't in cache already, mark it for removal.
         if _fom_saysomething.is_renpy_image_cached(exp):
             $ created_expressions.add(exp)
