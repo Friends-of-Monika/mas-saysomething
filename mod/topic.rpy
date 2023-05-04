@@ -222,9 +222,9 @@ label fom_saysomething_event_retry:
             m 1hub "Hope you liked it, ahaha~"
 
             if say:
-                $ quip = "say something else"
+                $ quip = _("say something else")
             else:
-                $ quip = "pose for you again"
+                $ quip = _("pose for you again")
 
             m 3eub "Do you want me to [quip]?{nw}"
             $ _history_list.pop()

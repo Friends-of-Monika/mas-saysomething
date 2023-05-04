@@ -57,67 +57,67 @@ init 100 python in _fom_saysomething:
     #      [0]: expression code/mnemonic
     #      [1]: expression human readable description
     EXPR_MAP = OrderedDict([
-        ("pose", ("Pose", [
-            ("1", "Rest on hands"),
-            ("2", "Cross"),
-            ("3", "Point right, rest"),
-            ("4", "Point right"),
-            ("5", "Lean"),
-            ("6", "Down"),
-            ("7", "Point right, down")
+        ("pose", (_("Pose"), [
+            ("1", _("Rest on hands")),
+            ("2", _("Cross")),
+            ("3", _("Point right, rest")),
+            ("4", _("Point right")),
+            ("5", _("Lean")),
+            ("6", _("Down")),
+            ("7", _("Point right, down"))
         ])),
-        ("eyes", ("Eyes", [
-            ("e", "Normal"),
-            ("w", "Wide"),
-            ("s", "Sparkle"),
-            ("t", "Smug"),
-            ("c", "Crazy"),
-            ("r", "Look right"),
-            ("l", "Look left"),
-            ("h", "Closed, happy"),
-            ("d", "Closed, sad"),
-            ("k", "Wink left"),
-            ("n", "Wink right"),
-            ("f", "Soft"),
-            ("m", "Smug, left"),
-            ("g", "Smug, right")
+        ("eyes", (_("Eyes"), [
+            ("e", _("Normal")),
+            ("w", _("Wide")),
+            ("s", _("Sparkle")),
+            ("t", _("Smug")),
+            ("c", _("Crazy")),
+            ("r", _("Look right")),
+            ("l", _("Look left")),
+            ("h", _("Closed, happy")),
+            ("d", _("Closed, sad")),
+            ("k", _("Wink left")),
+            ("n", _("Wink right")),
+            ("f", _("Soft")),
+            ("m", _("Smug, left")),
+            ("g", _("Smug, right"))
         ])),
-        ("eyebrows", ("Eyebrows", [
-            ("u", "Up"),
-            ("f", "Furrowed"),
-            ("k", "Knit"),
-            ("s", "Straight"),
-            ("t", "Thinking")
+        ("eyebrows", (_("Eyebrows"), [
+            ("u", _("Up")),
+            ("f", _("Furrowed")),
+            ("k", _("Knit")),
+            ("s", _("Straight")),
+            ("t", _("Thinking"))
         ])),
-        ("blush", ("Blush", [
-            (None, "None"),
-            ("bl", "Line"),
-            ("bs", "Shade"),
-            ("bf", "Full")
+        ("blush", (_("Blush"), [
+            (None, _("None")),
+            ("bl", _("Line")),
+            ("bs", _("Shade")),
+            ("bf", _("Full"))
         ])),
-        ("tears", ("Tears", [
-            (None, "None"),
-            ("ts", "Streaming"),
-            ("td", "Dried"),
-            ("tp", "Pooled"),
-            ("tu", "Tearing up")
+        ("tears", (_("Tears"), [
+            (None, _("None")),
+            ("ts", _("Streaming")),
+            ("td", _("Dried")),
+            ("tp", _("Pooled")),
+            ("tu", _("Tearing up"))
         ])),
-        ("sweat", ("Sweat", [
-            (None, "None"),
-            ("sdl", "Left cheek"),
-            ("sdr", "Right cheek"),
+        ("sweat", (_("Sweat"), [
+            (None, _("None")),
+            ("sdl", _("Left cheek")),
+            ("sdr", _("Right cheek")),
         ])),
-        ("mouth", ("Mouth", [
-            ("a", "Smile, closed"),
-            ("b", "Smile, open"),
-            ("c", "Straight"),
-            ("d", "Open"),
-            ("o", "Gasp"),
-            ("u", "Smug"),
-            ("w", "Wide"),
-            ("x", "Grit teeth"),
-            ("p", "Pout"),
-            ("t", "Triangle")
+        ("mouth", (_("Mouth"), [
+            ("a", _("Smile, closed")),
+            ("b", _("Smile, open")),
+            ("c", _("Straight")),
+            ("d", _("Open")),
+            ("o", _("Gasp")),
+            ("u", _("Smug")),
+            ("w", _("Wide")),
+            ("x", _("Grit teeth")),
+            ("p", _("Pout")),
+            ("t", _("Triangle"))
         ]))
     ])
 
@@ -798,7 +798,7 @@ screen fom_saysomething_picker(say=True):
                                 hbox:
                                     xfill True
                                     xmaximum 110
-                                    text "Expression"
+                                    text _("Expression")
 
                                 hbox:
                                     xmaximum 240
@@ -806,7 +806,7 @@ screen fom_saysomething_picker(say=True):
                                     xalign 1.0
 
                                     if picker.is_show_code():
-                                        text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
+                                        text _("{0} at {1}").format(picker.get_sprite_code(), picker.get_position_label()) xalign 0.5
                                     else:
                                         text picker.get_sprite_code() xalign 0.5
 
@@ -843,7 +843,7 @@ screen fom_saysomething_picker(say=True):
                         xmaximum 350
                         xfill True
 
-                        text "Position"
+                        text _("Position")
                         bar:
                             xalign 1.0
                             yalign 0.5
@@ -865,26 +865,26 @@ screen fom_saysomething_picker(say=True):
                         spacing 10
 
                         if picker.session is None:
-                            textbutton "Enable " + ("speech" if say else "session") + " mode":
+                            textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
                                 xysize (370, None)
                                 action Show("fom_saysomething_confirm_modal",
-                                            title="Enable " + ("speech" if say else "session") + " mode?",
-                                            message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
-                                                    "for Monika to do them one after another in a row.\n\n"
-                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.\n\n"
-                                                    "{i}You can enable " + ("speech" if say else "session") + " mode by default in submod settings.{/i}",
-                                            ok_button="OK",
+                                            title=_("Enable {0} mode").format(_("speech") if say else _("session")),
+                                            message=_("You will be able to save multiple {0} for Monika to do them one after another in a row.\n\n"
+                                                      "When done, click on {{i}}{1}{{/i}} button.\n\n"
+                                                      "{{i}}You can enable {0} mode by default in submod settings.{{/i}}")
+                                                      .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose")),
+                                            ok_button=_("OK"),
                                             ok_action=Function(picker.enable_session_mode))
 
                         else:
-                            textbutton ("Add" if not picker.is_editing_session_item() else "Edit"):
+                            textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
                                 sensitive not say or not picker.is_text_empty()
                                 if picker.is_editing_session_item():
                                     action Function(picker.edit_session_item)
                                 else:
                                     action Function(picker.add_session_item)
 
-                            textbutton "Remove":
+                            textbutton _("Remove"):
                                 sensitive picker.can_remove_session()
                                 action Function(picker.remove_session_item)
 
@@ -931,7 +931,7 @@ screen fom_saysomething_picker(say=True):
                     # Hint text in search box visible if no text is entered.
 
                     if len(picker.presets_search) == 0:
-                        text "Search for a preset...":
+                        text _("Search for a preset..."):
                             text_align 0.0
                             layout "nobreak"
                             color "#EEEEEEB2"
@@ -1004,16 +1004,16 @@ screen fom_saysomething_picker(say=True):
                     if say:
                         # Note: this button sensitivity relies on Ren'Py interaction
                         # restart that is done in text input field callback.
-                        textbutton "Say":
+                        textbutton _("Say"):
                             action Return(_fom_saysomething.RETURN_DONE)
                             sensitive picker.session is None and not picker.is_text_empty() or picker.session is not None and len(picker.session) > 0
 
                     else:
-                        textbutton "Pose":
+                        textbutton _("Pose"):
                             action Return(_fom_saysomething.RETURN_DONE)
                             sensitive picker.session is None or len(picker.session) > 0
 
-                    textbutton "Presets":
+                    textbutton _("Presets"):
                         # NOTE: DisableAllInputValues will re-focus on search
                         # text input.
                         action [SetField(picker, "presets_menu", True),
@@ -1024,30 +1024,30 @@ screen fom_saysomething_picker(say=True):
                 # selected state which is unwanted.
 
                 else:
-                    textbutton "Save":
+                    textbutton _("Save"):
                         action [Show("fom_saysomething_preset_name_input_modal"),
                                 picker.presets_search_value.Disable()]
                         selected False
-                    textbutton "Delete":
+                    textbutton _("Delete"):
                         action Show("fom_saysomething_confirm_modal",
-                                    title="Delete this preset?",
+                                    title=_("Delete this preset?"),
                                     message=picker.preset_name,
-                                    ok_button="Delete",
+                                    ok_button=_("Delete"),
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
                         selected False
                     if picker.preset_cursor is not None:
                         key "K_DELETE" action Show("fom_saysomething_confirm_modal",
-                                                    title="Delete this preset?",
+                                                    title=_("Delete this preset?"),
                                                     message=picker.preset_name,
-                                                    ok_button="Delete",
+                                                    ok_button=_("Delete"),
                                                     ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
                 # altogether, for presets it will take back to selectors.
 
-                textbutton ("Close" if not picker.presets_menu else "Back"):
+                textbutton (_("Close") if not picker.presets_menu else _("Back")):
                     xysize (118, None)
                     if not picker.presets_menu:
                         action Return(_fom_saysomething.RETURN_CLOSE)
@@ -1078,7 +1078,7 @@ screen fom_saysomething_picker(say=True):
                 style "fom_saysomething_titlebox"
                 align (0.5, 0.0)
 
-                text "What do you want me to say?~"
+                text _("What do you want me to say?~")
 
             vbox:
                 align (0.5, 0.58)
@@ -1123,9 +1123,9 @@ screen fom_saysomething_preset_name_input_modal:
     else:
         $ ok_action = [Play("sound", gui.activate_sound),
                        Show("fom_saysomething_confirm_modal",
-                            title="Overwrite this preset?",
+                            title=_("Overwrite this preset?"),
                             message=picker.preset_cursor,
-                            ok_button="Overwrite",
+                            ok_button=_("Overwrite"),
                             ok_action=Function(picker.save_preset, picker.preset_cursor)),
                        Hide("fom_saysomething_preset_name_input_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
@@ -1163,7 +1163,7 @@ screen fom_saysomething_preset_name_input_modal:
 
             # Title.
 
-            text "Save this preset as:":
+            text _("Save this preset as:"):
                 style "confirm_prompt"
                 xalign 0.5
 
@@ -1190,10 +1190,10 @@ screen fom_saysomething_preset_name_input_modal:
 
                 # Sensitivity of this button relies on emptiness of entered
                 # preset name.
-                textbutton "Save":
+                textbutton _("Save"):
                     action ok_action
                     sensitive not picker.is_preset_name_empty()
-                textbutton "Cancel":
+                textbutton _("Cancel"):
                     action cancel_action
 
 
@@ -1250,5 +1250,5 @@ screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
 
                 textbutton ok_button:
                     action ok_action
-                textbutton "Cancel":
+                textbutton _("Cancel"):
                     action cancel_action

@@ -9,7 +9,7 @@ init -990 python in mas_submod_utils:
     Submod(
         author="Friends of Monika",
         name="Say Something",
-        description="Ask your Monika to say something and pose for you~",
+        description=_("Ask your Monika to say something and pose for you~"),
         version="1.7.0",
         settings_pane="fom_saysomething_settings",
         version_updates={
