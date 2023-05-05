@@ -173,7 +173,7 @@ label fom_saysomething_event_retry:
                     $ scr_key = _fom_saysomething.get_screenshot_key()
                     if scr_key is not None:
                         $ persistent._fom_saysomething_seen_screenshot_hint = True
-                        $ renpy.notify("You can take a screenshot by pressing " + scr_key + ".")
+                        $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
                     $ del scr_key
 
                 # Get current expression after it was changed.
