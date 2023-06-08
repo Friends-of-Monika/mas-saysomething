@@ -1,3 +1,10 @@
+# markdown.rpy contains Markdown configuration for Mistune that is used by
+# Say Something submod in order to render Markdown to Ren'Py style tags.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
+
 init -80 python in _fom_saysomething_markdown:
 
     import mistune
