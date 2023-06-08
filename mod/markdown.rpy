@@ -14,6 +14,28 @@ init -80 python in _fom_saysomething_markdown:
         if md.renderer and md.renderer.NAME == 'html':
             md.renderer.register('inline_spoiler', render_inline_spoiler)
 
+    def underline(md):
+        ## Underline parsing function
+        def parse_inline_underline(inline, m, state):
+            text = m.group('underline_text')
+            new_state = state.copy()
+            new_state.src = text
+            children = inline.render(new_state)
+            state.append_token({'type': 'underline', 'children': children})
+            return m.end()
+
+        ## Registering it
+        INLINE_UNDERLINE_PATTERN = r'__\s*(?P<underline_text>.+?)\s*__'
+        md.inline.SPECIFICATION["emphasis"] = r'\*{1,3}(?=[^\s*])|\b(_{1}|_{3})(?=[^\s_])'
+        md.inline = mistune.inline_parser.InlineParser()
+        md.inline.register('underline', INLINE_UNDERLINE_PATTERN, parse_inline_underline)
+
+        # Not the best idea of Mistune developers to implement it GLOBALLY,
+        # but hopefully no one else uses Mistune but us - otherwise we'd have
+        # a collision point here, as we change GLOBAL dictionary here. Boo.
+        if '__' in mistune.inline_parser.EMPHASIS_END_RE:
+            del mistune.inline_parser.EMPHASIS_END_RE['__']
+
     def subset(md):
         # Disable unnecessary syntax
         md.block.rules.remove('fenced_code')
@@ -59,6 +81,9 @@ init -80 python in _fom_saysomething_markdown:
         def inline_spoiler(self, text): # ||Spoiler||
             return "{=edited}" + text + "{=normal}"
 
+        def underline(self, text):
+            return "{u}" + text + "{/u}"
+
         ## HTML overrides
 
         def linebreak(self):
@@ -79,5 +104,5 @@ init -80 python in _fom_saysomething_markdown:
 
     ## Markdown render function
 
-    render = mistune.create_markdown(plugins=['strikethrough', spoiler, subset],
+    render = mistune.create_markdown(plugins=[underline, 'strikethrough', spoiler, subset],
                                      renderer=RenPyRenderer())
