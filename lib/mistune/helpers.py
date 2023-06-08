@@ -1,6 +1,6 @@
 import re
 import string
-from .util import escape_url
+from mistune.util import escape_url
 
 PREVENT_BACKSLASH = r'(?<!\\)(?:\\\\)*'
 PUNCTUATION = r'[' + re.escape(string.punctuation) + r']'

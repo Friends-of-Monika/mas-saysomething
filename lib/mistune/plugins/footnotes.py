@@ -1,6 +1,6 @@
 import re
-from ..core import BlockState
-from ..util import unikey
+from mistune.core import BlockState
+from mistune.util import unikey
 from ..helpers import LINK_LABEL
 
 __all__ = ['footnotes']
@@ -18,7 +18,7 @@ REF_FOOTNOTE = (
 INLINE_FOOTNOTE = r'\[\^(?P<footnote_key>' + LINK_LABEL + r')\]'
 
 
-def parse_inline_footnote(inline, m: re.Match, state):
+def parse_inline_footnote(inline, m, state):
     key = unikey(m.group('footnote_key'))
     ref = state.env.get('ref_footnotes')
     if ref and key in ref:
@@ -38,7 +38,7 @@ def parse_inline_footnote(inline, m: re.Match, state):
     return m.end()
 
 
-def parse_ref_footnote(block, m: re.Match, state: BlockState):
+def parse_ref_footnote(block, m, state):
     ref = state.env.get('ref_footnotes')
     if not ref:
         ref = {}
@@ -50,7 +50,7 @@ def parse_ref_footnote(block, m: re.Match, state: BlockState):
     return m.end()
 
 
-def parse_footnote_item(block, key: str, index: int, state: BlockState):
+def parse_footnote_item(block, key, index, state):
     ref = state.env.get('ref_footnotes')
     text = ref[key]
 
@@ -76,7 +76,7 @@ def parse_footnote_item(block, key: str, index: int, state: BlockState):
     }
 
 
-def md_footnotes_hook(md, result: str, state: BlockState):
+def md_footnotes_hook(md, result, state):
     notes = state.env.get('footnotes')
     if not notes:
         return result
@@ -91,17 +91,17 @@ def md_footnotes_hook(md, result: str, state: BlockState):
     return result + output
 
 
-def render_footnote_ref(renderer, key: str, index: int):
+def render_footnote_ref(renderer, key, index):
     i = str(index)
     html = '<sup class="footnote-ref" id="fnref-' + i + '">'
     return html + '<a href="#fn-' + i + '">' + i + '</a></sup>'
 
 
-def render_footnotes(renderer, text: str):
+def render_footnotes(renderer, text):
     return '<section class="footnotes">\n<ol>\n' + text + '</ol>\n</section>\n'
 
 
-def render_footnote_item(renderer, text: str, key: str, index: int):
+def render_footnote_item(renderer, text, key, index):
     i = str(index)
     back = '<a href="#fnref-' + i + '" class="footnote">&#8617;</a>'
     text = text.rstrip()[:-4] + back + '</p>'

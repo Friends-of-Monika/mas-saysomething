@@ -1,10 +1,6 @@
 import re
-from .core import BlockState
-from .util import (
-    strip_end,
-    expand_tab,
-    expand_leading_tab,
-)
+from mistune.core import BlockState
+from mistune.util import strip_end, expand_tab, expand_leading_tab
 # because list is complex, split list parser in a new file
 
 LIST_PATTERN = (
@@ -16,7 +12,7 @@ LIST_PATTERN = (
 _LINE_HAS_TEXT = re.compile(r'( *)\S')
 
 
-def parse_list(block, m: re.Match, state: BlockState) -> int:
+def parse_list(block, m, state):
     """Parse tokens for ordered and unordered list."""
     text = m.group('list_3')
     if not text.strip():

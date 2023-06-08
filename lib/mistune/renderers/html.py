@@ -1,5 +1,5 @@
-from ..core import BaseRenderer
-from ..util import escape as escape_text, striptags, safe_entity
+from mistune.core import BaseRenderer
+from mistune.util import escape as escape_text, striptags, safe_entity
 
 
 class HTMLRenderer(BaseRenderer):
@@ -42,7 +42,7 @@ class HTMLRenderer(BaseRenderer):
         else:
             return func(text)
 
-    def safe_url(self, url: str) -> str:
+    def safe_url(self, url):
         """Ensure the given URL is safe. This method is used for rendering
         links, images, and etc.
         """
@@ -59,24 +59,24 @@ class HTMLRenderer(BaseRenderer):
             return '#harmful-link'
         return url
 
-    def text(self, text: str) -> str:
+    def text(self, text):
         if self._escape:
             return escape_text(text)
         return safe_entity(text)
 
-    def emphasis(self, text: str) -> str:
+    def emphasis(self, text):
         return '<em>' + text + '</em>'
 
-    def strong(self, text: str) -> str:
+    def strong(self, text):
         return '<strong>' + text + '</strong>'
 
-    def link(self, text: str, url: str, title=None) -> str:
+    def link(self, text, url, title=None):
         s = '<a href="' + self.safe_url(url) + '"'
         if title:
             s += ' title="' + safe_entity(title) + '"'
         return s + '>' + text + '</a>'
 
-    def image(self, text: str, url: str, title=None) -> str:
+    def image(self, text, url, title=None):
         src = self.safe_url(url)
         alt = escape_text(striptags(text))
         s = '<img src="' + src + '" alt="' + alt + '"'
@@ -84,24 +84,24 @@ class HTMLRenderer(BaseRenderer):
             s += ' title="' + safe_entity(title) + '"'
         return s + ' />'
 
-    def codespan(self, text: str) -> str:
+    def codespan(self, text):
         return '<code>' + text + '</code>'
 
-    def linebreak(self) -> str:
+    def linebreak(self):
         return '<br />\n'
 
-    def softbreak(self) -> str:
+    def softbreak(self):
         return '\n'
 
-    def inline_html(self, html: str) -> str:
+    def inline_html(self, html):
         if self._escape:
             return escape_text(html)
         return html
 
-    def paragraph(self, text: str) -> str:
+    def paragraph(self, text):
         return '<p>' + text + '</p>\n'
 
-    def heading(self, text: str, level: int, **attrs) -> str:
+    def heading(self, text, level, **attrs):
         tag = 'h' + str(level)
         html = '<' + tag
         _id = attrs.get('id')
@@ -109,16 +109,16 @@ class HTMLRenderer(BaseRenderer):
             html += ' id="' + _id + '"'
         return html + '>' + text + '</' + tag + '>\n'
 
-    def blank_line(self) -> str:
+    def blank_line(self):
         return ''
 
-    def thematic_break(self) -> str:
+    def thematic_break(self):
         return '<hr />\n'
 
-    def block_text(self, text: str) -> str:
+    def block_text(self, text):
         return text
 
-    def block_code(self, code: str, info=None) -> str:
+    def block_code(self, code, info=None):
         html = '<pre><code'
         if info is not None:
             info = safe_entity(info.strip())
@@ -127,18 +127,18 @@ class HTMLRenderer(BaseRenderer):
             html += ' class="language-' + lang + '"'
         return html + '>' + escape_text(code) + '</code></pre>\n'
 
-    def block_quote(self, text: str) -> str:
+    def block_quote(self, text):
         return '<blockquote>\n' + text + '</blockquote>\n'
 
-    def block_html(self, html: str) -> str:
+    def block_html(self, html):
         if self._escape:
             return '<p>' + escape_text(html.strip()) + '</p>\n'
         return html + '\n'
 
-    def block_error(self, text: str) -> str:
+    def block_error(self, text):
         return '<div class="error"><pre>' + text + '</pre></div>\n'
 
-    def list(self, text: str, ordered: bool, **attrs) -> str:
+    def list(self, text, ordered, **attrs):
         if ordered:
             html = '<ol'
             start = attrs.get('start')
@@ -147,5 +147,5 @@ class HTMLRenderer(BaseRenderer):
             return html + '>\n' + text + '</ol>\n'
         return '<ul>\n' + text + '</ul>\n'
 
-    def list_item(self, text: str) -> str:
+    def list_item(self, text):
         return '<li>' + text + '</li>\n'

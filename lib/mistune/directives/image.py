@@ -1,6 +1,6 @@
 import re
 from ._base import DirectivePlugin
-from ..util import escape as escape_text, escape_url
+from mistune.util import escape as escape_text, escape_url
 
 __all__ = ['Image', 'Figure']
 

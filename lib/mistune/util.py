@@ -1,24 +1,27 @@
-import re
-from urllib.parse import quote
+import re, sys
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote
 from html import _replace_charref
 
 
 _expand_tab_re = re.compile(r'^( {0,3})\t', flags=re.M)
 
 
-def expand_leading_tab(text: str, width=4):
+def expand_leading_tab(text, width=4):
     def repl(m):
         s = m.group(1)
         return s + ' ' * (width - len(s))
     return _expand_tab_re.sub(repl, text)
 
 
-def expand_tab(text: str, space: str='    '):
+def expand_tab(text, space='    '):
     repl = r'\1' + space
     return _expand_tab_re.sub(repl, text)
 
 
-def escape(s: str, quote: bool=True):
+def escape(s, quote=True):
     """Escape characters of ``&<>``. If quote=True, ``"`` will be
     converted to ``&quote;``."""
     s = s.replace("&", "&amp;")
@@ -29,7 +32,7 @@ def escape(s: str, quote: bool=True):
     return s
 
 
-def escape_url(link: str):
+def escape_url(link):
     """Escape URL for safety."""
     safe = (
         ':/?#@'           # gen-delims - '[]' (rfc3986)
@@ -39,12 +42,12 @@ def escape_url(link: str):
     return escape(quote(unescape(link), safe=safe))
 
 
-def safe_entity(s: str):
+def safe_entity(s):
     """Escape characters for safety."""
     return escape(unescape(s))
 
 
-def unikey(s: str):
+def unikey(s):
     """Generate a unique key for links and footnotes."""
     key = ' '.join(s.split()).strip()
     return key.lower().upper()
@@ -57,7 +60,7 @@ _charref_re = re.compile(
 )
 
 
-def unescape(s: str):
+def unescape(s):
     """
     Copy from `html.unescape`, but `_charref` is different. CommonMark
     does not accept entity references without a trailing semicolon
@@ -70,12 +73,12 @@ def unescape(s: str):
 _striptags_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
 
 
-def striptags(s: str):
+def striptags(s):
     return _striptags_re.sub('', s)
 
 
 _strip_end_re = re.compile(r'\n\s+$')
 
 
-def strip_end(src: str):
+def strip_end(src):
     return _strip_end_re.sub('\n', src)

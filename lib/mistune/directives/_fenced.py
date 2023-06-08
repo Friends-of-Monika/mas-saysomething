@@ -16,15 +16,15 @@ class FencedParser(DirectiveParser):
     name = 'fenced_directive'
 
     @staticmethod
-    def parse_type(m: re.Match):
+    def parse_type(m):
         return m.group('type')
 
     @staticmethod
-    def parse_title(m: re.Match):
+    def parse_title(m):
         return m.group('title')
 
     @staticmethod
-    def parse_content(m: re.Match):
+    def parse_content(m):
         return m.group('text')
 
 

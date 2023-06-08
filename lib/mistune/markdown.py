@@ -1,7 +1,6 @@
-from typing import Optional
-from .core import BlockState
-from .block_parser import BlockParser
-from .inline_parser import InlineParser
+from mistune.core import BlockState
+from mistune.block_parser import BlockParser
+from mistune.inline_parser import InlineParser
 
 
 class Markdown:
@@ -19,8 +18,8 @@ class Markdown:
     :param plugins: mistune plugins to use
     """
     def __init__(self, renderer=None,
-                 block: Optional[BlockParser]=None,
-                 inline: Optional[InlineParser]=None,
+                 block=None,
+                 inline=None,
                  plugins=None):
         if block is None:
             block = BlockParser()
@@ -42,7 +41,7 @@ class Markdown:
     def use(self, plugin):
         plugin(self)
 
-    def render_state(self, state: BlockState):
+    def render_state(self, state):
         data = self._iter_render(state.tokens, state)
         if self.renderer:
             return self.renderer(data, state)
@@ -60,7 +59,7 @@ class Markdown:
                 tok['children'] = self.inline(text.strip(' \r\n\t\f'), state.env)
             yield tok
 
-    def parse(self, s: str, state: Optional[BlockState]=None):
+    def parse(self, s, state=None):
         """Parse and convert the given markdown string. If renderer is None,
         the returned **result** will be parsed markdown tokens.
 
@@ -104,7 +103,7 @@ class Markdown:
         s = s.decode(encoding)
         return self.parse(s, state)
 
-    def __call__(self, s: str):
+    def __call__(self, s):
         if s is None:
             s = '\n'
         return self.parse(s)[0]

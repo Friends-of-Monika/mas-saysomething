@@ -1,9 +1,8 @@
 import re
-from typing import Dict, Any
 from textwrap import indent
-from ._list import render_list
-from ..core import BaseRenderer, BlockState
-from ..util import strip_end
+from mistune._list import render_list
+from mistune.core import BaseRenderer, BlockState
+from mistune.util import strip_end
 
 fenced_re = re.compile(r'^[`~]+', re.M)
 
@@ -12,13 +11,13 @@ class MarkdownRenderer(BaseRenderer):
     """A renderer to re-format Markdown text."""
     NAME = 'markdown'
 
-    def __call__(self, tokens, state: BlockState):
+    def __call__(self, tokens, state):
         out = self.render_tokens(tokens, state)
         # special handle for line breaks
         out += '\n\n'.join(self.render_referrences(state)) + '\n'
         return strip_end(out)
 
-    def render_referrences(self, state: BlockState):
+    def render_referrences(self, state):
         ref_links = state.env['ref_links']
         for key in ref_links:
             attrs = ref_links[key]
@@ -28,20 +27,20 @@ class MarkdownRenderer(BaseRenderer):
                 text += ' "' + title + '"'
             yield text
 
-    def render_children(self, token, state: BlockState):
+    def render_children(self, token, state):
         children = token['children']
         return self.render_tokens(children, state)
 
-    def text(self, token: Dict[str, Any], state: BlockState) -> str:
+    def text(self, token, state):
         return token['raw']
 
-    def emphasis(self, token: Dict[str, Any], state: BlockState) -> str:
+    def emphasis(self, token, state):
         return '*' + self.render_children(token, state) + '*'
 
-    def strong(self, token: Dict[str, Any], state: BlockState) -> str:
+    def strong(self, token, state):
         return '**' + self.render_children(token, state) + '**'
 
-    def link(self, token: Dict[str, Any], state: BlockState) -> str:
+    def link(self, token, state):
         label = token.get('label')
         text = self.render_children(token, state)
         out = '[' + text + ']'
@@ -65,41 +64,41 @@ class MarkdownRenderer(BaseRenderer):
             out += ' "' + title + '"'
         return out + ')'
 
-    def image(self, token: Dict[str, Any], state: BlockState) -> str:
+    def image(self, token, state):
         return '!' + self.link(token, state)
 
-    def codespan(self, token: Dict[str, Any], state: BlockState) -> str:
+    def codespan(self, token, state):
         return '`' + token['raw'] + '`'
 
-    def linebreak(self, token: Dict[str, Any], state: BlockState) -> str:
+    def linebreak(self, token, state):
         return '  \n'
 
-    def softbreak(self, token: Dict[str, Any], state: BlockState) -> str:
+    def softbreak(self, token, state):
         return '\n'
 
-    def blank_line(self, token: Dict[str, Any], state: BlockState) -> str:
+    def blank_line(self, token, state):
         return ''
 
-    def inline_html(self, token: Dict[str, Any], state: BlockState) -> str:
+    def inline_html(self, token, state):
         return token['raw']
 
-    def paragraph(self, token: Dict[str, Any], state: BlockState) -> str:
+    def paragraph(self, token, state):
         text = self.render_children(token, state)
         return text + '\n\n'
 
-    def heading(self, token: Dict[str, Any], state: BlockState) -> str:
+    def heading(self, token, state):
         level = token['attrs']['level']
         marker = '#' * level
         text = self.render_children(token, state)
         return marker + ' ' + text + '\n\n'
 
-    def thematic_break(self, token: Dict[str, Any], state: BlockState) -> str:
+    def thematic_break(self, token, state):
         return '***\n\n'
 
-    def block_text(self, token: Dict[str, Any], state: BlockState) -> str:
+    def block_text(self, token, state):
         return self.render_children(token, state) + '\n'
 
-    def block_code(self, token: Dict[str, Any], state: BlockState) -> str:
+    def block_code(self, token, state):
         attrs = token.get('attrs', {})
         info = attrs.get('info', '')
         code = token['raw']
@@ -111,17 +110,17 @@ class MarkdownRenderer(BaseRenderer):
             marker = _get_fenced_marker(code)
         return marker + info + '\n' + code + marker + '\n\n'
 
-    def block_quote(self, token: Dict[str, Any], state: BlockState) -> str:
+    def block_quote(self, token, state):
         text = indent(self.render_children(token, state), '> ')
         return text + '\n\n'
 
-    def block_html(self, token: Dict[str, Any], state: BlockState) -> str:
+    def block_html(self, token, state):
         return token['raw'] + '\n\n'
 
-    def block_error(self, token: Dict[str, Any], state: BlockState) -> str:
+    def block_error(self, token, state):
         return ''
 
-    def list(self, token: Dict[str, Any], state: BlockState) -> str:
+    def list(self, token, state):
         return render_list(self, token, state)
 
 

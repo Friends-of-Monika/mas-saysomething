@@ -1,7 +1,7 @@
 import re
 import types
-from ..util import escape
-from ..helpers import PREVENT_BACKSLASH
+from mistune.util import escape
+from mistune.helpers import PREVENT_BACKSLASH
 
 __all__ = ['abbr']
 

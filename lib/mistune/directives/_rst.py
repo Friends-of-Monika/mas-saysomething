@@ -15,15 +15,15 @@ class RSTParser(DirectiveParser):
     name = 'rst_directive'
 
     @staticmethod
-    def parse_type(m: re.Match):
+    def parse_type(m):
         return m.group('type')
 
     @staticmethod
-    def parse_title(m: re.Match):
+    def parse_title(m):
         return m.group('title')
 
     @staticmethod
-    def parse_content(m: re.Match):
+    def parse_content(m):
         full_content = m.group(0)
         text = m.group('text')
         pretext = full_content[:-len(text)]

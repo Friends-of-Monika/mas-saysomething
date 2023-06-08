@@ -8,16 +8,16 @@
     Documentation: https://mistune.lepture.com/
 """
 
-from .markdown import Markdown
-from .core import BlockState, InlineState, BaseRenderer
-from .block_parser import BlockParser
-from .inline_parser import InlineParser
-from .renderers.html import HTMLRenderer
-from .util import escape, escape_url, safe_entity, unikey
-from .plugins import import_plugin
+from mistune.markdown import Markdown
+from mistune.core import BlockState, InlineState, BaseRenderer
+from mistune.block_parser import BlockParser
+from mistune.inline_parser import InlineParser
+from mistune.renderers.html import HTMLRenderer
+from mistune.util import escape, escape_url, safe_entity, unikey
+from mistune.plugins import import_plugin
 
 
-def create_markdown(escape: bool=True, hard_wrap: bool=False, renderer='html', plugins=None) -> Markdown:
+def create_markdown(escape=True, hard_wrap=False, renderer='html', plugins=None):
     """Create a Markdown instance based on the given condition.
 
     :param escape: Boolean. If using html renderer, escape html.
@@ -43,7 +43,7 @@ def create_markdown(escape: bool=True, hard_wrap: bool=False, renderer='html', p
     return Markdown(renderer=renderer, inline=inline, plugins=plugins)
 
 
-html: Markdown = create_markdown(
+html = create_markdown(
     escape=False,
     plugins=['strikethrough', 'footnotes', 'table', 'speedup']
 )
@@ -52,7 +52,7 @@ html: Markdown = create_markdown(
 __cached_parsers = {}
 
 
-def markdown(text, escape=True, renderer='html', plugins=None) -> str:
+def markdown(text, escape=True, renderer='html', plugins=None):
     key = (escape, renderer, plugins)
     if key in __cached_parsers:
         return __cached_parsers[key](text)
