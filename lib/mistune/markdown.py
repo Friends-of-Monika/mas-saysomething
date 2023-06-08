@@ -28,8 +28,8 @@ class Markdown:
             inline = InlineParser()
 
         self.renderer = renderer
-        self.block: BlockParser = block
-        self.inline: InlineParser = inline
+        self.block = block
+        self.inline = inline
         self.before_parse_hooks = []
         self.before_render_hooks = []
         self.after_render_hooks = []

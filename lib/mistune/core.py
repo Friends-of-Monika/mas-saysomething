@@ -1,5 +1,4 @@
 import re
-from typing import Dict, Any
 
 _LINE_END = re.compile(r'\n|$')
 
