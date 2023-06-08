@@ -2,6 +2,8 @@ init -80 python in _fom_saysomething_markdown:
 
     import mistune
 
+    ## Plugins
+
     def spoiler(md):
         # This is a copy-paste from the source code, except it doesn't
         # add a block spoiler parser function here. And also modifies
@@ -34,18 +36,30 @@ init -80 python in _fom_saysomething_markdown:
         md.inline.rules.remove('auto_email')
         md.inline.rules.remove('inline_html')
 
+    ## Renderer
+
     class RenPyRenderer(mistune.HTMLRenderer):
         def __init__(self):
             super(RenPyRenderer, self).__init__()
 
-        def text(self, text):
+        ## Formatting
+
+        def text(self, text): # Plain text
             return text.replace("{", "{{")
 
-        def emphasis(self, text):
+        def emphasis(self, text): # *Emphasis*
             return '{i}' + text + '{/i}'
 
-        def strong(self, text):
+        def strong(self, text): # **Strong**
             return '{b}' + text + '{/b}'
+
+        def strikethrough(self, text): # ~~Strikethrough~~
+            return "{s}" + text + "{/s}"
+
+        def inline_spoiler(self, text): # ||Spoiler||
+            return "{=edited}" + text + "{=normal}"
+
+        ## HTML overrides
 
         def linebreak(self):
             return '\n'
@@ -62,12 +76,8 @@ init -80 python in _fom_saysomething_markdown:
         def block_text(self, text):
             return text
 
-        def strikethrough(self, text):
-            return "{s}" + text + "{/s}"
 
-        def inline_spoiler(self, text):
-            return "{=edited}" + text + "{=normal}"
-
+    ## Markdown render function
 
     render = mistune.create_markdown(plugins=['strikethrough', spoiler, subset],
                                      renderer=RenPyRenderer())
