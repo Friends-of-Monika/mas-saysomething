@@ -44,6 +44,4 @@ init -99 python in _fom_saysomething_lib:
 
     import store, os, sys
     from store import _fom_saysomething
-
-    if sys.version_info.major == 2:
-        sys.path.append(os.path.join(_fom_saysomething.basedir, "lib", "py2"))
+    sys.path.append(os.path.join(_fom_saysomething.basedir, "lib"))
