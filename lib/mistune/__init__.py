@@ -8,13 +8,13 @@
     Documentation: https://mistune.lepture.com/
 """
 
-from .markdown import Markdown
-from .core import BlockState, InlineState, BaseRenderer
-from .block_parser import BlockParser
-from .inline_parser import InlineParser
-from .renderers.html import HTMLRenderer
-from .util import escape, escape_url, safe_entity, unikey
-from .plugins import import_plugin
+from mistune.markdown import Markdown
+from mistune.core import BlockState, InlineState, BaseRenderer
+from mistune.block_parser import BlockParser
+from mistune.inline_parser import InlineParser
+from mistune.renderers.html import HTMLRenderer
+from mistune.util import escape, escape_url, safe_entity, unikey
+from mistune.plugins import import_plugin
 
 
 def create_markdown(escape=True, hard_wrap=False, renderer='html', plugins=None):

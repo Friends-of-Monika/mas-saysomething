@@ -14,7 +14,7 @@
 """
 
 from ._base import DirectivePlugin
-from ..toc import normalize_toc_item, render_toc_ul
+from mistune.toc import normalize_toc_item, render_toc_ul
 
 
 class TableOfContents(DirectivePlugin):

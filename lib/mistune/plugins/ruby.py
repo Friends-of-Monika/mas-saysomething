@@ -1,6 +1,6 @@
 import re
-from ..util import unikey
-from ..helpers import parse_link, parse_link_label
+from mistune.util import unikey
+from mistune.helpers import parse_link, parse_link_label
 
 
 RUBY_PATTERN = r'\[(?:\w+\(\w+\))+\]'

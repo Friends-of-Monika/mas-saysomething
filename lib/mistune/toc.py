@@ -1,4 +1,4 @@
-from .util import striptags
+from mistune.util import striptags
 
 
 def add_toc_hook(md, min_level=1, max_level=3, heading_id=None):

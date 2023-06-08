@@ -1,7 +1,7 @@
-from ..util import strip_end
+from mistune.util import strip_end
 
 
-def render_list(renderer, token, state) -> str:
+def render_list(renderer, token, state):
     attrs = token['attrs']
     if attrs['ordered']:
         children = _render_ordered_list(renderer, token, state)

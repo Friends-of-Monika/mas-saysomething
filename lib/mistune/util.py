@@ -1,5 +1,8 @@
-import re
-from urllib.parse import quote
+import re, sys
+try:
+    from urllib.parse import quote
+except ImportError:
+    from urllib import quote
 from html import _replace_charref
 
 
