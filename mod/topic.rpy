@@ -197,9 +197,10 @@ label fom_saysomething_event_retry:
 
                 # Finally, say text or show pose for 5 seconds.
                 if say:
-                    $ quip = picker.text.replace("{", "{{")
                     if persistent._fom_saysomething_markdown_enabled:
-                        $ quip = _fom_saysomething_markdown.render(quip)
+                        $ quip = _fom_saysomething_markdown.render(picker.text)
+                    else:
+                        $ quip = picker.txt
                     m "[quip]"
                 else:
                     window hide
