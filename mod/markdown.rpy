@@ -1,4 +1,4 @@
-init -100 python in _fom_saysomething_markdown:
+init -80 python in _fom_saysomething_markdown:
 
     import mistune
 
