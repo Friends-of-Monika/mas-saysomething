@@ -56,9 +56,6 @@ init -80 python in _fom_saysomething_markdown:
         def paragraph(self, text):
             return text
 
-        # def heading(self, text, level, **attrs):
-        #     return '{size=*1.25}' + text + '{/size}\n'
-
         def blank_line(self):
             return ''
 
@@ -68,7 +65,7 @@ init -80 python in _fom_saysomething_markdown:
         def strikethrough(self, text):
             return "{s}" + text + "{/s}"
 
-        def spoiler(self, text):
+        def inline_spoiler(self, text):
             return "{=edited}" + text + "{=normal}"
 
 
