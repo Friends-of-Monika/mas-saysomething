@@ -1,7 +1,8 @@
+from typing import Dict, Any
 from textwrap import indent
-from mistune._list import render_list
-from mistune.core import BaseRenderer, BlockState
-from mistune.util import strip_end
+from ._list import render_list
+from ..core import BaseRenderer, BlockState
+from ..util import strip_end
 
 
 class RSTRenderer(BaseRenderer):
@@ -29,14 +30,14 @@ class RSTRenderer(BaseRenderer):
             prev = tok
             yield self.render_token(tok, state)
 
-    def __call__(self, tokens, state):
+    def __call__(self, tokens, state: BlockState):
         state.env['inline_images'] = []
         out = self.render_tokens(tokens, state)
         # special handle for line breaks
         out += '\n\n'.join(self.render_referrences(state)) + '\n'
         return strip_end(out)
 
-    def render_referrences(self, state):
+    def render_referrences(self, state: BlockState):
         images = state.env['inline_images']
         for index, token in enumerate(images):
             attrs = token['attrs']
@@ -44,45 +45,45 @@ class RSTRenderer(BaseRenderer):
             ident = self.INLINE_IMAGE_PREFIX + str(index)
             yield '.. |' + ident + '| image:: ' + attrs['url'] + '\n   :alt: ' + alt
 
-    def render_children(self, token, state):
+    def render_children(self, token, state: BlockState):
         children = token['children']
         return self.render_tokens(children, state)
 
-    def text(self, token, state):
+    def text(self, token: Dict[str, Any], state: BlockState) -> str:
         text = token['raw']
         return text.replace('|', r'\|')
 
-    def emphasis(self, token, state):
+    def emphasis(self, token: Dict[str, Any], state: BlockState) -> str:
         return '*' + self.render_children(token, state) + '*'
 
-    def strong(self, token, state):
+    def strong(self, token: Dict[str, Any], state: BlockState) -> str:
         return '**' + self.render_children(token, state) + '**'
 
-    def link(self, token, state):
+    def link(self, token: Dict[str, Any], state: BlockState) -> str:
         attrs = token['attrs']
         text = self.render_children(token, state)
         return '`' + text + ' <' + attrs['url'] + '>`__'
 
-    def image(self, token, state):
-        refs = state.env['inline_images']
+    def image(self, token: Dict[str, Any], state: BlockState) -> str:
+        refs: list = state.env['inline_images']
         index = len(refs)
         refs.append(token)
         return '|' + self.INLINE_IMAGE_PREFIX + str(index) + '|'
 
-    def codespan(self, token, state):
+    def codespan(self, token: Dict[str, Any], state: BlockState) -> str:
         return '``' + token['raw'] + '``'
 
-    def linebreak(self, token, state):
+    def linebreak(self, token: Dict[str, Any], state: BlockState) -> str:
         return '<linebreak>'
 
-    def softbreak(self, token, state):
+    def softbreak(self, token: Dict[str, Any], state: BlockState) -> str:
         return ' '
 
-    def inline_html(self, token, state):
+    def inline_html(self, token: Dict[str, Any], state: BlockState) -> str:
         # rst does not support inline html
         return ''
 
-    def paragraph(self, token, state):
+    def paragraph(self, token: Dict[str, Any], state: BlockState) -> str:
         children = token['children']
         if len(children) == 1 and children[0]['type'] == 'image':
             image = children[0]
@@ -100,19 +101,19 @@ class RSTRenderer(BaseRenderer):
                 text = '\n'.join('| ' + line for line in lines)
         return text + '\n\n'
 
-    def heading(self, token, state):
+    def heading(self, token: Dict[str, Any], state: BlockState) -> str:
         attrs = token['attrs']
         text = self.render_children(token, state)
         marker = self.HEADING_MARKERS[attrs['level']]
         return text + '\n' + marker * len(text) + '\n\n'
 
-    def thematic_break(self, token, state):
+    def thematic_break(self, token: Dict[str, Any], state: BlockState) -> str:
         return '--------------\n\n'
 
-    def block_text(self, token, state):
+    def block_text(self, token: Dict[str, Any], state: BlockState) -> str:
         return self.render_children(token, state) + '\n'
 
-    def block_code(self, token, state):
+    def block_code(self, token: Dict[str, Any], state: BlockState) -> str:
         attrs = token.get('attrs', {})
         info = attrs.get('info')
         code = indent(token['raw'], '   ')
@@ -122,7 +123,7 @@ class RSTRenderer(BaseRenderer):
         else:
             return '::\n\n' + code + '\n\n'
 
-    def block_quote(self, token, state):
+    def block_quote(self, token: Dict[str, Any], state: BlockState) -> str:
         text = indent(self.render_children(token, state), '   ')
         prev = token['prev']
         ignore_blocks = (
@@ -135,12 +136,12 @@ class RSTRenderer(BaseRenderer):
             text = '..\n\n' + text
         return text
 
-    def block_html(self, token, state):
+    def block_html(self, token: Dict[str, Any], state: BlockState) -> str:
         raw = token['raw']
         return '.. raw:: html\n\n' + indent(raw, '   ') + '\n\n'
 
-    def block_error(self, token, state):
+    def block_error(self, token: Dict[str, Any], state: BlockState) -> str:
         return ''
 
-    def list(self, token, state):
+    def list(self, token: Dict[str, Any], state: BlockState) -> str:
         return render_list(self, token, state)

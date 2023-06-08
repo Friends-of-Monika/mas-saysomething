@@ -5,15 +5,15 @@ class DirectiveParser:
     name = 'directive'
 
     @staticmethod
-    def parse_type(m):
+    def parse_type(m: re.Match):
         raise NotImplementedError()
 
     @staticmethod
-    def parse_title(m):
+    def parse_title(m: re.Match):
         raise NotImplementedError()
 
     @staticmethod
-    def parse_content(m):
+    def parse_content(m: re.Match):
         raise NotImplementedError()
 
     @classmethod
@@ -28,7 +28,7 @@ class DirectiveParser:
         return child.tokens
 
     @staticmethod
-    def parse_options(m):
+    def parse_options(m: re.Match):
         text = m.group('options')
         if not text.strip():
             return []
@@ -99,16 +99,16 @@ class DirectivePlugin:
     def __init__(self):
         self.parser = None
 
-    def parse_options(self, m):
+    def parse_options(self, m: re.Match):
         return self.parser.parse_options(m)
 
-    def parse_type(self, m):
+    def parse_type(self, m: re.Match):
         return self.parser.parse_type(m)
 
-    def parse_title(self, m):
+    def parse_title(self, m: re.Match):
         return self.parser.parse_title(m)
 
-    def parse_content(self, m):
+    def parse_content(self, m: re.Match):
         return self.parser.parse_content(m)
 
     def parse_tokens(self, block, text, state):

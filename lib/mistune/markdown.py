@@ -1,6 +1,7 @@
-from mistune.core import BlockState
-from mistune.block_parser import BlockParser
-from mistune.inline_parser import InlineParser
+from typing import Optional
+from .core import BlockState
+from .block_parser import BlockParser
+from .inline_parser import InlineParser
 
 
 class Markdown:
@@ -17,7 +18,10 @@ class Markdown:
     :param inline: inline level syntax parser
     :param plugins: mistune plugins to use
     """
-    def __init__(self, renderer=None, block=None, inline=None, plugins=None):
+    def __init__(self, renderer=None,
+                 block: Optional[BlockParser]=None,
+                 inline: Optional[InlineParser]=None,
+                 plugins=None):
         if block is None:
             block = BlockParser()
 
@@ -25,8 +29,8 @@ class Markdown:
             inline = InlineParser()
 
         self.renderer = renderer
-        self.block = block
-        self.inline = inline
+        self.block: BlockParser = block
+        self.inline: InlineParser = inline
         self.before_parse_hooks = []
         self.before_render_hooks = []
         self.after_render_hooks = []
@@ -38,7 +42,7 @@ class Markdown:
     def use(self, plugin):
         plugin(self)
 
-    def render_state(self, state):
+    def render_state(self, state: BlockState):
         data = self._iter_render(state.tokens, state)
         if self.renderer:
             return self.renderer(data, state)
@@ -52,10 +56,11 @@ class Markdown:
             elif 'text' in tok:
                 text = tok.pop('text')
                 # process inline text
-                tok['children'] = self.inline(text.strip(), state.env)
+                # avoid striping emsp or other unicode spaces
+                tok['children'] = self.inline(text.strip(' \r\n\t\f'), state.env)
             yield tok
 
-    def parse(self, s, state=None):
+    def parse(self, s: str, state: Optional[BlockState]=None):
         """Parse and convert the given markdown string. If renderer is None,
         the returned **result** will be parsed markdown tokens.
 
@@ -69,6 +74,8 @@ class Markdown:
         # normalize line separator
         s = s.replace('\r\n', '\n')
         s = s.replace('\r', '\n')
+        if not s.endswith('\n'):
+            s += '\n'
 
         state.process(s)
 
@@ -97,7 +104,7 @@ class Markdown:
         s = s.decode(encoding)
         return self.parse(s, state)
 
-    def __call__(self, s):
+    def __call__(self, s: str):
         if s is None:
             s = '\n'
         return self.parse(s)[0]

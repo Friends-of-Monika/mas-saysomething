@@ -1,6 +1,6 @@
 import re
-from mistune.core import BlockState
-from mistune.util import unikey
+from ..core import BlockState
+from ..util import unikey
 from ..helpers import LINK_LABEL
 
 __all__ = ['footnotes']
@@ -18,7 +18,7 @@ REF_FOOTNOTE = (
 INLINE_FOOTNOTE = r'\[\^(?P<footnote_key>' + LINK_LABEL + r')\]'
 
 
-def parse_inline_footnote(inline, m, state):
+def parse_inline_footnote(inline, m: re.Match, state):
     key = unikey(m.group('footnote_key'))
     ref = state.env.get('ref_footnotes')
     if ref and key in ref:
@@ -38,7 +38,7 @@ def parse_inline_footnote(inline, m, state):
     return m.end()
 
 
-def parse_ref_footnote(block, m, state):
+def parse_ref_footnote(block, m: re.Match, state: BlockState):
     ref = state.env.get('ref_footnotes')
     if not ref:
         ref = {}
@@ -50,7 +50,7 @@ def parse_ref_footnote(block, m, state):
     return m.end()
 
 
-def parse_footnote_item(block, key, index, state):
+def parse_footnote_item(block, key: str, index: int, state: BlockState):
     ref = state.env.get('ref_footnotes')
     text = ref[key]
 
@@ -76,7 +76,7 @@ def parse_footnote_item(block, key, index, state):
     }
 
 
-def md_footnotes_hook(md, result, state):
+def md_footnotes_hook(md, result: str, state: BlockState):
     notes = state.env.get('footnotes')
     if not notes:
         return result
@@ -91,17 +91,17 @@ def md_footnotes_hook(md, result, state):
     return result + output
 
 
-def render_footnote_ref(renderer, key, index):
+def render_footnote_ref(renderer, key: str, index: int):
     i = str(index)
     html = '<sup class="footnote-ref" id="fnref-' + i + '">'
     return html + '<a href="#fn-' + i + '">' + i + '</a></sup>'
 
 
-def render_footnotes(renderer, text):
+def render_footnotes(renderer, text: str):
     return '<section class="footnotes">\n<ol>\n' + text + '</ol>\n</section>\n'
 
 
-def render_footnote_item(renderer, text, key, index):
+def render_footnote_item(renderer, text: str, key: str, index: int):
     i = str(index)
     back = '<a href="#fnref-' + i + '" class="footnote">&#8617;</a>'
     text = text.rstrip()[:-4] + back + '</p>'

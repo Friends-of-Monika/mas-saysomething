@@ -1,5 +1,5 @@
 import re
-from mistune.helpers import PREVENT_BACKSLASH
+from ..helpers import PREVENT_BACKSLASH
 
 __all__ = ["strikethrough", "mark", "insert", "superscript", "subscript"]
 

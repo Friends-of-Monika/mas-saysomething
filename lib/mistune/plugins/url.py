@@ -1,4 +1,4 @@
-from mistune.util import escape_url
+from ..util import escape_url
 
 __all__ = ['url']
 

@@ -1,5 +1,5 @@
 import re
-from mistune.util import strip_end
+from ..util import strip_end
 
 __all__ = ['def_list']
 

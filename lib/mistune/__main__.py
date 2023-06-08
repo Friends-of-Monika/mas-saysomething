@@ -1,9 +1,11 @@
 import sys
 import argparse
-from mistune.renderers.rst import RSTRenderer
-from mistune.renderers.markdown import MarkdownRenderer
-from mistune import create_markdown
-from mistune import __version__ as version
+from .renderers.rst import RSTRenderer
+from .renderers.markdown import MarkdownRenderer
+from . import (
+    create_markdown,
+    __version__ as version
+)
 
 
 def _md(args):
