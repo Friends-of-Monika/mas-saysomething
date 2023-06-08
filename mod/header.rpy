@@ -1,4 +1,5 @@
 # header.rpy contains MAS submod header as well as Submod Updater header.
+# It also contains logic for libraries injection.
 #
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
@@ -28,3 +29,19 @@ init -989 python:
             repository_name="mas-saysomething",
             extraction_depth=3
         )
+
+
+## Setting up lib/ directory for custom libraries location
+
+init -199 python in _fom_saysomething:
+
+    import store, os
+    from store import _fom_saysomething
+    basedir = os.path.join(renpy.config.basedir, *_fom_saysomething.get_script_file(
+        fallback="game/Submods/Say Something/header.rpy").split("/")[:-1])
+
+init -99 python in _fom_saysomething_lib:
+
+    import store, os, sys
+    from store import _fom_saysomething
+    sys.path.append(os.path.join(_fom_saysomething.basedir, "lib"))
