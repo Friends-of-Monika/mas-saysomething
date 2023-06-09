@@ -162,19 +162,19 @@ label fom_saysomething_event_retry:
             if picker_session is None:
                 $ picker_session = [picker._save_state()]
 
+            # Show screenshot hint.
+            if not persistent._fom_saysomething_seen_screenshot_hint:
+                $ scr_key = _fom_saysomething.get_screenshot_key()
+                if scr_key is not None:
+                    $ persistent._fom_saysomething_seen_screenshot_hint = True
+                    $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
+                $ del scr_key
+
             # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
                 $ picker._load_state(picker_session[state_i])
                 $ state_i += 1
-
-                # Show screenshot hint.
-                if not persistent._fom_saysomething_seen_screenshot_hint:
-                    $ scr_key = _fom_saysomething.get_screenshot_key()
-                    if scr_key is not None:
-                        $ persistent._fom_saysomething_seen_screenshot_hint = True
-                        $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
-                    $ del scr_key
 
                 # Get current expression after it was changed.
                 $ exp = picker.get_sprite_code()
