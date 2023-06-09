@@ -55,6 +55,7 @@ init -80 python in _fom_saysomething_markdown:
 
         # Actually, heading idea *isn't that bad*, but we sure need some logic
         # in place to make the TERRIBLY LARGE lines fit inside the dialog box.
+        # While we don't it's better to leave this removed.
         md.block.rules.remove('axt_heading')
         md.block.rules.remove('setex_heading')
 
@@ -88,7 +89,7 @@ init -80 python in _fom_saysomething_markdown:
         def inline_spoiler(self, text): # ||Spoiler||
             return "{=edited}" + text + "{=normal}"
 
-        def underline(self, text):
+        def underline(self, text): # __underline__
             return "{u}" + text + "{/u}"
 
         ## HTML overrides
@@ -103,7 +104,7 @@ init -80 python in _fom_saysomething_markdown:
             return text
 
         def blank_line(self):
-            return ''
+            return '\n\n'
 
         def block_text(self, text):
             return text
