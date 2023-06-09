@@ -170,6 +170,9 @@ label fom_saysomething_event_retry:
                     $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
                 $ del scr_key
 
+            # Memorize 5-poses for transitions.
+            $ pose_5 = False
+
             # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
@@ -189,11 +192,10 @@ label fom_saysomething_event_retry:
                 # Show Monika with sprite code and at set position, optionally lock
                 # eyes blinking and say text. For entering and exiting 5-pose
                 # apply transition.
-                $ exp_5 = False
                 $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
-                if exp.startswith("5") or exp_5:
+                if (not exp.startswith("5") and pose_5) or (exp.startswith("5") and not pose_5):
                     $ renpy.with_statement(dissolve_monika)
-                    $ exp_5 = not exp_5
+                    $ pose_5 = not pose_5
 
                 # Finally, say text or show pose for 5 seconds.
                 if say:
