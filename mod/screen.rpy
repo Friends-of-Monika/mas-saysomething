@@ -140,6 +140,9 @@ init 100 python in _fom_saysomething:
         (store.t44, "t44")  #8
     ]
 
+    # Need this limitation because else we'll quickly run out of memory.
+    MAX_SESSION_SIZE = 100
+
 
     class Picker(object):
         """
@@ -525,7 +528,14 @@ init 100 python in _fom_saysomething:
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
+
+            RAISES:
+                ValueError:
+                    If session entries count is too big.
             """
+
+            if self.is_session_maximum_reached():
+                raise ValueError("Maximum count of session entries reached.")
 
             self.session.append(self._save_state())
             self.session_cursor += 1
@@ -596,6 +606,20 @@ init 100 python in _fom_saysomething:
             if self.session_cursor == 0 and len(self.session) == 0:
                 return False
             return self.session_cursor != len(self.session)
+
+        def is_session_maximum_reached(self):
+            """
+            Checks if the session has reached its maximum capacity.
+
+            OUT:
+                True:
+                    If the session is full and has reached the maximum size.
+
+                False:
+                    If the session has not yet reached the maximum size.
+            """
+
+            return not (len(self.session) < MAX_SESSION_SIZE)
 
         def on_position_change(self, value):
             """
@@ -881,8 +905,18 @@ screen fom_saysomething_picker(say=True):
                                 sensitive not say or not picker.is_text_empty()
                                 if picker.is_editing_session_item():
                                     action Function(picker.edit_session_item)
+
                                 else:
-                                    action Function(picker.add_session_item)
+                                    if not picker.is_session_maximum_reached():
+                                        # While limit is not reached, keep adding iteams
+                                        action Function(picker.add_session_item)
+
+                                    else:
+                                        # When reached, show a nice message about it.
+                                        action Show("dialog",
+                                                    message=_("You have reached the maximum amount\nof {0}.")
+                                                            .format(_("phrases for Monika to say") if say else _("poses for Monika to do")),
+                                                    ok_action=Hide("dialog"))
 
                             textbutton _("Remove"):
                                 sensitive picker.can_remove_session()
