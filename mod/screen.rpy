@@ -391,7 +391,7 @@ init 100 python in _fom_saysomething:
             )
 
             # Set GUI flip.
-            self.gui_flip = self.position_adjustment.value > 5
+            self.gui_flip = self.position_adjustment.value > 4
 
             # Variable that stores entered user text prompt.
             self.text = ""
