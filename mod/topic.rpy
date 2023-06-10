@@ -164,7 +164,7 @@ label fom_saysomething_event_retry:
 
             # Show screenshot hint.
             if not persistent._fom_saysomething_seen_screenshot_hint:
-                $ scr_key = _fom_saysomething.get_screenshot_key()
+                $ scr_key = _fom_saysomething.get_friendly_key("screenshot")
                 if scr_key is not None:
                     $ persistent._fom_saysomething_seen_screenshot_hint = True
                     $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
@@ -173,11 +173,29 @@ label fom_saysomething_event_retry:
             # Memorize 5-poses for transitions.
             $ pose_5 = False
 
+            # Allow skipping here if dialogue is long enough.
+            $ _fom_enable_skipping = len(picker_session) >= (_fom_saysomething.SPEECH_SKIPPABLE_SIZE if say else _fom_saysomething.POSING_SKIPPABLE_SIZE)
+            if _fom_enable_skipping:
+                if say:
+                    $ _fom_skip_pstate = (config.allow_skipping, preferences.skip_unseen)
+                    $ config.allow_skipping = True
+                    $ preferences.skip_unseen = True
+                else:
+                    # Create keybind for quick skipping posing, which can be LONG.
+                    call fom_saysomething_create_skip_keybind("_fom_saysomething_post_loop")
+
             # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
                 $ picker._load_state(picker_session[state_i])
                 $ state_i += 1
+
+                # Give a hint about skipping; it must not be shown the same time as screenshot hint.
+                if (state_i > 1 or persistent._fom_saysomething_seen_screenshot_hint) and _fom_enable_skipping and not say:
+                    if not persistent._fom_saysomething_seen_skip_hint:
+                        $ skip_key = _fom_saysomething.get_friendly_key("_fom_skip")
+                        $ renpy.notify(_("You can stop the posing session by pressing {0}.").format(skip_key))
+                        $ persistent._fom_saysomething_seen_skip_hint = True
 
                 # Get current expression after it was changed.
                 $ exp = picker.get_sprite_code()
@@ -209,38 +227,48 @@ label fom_saysomething_event_retry:
                     pause picker.pose_delay
                     window show
 
-            # Cleanup.
-            $ del state_i, picker_session
+            label _fom_saysomething_post_loop:
+                # Cleanup.
+                $ del state_i, picker_session
 
-            # No longer posing.
-            $ _fom_saysomething.posing = False
+                # No longer posing.
+                $ _fom_saysomething.posing = False
 
-            # Unlock winking/blinking.
-            $ set_eyes_lock(exp, False)
+                # Unlock winking/blinking.
+                $ set_eyes_lock(exp, False)
 
-            # Anyway, recover buttons after we're done showing.
-            if persistent._fom_saysomething_hide_quick_buttons:
-                call fom_saysomething_event_buttons(_show=True)
+                # Undo skipping unlock.
+                if _fom_enable_skipping:
+                    if say:
+                        $ config.allow_skipping = _fom_skip_pstate[0]
+                        $ preferences.skip_unseen = _fom_skip_pstate[1]
+                        $ del _fom_enable_skipping, _fom_skip_pstate
+                    else:
+                        call fom_saysomething_remove_skip_keybind
 
-            show monika 3tua at t11
-            m 3tua "Well? {w=0.3}Did I do it good enough?"
-            m 1hub "Hope you liked it, ahaha~"
+                # Anyway, recover buttons after we're done showing.
+                if persistent._fom_saysomething_hide_quick_buttons:
+                    call fom_saysomething_event_buttons(_show=True)
 
-            if say:
-                $ quip = _("say something else")
-            else:
-                $ quip = _("pose for you again")
+                show monika 3tua at t11
+                m 3tua "Well? {w=0.3}Did I do it good enough?"
+                m 1hub "Hope you liked it, ahaha~"
 
-            m 3eub "Do you want me to [quip]?{nw}"
-            $ _history_list.pop()
-            menu:
-                m "Do you want me to [quip]?{fast}"
+                if say:
+                    $ quip = _("say something else")
+                else:
+                    $ quip = _("pose for you again")
 
-                "Yes.":
-                    jump fom_saysomething_event_retry
+                m 3eub "Do you want me to [quip]?{nw}"
+                $ _history_list.pop()
+                menu:
+                    m "Do you want me to [quip]?{fast}"
 
-                "No.":
-                    m 1hua "Okay~"
+                    "Yes.":
+                        jump fom_saysomething_event_retry
+
+                    "No.":
+                        m 1hua "Okay~"
 
     # Once done with all the speech/posing, remove the images saved in cache
     # that weren't cached before (so that we don't touch MAS sprites.)
@@ -258,4 +286,22 @@ label fom_saysomething_event_buttons(_show=True):
         $ HKBShowButtons()
     else:
         $ HKBHideButtons()
+    return
+
+init python:
+    def _fom_skip_to_label(_label):
+        def skip():
+            renpy.jump(_label)
+        return skip
+
+label fom_saysomething_create_skip_keybind(_label):
+    $ config.keymap["_fom_skip"] = ["x", "X"]
+    $ del config.keymap["derandom_topic"]
+    $ config.underlay.append(renpy.Keymap(_fom_skip=_fom_skip_to_label(_label)))
+    return
+
+label fom_saysomething_remove_skip_keybind():
+    $ config.keymap["derandom_topic"] = ["x", "X"]
+    $ del config.keymap["_fom_skip"]
+    $ config.underlay.pop(-1)
     return

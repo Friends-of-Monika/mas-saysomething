@@ -91,21 +91,21 @@ init -200 python in _fom_saysomething:
             if tup in renpy.display.image.images:
                 del renpy.display.image.images[tup]
 
-    def get_screenshot_key():
+    def get_friendly_key(action):
         """
-        Retrieves user-friendly key combination for a screenshot.
-        If keymap is not configured for screenshots, returns None.
+        Retrieves user-friendly key combination for a given action.
+        If keymap is not configured for this action, returns None.
 
         OUT:
             str:
                 User-friendly key combination.
 
             None:
-                If keymap is not configured for taking screenshots.
+                If keymap is not configured.
         """
 
         # May be not set or be empty here.
-        key = renpy.config.keymap.get("screenshot")
+        key = renpy.config.keymap.get(action)
         if key is None or len(key) == 0:
             return None
 

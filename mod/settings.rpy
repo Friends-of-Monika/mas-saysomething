@@ -10,6 +10,7 @@ define persistent._fom_saysomething_seen_screenshot_hint = False
 define persistent._fom_saysomething_speech_mode_default = False
 define persistent._fom_saysomething_pose_pause = 5.0
 define persistent._fom_saysomething_markdown_enabled = True
+define persistent._fom_saysomething_seen_skip_hint = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -41,23 +42,18 @@ screen fom_saysomething_settings:
                 hovered SetField(tooltip, "value", _("Allow Monika to blink or wink when posing."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
+            textbutton _("Enable speech/session mode by default"):
+                selected persistent._fom_saysomething_speech_mode_default
+                action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
+                hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
+                unhovered SetField(tooltip, "value", tooltip.default)
+
+        grid 2 2:
             textbutton _("Enable Markdown"):
                 selected persistent._fom_saysomething_markdown_enabled
                 action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
                 hovered SetField(tooltip, "value", _("Enable Markdown text formatting when asking Monika to say something."))
                 unhovered SetField(tooltip, "value", tooltip.default)
-
-        textbutton _("Show screenshot key hint"):
-            selected not persistent._fom_saysomething_seen_screenshot_hint
-            action ToggleField(persistent, "_fom_saysomething_seen_screenshot_hint")
-            hovered SetField(tooltip, "value", _("Show a hint with screenshot key when saying or posing."))
-            unhovered SetField(tooltip, "value", tooltip.default)
-
-        textbutton _("Enable speech/session mode by default"):
-            selected persistent._fom_saysomething_speech_mode_default
-            action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
-            hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
-            unhovered SetField(tooltip, "value", tooltip.default)
 
         hbox:
             xfill True
