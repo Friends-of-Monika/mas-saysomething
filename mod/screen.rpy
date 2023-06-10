@@ -1259,7 +1259,7 @@ screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
 
     frame:
         vbox:
-            xmaximum 500
+            xmaximum 650
 
             align (0.5, 0.5)
             spacing 30
