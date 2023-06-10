@@ -143,8 +143,11 @@ init 100 python in _fom_saysomething:
     # Need this limitation because else we'll quickly run out of memory.
     MAX_SESSION_SIZE = 100
 
-    # How many session entries is required in order to allow skipping.
-    SKIPPABLE_SIZE = int(MAX_SESSION_SIZE * 0.1)
+    # How many session entries is required in order to allow skipping speech.
+    SPEECH_SKIPPABLE_SIZE = int(MAX_SESSION_SIZE * 0.1)
+
+    # How many pose entries is required in order to allow skipping.
+    POSING_SKIPPABLE_SIZE = int(MAX_SESSION_SIZE * 0.03)
 
 
     class Picker(object):
@@ -547,8 +550,11 @@ init 100 python in _fom_saysomething:
             self.session_cursor += 1
             self._reset_state()
 
-            if store.say and len(self.session) >= SKIPPABLE_SIZE and not self.skip_notification_seen:
-                renpy.notify(_("At that point, Skip button will be unlocked."))
+            if len(self.session) >= (SPEECH_SKIPPABLE_SIZE if store.say else POSING_SKIPPABLE_SIZE) and not self.skip_notification_seen:
+                if store.say:
+                    renpy.notify(_("At that point, you'll be able to skip her speech."))
+                else:
+                    renpy.notify(_("At that point, you'll be able to skip posing."))
                 self.skip_notification_seen = True
 
             return RETURN_RENDER
@@ -908,7 +914,9 @@ screen fom_saysomething_picker(say=True):
                                                       .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
                                                               _fom_saysomething.MAX_SESSION_SIZE,
                                                               _("Skip button on quick menu will be unlocked if your speech has more than {0} phrases.\n\n")
-                                                              .format(_fom_saysomething.SKIPPABLE_SIZE) if say else ""),
+                                                              .format(_fom_saysomething.SPEECH_SKIPPABLE_SIZE) if say else
+                                                              _("Skipping posing will be unlocked if you added more than {0} poses.\n\n")
+                                                              .format(_fom_saysomething.POSING_SKIPPABLE_SIZE)),
                                             ok_button=_("OK"),
                                             ok_action=Function(picker.enable_session_mode))
 
