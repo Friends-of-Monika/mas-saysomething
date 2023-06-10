@@ -329,6 +329,6 @@ label fom_saysomething_generate(picker):
                 $ script_name = None
 
     $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
-    $ renpy.notify(_("Speech has been saved to {0}").format(script_path))
+    $ renpy.notify(_("Speech been saved as {0}").format(script_path))
 
     return
