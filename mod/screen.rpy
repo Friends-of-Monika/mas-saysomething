@@ -1350,7 +1350,7 @@ screen fom_saysomething_script_name_input_modal:
                     action Return(script_name)
                     sensitive bool(script_name)
                 textbutton _("Cancel"):
-                    action Return(None)
+                    action Return(False)
 
 
 # Modal screen shared between confirming preset deletion and overwrite confirmation.

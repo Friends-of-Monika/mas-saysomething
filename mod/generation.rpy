@@ -57,7 +57,7 @@ init 101 python in _fom_saysomething:
                 Tuple of 2 elements, name and extensions.
         """
         parts = path.partition(".")
-        return parts[0], parts[1]
+        return parts[0], parts[2]
 
     def _get_unique_name(_dir, suggested_name):
         """
@@ -82,8 +82,10 @@ init 101 python in _fom_saysomething:
 
         count = 1
         while True:
-            if not os.path.exists(os.path.join(_dir, suggested_name + "(" + count + ")")):
-                return suggested_name
+            sn_name, sn_ext = _get_split_name_ext(suggested_name)
+            new_name = sn_name + " (" + str(count) + ")." + sn_ext
+            if not os.path.exists(os.path.join(_dir, new_name)):
+                return new_name
             count += 1
 
     def get_script_name_suggestion():
@@ -96,7 +98,9 @@ init 101 python in _fom_saysomething:
                 Guaranteed unique script name suggestion.
         """
 
-        return _get_unique_name(SPEECHES_DIR_PATH, DEFAULT_SCRIPT_NAME)
+        uniq_name = _get_unique_name(SPEECHES_DIR_PATH, DEFAULT_SCRIPT_NAME + ".rpy.txt")
+        uniq_name = uniq_name[:-8]
+        return uniq_name
 
     def is_script_name_exists(name):
         """
@@ -248,6 +252,10 @@ init 101 python in _fom_saysomething:
                 Picker session, list of session entries.
             name -> str:
                 Name of the script, user-chosen arbitrary string.
+
+        OUT:
+            str:
+                Path where the script has been saved.
         """
 
         def get_dialog_line(poses, pos, text):
@@ -269,3 +277,5 @@ init 101 python in _fom_saysomething:
                 _get_escaped_text(name),
                 "\n".join(lines),
                 GENERATOR_IDENT))
+
+        return path

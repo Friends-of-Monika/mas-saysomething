@@ -319,7 +319,7 @@ label fom_saysomething_generate(picker):
     $ script_name = None
     while not script_name:
         call screen fom_saysomething_script_name_input_modal
-        if _return is None:
+        if not _return:
             return
 
         $ script_name = _return
@@ -328,6 +328,7 @@ label fom_saysomething_generate(picker):
             if not _return:
                 $ script_name = None
 
-    $ _fom_saysomething.generate_script(picker.session, script_name)
+    $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
+    $ renpy.notify(_("Speech has been saved to {0}").format(script_path))
 
     return
