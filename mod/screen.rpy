@@ -143,6 +143,9 @@ init 100 python in _fom_saysomething:
     # Need this limitation because else we'll quickly run out of memory.
     MAX_SESSION_SIZE = 100
 
+    # How many session entries is required in order to allow skipping.
+    SKIPPABLE_SIZE = int(MAX_SESSION_SIZE * 0.1)
+
 
     class Picker(object):
         """
@@ -191,6 +194,9 @@ init 100 python in _fom_saysomething:
 
             # Delay between changing poses.
             self.pose_delay = persistent._fom_saysomething_pose_pause
+
+            # Whether or not skip unlock notification was already seen.
+            self.skip_notification_seen = False
 
         def pose_switch_selector(self, key, forward):
             """
@@ -540,6 +546,10 @@ init 100 python in _fom_saysomething:
             self.session.append(self._save_state())
             self.session_cursor += 1
             self._reset_state()
+
+            if store.say and len(self.session) >= SKIPPABLE_SIZE and not self.skip_notification_seen:
+                renpy.notify(_("At that point, Skip button will be unlocked."))
+                self.skip_notification_seen = True
 
             return RETURN_RENDER
 
@@ -892,11 +902,13 @@ screen fom_saysomething_picker(say=True):
                             textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
                                 xysize (370, None)
                                 action Show("fom_saysomething_confirm_modal",
-                                            title=_("Enable {0} mode").format(_("speech") if say else _("session")),
-                                            message=_("You will be able to save multiple {0} for Monika to do them one after another in a row.\n\n"
-                                                      "When done, click on {{i}}{1}{{/i}} button.\n\n"
+                                            message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
+                                                      "click on {{i}}{1}{{/i}} button.\n\n{3}"
                                                       "{{i}}You can enable {0} mode by default in submod settings.{{/i}}")
-                                                      .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose")),
+                                                      .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
+                                                              _fom_saysomething.MAX_SESSION_SIZE,
+                                                              _("Skip button on quick menu will be unlocked if your speech has more than {0} phrases.\n\n")
+                                                              .format(_fom_saysomething.SKIPPABLE_SIZE) if say else ""),
                                             ok_button=_("OK"),
                                             ok_action=Function(picker.enable_session_mode))
 
@@ -1234,7 +1246,7 @@ screen fom_saysomething_preset_name_input_modal:
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
+screen fom_saysomething_confirm_modal(message, ok_button, ok_action, title=None):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
                    Hide("fom_saysomething_confirm_modal")]
@@ -1266,9 +1278,10 @@ screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
 
             # Title.
 
-            text title:
-                style "confirm_prompt"
-                xalign 0.5
+            if title:
+                text title:
+                    style "confirm_prompt"
+                    xalign 0.5
 
             # Text.
 

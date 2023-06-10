@@ -173,6 +173,13 @@ label fom_saysomething_event_retry:
             # Memorize 5-poses for transitions.
             $ pose_5 = False
 
+            # Allow skipping here if dialogue is long enough.
+            $ _fom_enable_skipping = len(picker_session) >= _fom_saysomething.SKIPPABLE_SIZE
+            if _fom_enable_skipping:
+                $ _fom_skip_pstate = (config.allow_skipping, preferences.skip_unseen)
+                $ config.allow_skipping = True
+                $ preferences.skip_unseen = True
+
             # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
@@ -217,6 +224,12 @@ label fom_saysomething_event_retry:
 
             # Unlock winking/blinking.
             $ set_eyes_lock(exp, False)
+
+            # Undo skipping unlock.
+            if _fom_enable_skipping:
+                $ config.allow_skipping = _fom_skip_pstate[0]
+                $ preferences.skip_unseen = _fom_skip_pstate[1]
+                $ del _fom_enable_skipping, _fom_skip_pstate
 
             # Anyway, recover buttons after we're done showing.
             if persistent._fom_saysomething_hide_quick_buttons:
