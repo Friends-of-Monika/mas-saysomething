@@ -24,7 +24,7 @@ screen fom_saysomething_settings:
 
         style_prefix "check"
 
-        grid 3 2:
+        grid 2 3:
             textbutton _("Show expression code"):
                 selected persistent._fom_saysomething_show_code
                 action ToggleField(persistent, "_fom_saysomething_show_code")
