@@ -42,17 +42,17 @@ screen fom_saysomething_settings:
                 hovered SetField(tooltip, "value", _("Allow Monika to blink or wink when posing."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
+            textbutton _("Enable speech/session mode by default"):
+                selected persistent._fom_saysomething_speech_mode_default
+                action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
+                hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
+                unhovered SetField(tooltip, "value", tooltip.default)
+
         grid 2 2:
             textbutton _("Enable Markdown"):
                 selected persistent._fom_saysomething_markdown_enabled
                 action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
                 hovered SetField(tooltip, "value", _("Enable Markdown text formatting when asking Monika to say something."))
-                unhovered SetField(tooltip, "value", tooltip.default)
-
-            textbutton _("Enable speech/session mode by default"):
-                selected persistent._fom_saysomething_speech_mode_default
-                action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
-                hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
         hbox:
