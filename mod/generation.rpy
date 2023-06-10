@@ -2,6 +2,7 @@ init 101 python in _fom_saysomething:
 
     import os, re
     from store import mas_submod_utils
+    from store import _fom_saysomething_markdown as markdown
 
     def _get_sane_name(dir_name):
         """
@@ -259,11 +260,30 @@ init 101 python in _fom_saysomething:
         """
 
         def get_dialog_line(poses, pos, text):
-            text = render(_get_escaped_text(text))
+            text = markdown.render(_get_escaped_text(text))
             return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
 
+        def get_trans_line(poses, pos, dissolve=False):
+            return 'show monika {0} at {1} zorder MAS_MONIKA_Z{2}'.format(
+                get_sprite_code(poses),
+                get_position_code(pos),
+                ' with dissolve_monika' if dissolve else '')
+
         lines = list()
+
+        leaning = False
+        prev_pos = None
+
         for poses, pos, text in session:
+            if prev_pos is None:
+                prev_pos = pos
+            elif prev_pos != pos:
+                lines.append(get_trans_line(poses, pos))
+
+            if (poses["pose"] == 4 and not leaning) or (poses["pose"] != 4 and leaning):
+                lines.append("    " + get_trans_line(poses, pos, dissolve=True))
+                leaning = poses["pose"] == 4
+
             lines.append("    " + get_dialog_line(poses, pos, text))
 
         if not os.path.exists(SPEECHES_DIR_PATH):
