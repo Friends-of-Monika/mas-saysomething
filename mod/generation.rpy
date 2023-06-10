@@ -259,8 +259,8 @@ init 101 python in _fom_saysomething:
         """
 
         def get_dialog_line(poses, pos, text):
-            return ('m {0} "{1}"'.format(get_sprite_code(poses),
-                                         _get_escaped_text(text)))
+            text = render(_get_escaped_text(text))
+            return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
 
         lines = list()
         for poses, pos, text in session:
