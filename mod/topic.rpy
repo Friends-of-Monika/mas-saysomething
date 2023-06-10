@@ -259,6 +259,13 @@ label fom_saysomething_event_retry:
                 else:
                     $ quip = _("pose for you again")
 
+                if persistent._fom_saysomething_enable_codegen:
+                    call screen fom_saysomething_confirm_modal(_(
+                        "Say Something can generate a simple topic with the speech you've just created. "
+                        "Would you like to do it now?"))
+                    if _return:
+                        call fom_saysomething_generate(picker)
+
                 m 3eub "Do you want me to [quip]?{nw}"
                 $ _history_list.pop()
                 menu:
@@ -294,6 +301,8 @@ init python:
             renpy.jump(_label)
         return skip
 
+# TODO: Just noticed we cannot skip anyhow if we don't have quick menu shown.
+# Need to use the same approach with speeches too.
 label fom_saysomething_create_skip_keybind(_label):
     $ config.keymap["_fom_skip"] = ["x", "X"]
     $ del config.keymap["derandom_topic"]
@@ -304,4 +313,21 @@ label fom_saysomething_remove_skip_keybind():
     $ config.keymap["derandom_topic"] = ["x", "X"]
     $ del config.keymap["_fom_skip"]
     $ config.underlay.pop(-1)
+    return
+
+label fom_saysomething_generate(picker):
+    $ script_name = None
+    while not script_name:
+        call screen fom_saysomething_script_name_input_modal
+        if _return is None:
+            return
+
+        $ script_name = _return
+        if _fom_saysomething.is_script_name_exists(script_name):
+            call screen fom_saysomething_confirm_modal(_("Script with that name already exists. Do you want to overwrite it?"))
+            if not _return:
+                $ script_name = None
+
+    $ _fom_saysomething.generate_script(picker.session, script_name)
+
     return
