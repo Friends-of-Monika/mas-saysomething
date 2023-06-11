@@ -316,19 +316,36 @@ label fom_saysomething_remove_skip_keybind():
     return
 
 label fom_saysomething_generate(picker):
+    # Ren'Py is being Ren'Pain again, so this ugliness here is an effort to
+    # somewhat make a break/continue control. Must stop when script_name is
+    # finally set or interrupted by return.
     $ script_name = None
     while not script_name:
+        # Ask for script name in a modal window
         call screen fom_saysomething_script_name_input_modal
-        if not _return:
-            return
 
+        # User chose 'cancel'
+        if not _return:
+            # If they hit cancel, they will lose their script. Need to confirm.
+            call screen fom_saysomething_confirm_modal(_("Your speech script will be lost. Continue?"))
+
+            # Confirmed, discard the script and return back.
+            if not _return:
+                return
+
+        # User entered script name and clicked okay button.
         $ script_name = _return
+
+        # Check if script name already exists, confirm overwriting if necessary.
         if _fom_saysomething.is_script_name_exists(script_name):
             call screen fom_saysomething_confirm_modal(_("Script with that name already exists. Do you want to overwrite it?"))
+
+            # User did not confirm, reset script name and ask again.
             if not _return:
                 $ script_name = None
 
+    # Script name chosen, overwriting allowed if conflicted, write now.
     $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
-    $ renpy.notify(_("Speech been saved as {0}").format(script_path))
+    $ renpy.notify(_("Speech saved as {0}").format(script_path))
 
     return
