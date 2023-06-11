@@ -842,12 +842,12 @@ screen fom_saysomething_picker(say=True):
             if picker.is_show_code():
                 align (0.99, 0.07)
             else:
-                align (0.97, 0.2)
+                align (0.99, 0.2)
         else:
             if picker.is_show_code():
                 align (0.01, 0.07)
             else:
-                align (0.03, 0.2)
+                align (0.01, 0.2)
 
         vbox:
             spacing 10
@@ -1146,17 +1146,30 @@ screen fom_saysomething_picker(say=True):
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
-        # frame:
-        #     background None
-        #     padding (0, 10, 0, 0)
+    vbox:
+        align (0.99, 0.977)
+        xsize 210
 
-        #     #style_prefix "check_scrollable_menu"
+        style_prefix "check_scrollable_menu"
 
-        #     hbox:
-        #         textbutton _("Enab. Blinking"):
-        #             xysize (194, None)
-        #             xpos 176
-        #             action NullAction()
+        textbutton _("Show Q. Menu"):
+            xysize (210, None)
+            selected not persistent._fom_saysomething_hide_quick_buttons
+            action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
+                    Function(_fom_saysomething.set_mas_gui_visible,
+                            persistent._fom_saysomething_hide_quick_buttons)]
+
+        # textbutton _("Lock Blinking"):
+        #     xysize (210, None)
+        #     selected not persistent._fom_saysomething_allow_winking
+        #     action ToggleField(persistent, "_fom_saysomething_allow_winking")
+
+        # vbox:
+        #     style_prefix "fom_saysomething_confirm"
+        #     textbutton _("Markdown Help"):
+        #         xysize (210, None)
+        #         selected not persistent._fom_saysomething_markdown_enabled
+        #         action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent

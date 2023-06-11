@@ -227,3 +227,18 @@ init -200 python in _fom_saysomething:
                 # Simply remove leading "game" item frm path parts.
                 parts.pop(0)
             return "/".join(parts)
+
+    def set_mas_gui_visible(visible):
+        """
+        Shows or hides MAS GUI (left buttons and quick menu.)
+
+        IN:
+            visible -> bool:
+                True to show, False to hide.
+        """
+
+        store.quick_menu = visible
+        if visible:
+            store.HKBShowButtons()
+        else:
+            store.HKBHideButtons()
