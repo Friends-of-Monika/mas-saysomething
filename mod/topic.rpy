@@ -4,7 +4,6 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-define persistent._fom_saysomething_seen_skip_hint = False
 define persistent._fom_saysomething_seen_screenshot_hint = False
 
 init 5 python:
@@ -172,29 +171,11 @@ label fom_saysomething_event_retry:
             # Memorize 5-poses for transitions.
             $ pose_5 = False
 
-            # Allow skipping here if dialogue is long enough.
-            $ _fom_enable_skipping = len(picker_session) >= (_fom_saysomething.SPEECH_SKIPPABLE_SIZE if say else _fom_saysomething.POSING_SKIPPABLE_SIZE)
-            if _fom_enable_skipping:
-                if say:
-                    $ _fom_skip_pstate = (config.allow_skipping, preferences.skip_unseen)
-                    $ config.allow_skipping = True
-                    $ preferences.skip_unseen = True
-                else:
-                    # Create keybind for quick skipping posing, which can be LONG.
-                    call fom_saysomething_create_skip_keybind("_fom_saysomething_post_loop")
-
             # Ren'Py has no 'for' statement, so use 'while'.
             $ state_i = 0
             while state_i < len(picker_session):
                 $ picker._load_state(picker_session[state_i])
                 $ state_i += 1
-
-                # Give a hint about skipping; it must not be shown the same time as screenshot hint.
-                if (state_i > 1 or persistent._fom_saysomething_seen_screenshot_hint) and _fom_enable_skipping and not say:
-                    if not persistent._fom_saysomething_seen_skip_hint:
-                        $ skip_key = _fom_saysomething.get_friendly_key("_fom_skip")
-                        $ renpy.notify(_("You can stop the posing session by pressing {0}.").format(skip_key))
-                        $ persistent._fom_saysomething_seen_skip_hint = True
 
                 # Get current expression after it was changed.
                 $ exp = picker.get_sprite_code()
@@ -231,15 +212,6 @@ label fom_saysomething_event_retry:
 
                 # Unlock winking/blinking.
                 $ set_eyes_lock(exp, False)
-
-                # Undo skipping unlock.
-                if _fom_enable_skipping:
-                    if say:
-                        $ config.allow_skipping = _fom_skip_pstate[0]
-                        $ preferences.skip_unseen = _fom_skip_pstate[1]
-                        $ del _fom_enable_skipping, _fom_skip_pstate
-                    else:
-                        call fom_saysomething_remove_skip_keybind
 
                 # Anyway, recover buttons after we're done showing.
                 if persistent._fom_saysomething_hide_quick_buttons:
@@ -278,26 +250,6 @@ label fom_saysomething_event_retry:
     $ del created_expressions
 
     $ _fom_saysomething.set_mas_gui_visible(True)
-    return
-
-init python:
-    def _fom_skip_to_label(_label):
-        def skip():
-            renpy.jump(_label)
-        return skip
-
-# TODO: Just noticed we cannot skip anyhow if we don't have quick menu shown.
-# Need to use the same approach with speeches too.
-label fom_saysomething_create_skip_keybind(_label):
-    $ config.keymap["_fom_skip"] = ["x", "X"]
-    $ del config.keymap["derandom_topic"]
-    $ config.underlay.append(renpy.Keymap(_fom_skip=_fom_skip_to_label(_label)))
-    return
-
-label fom_saysomething_remove_skip_keybind():
-    $ config.keymap["derandom_topic"] = ["x", "X"]
-    $ del config.keymap["_fom_skip"]
-    $ config.underlay.pop(-1)
     return
 
 # NOTE: picker instance (picker) is expected to be in the scope here.
