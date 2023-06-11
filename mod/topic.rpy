@@ -110,7 +110,7 @@ label fom_saysomething_event_retry:
 
             # Show buttons and quick menu if they were hidden.
             if persistent._fom_saysomething_hide_quick_buttons:
-                call fom_saysomething_event_buttons(_show=True)
+                $ _fom_saysomething.set_mas_gui_visible(True)
 
             # Unlock expression picker had before closing.
             $ set_eyes_lock(picker.get_sprite_code(), False)
@@ -140,7 +140,7 @@ label fom_saysomething_event_retry:
             # An actual text has been typed and expression is set, stop the loop
             # and show buttons if they were hidden for preview.
             $ stop_picker_loop = True
-            call fom_saysomething_event_buttons(_show=True)
+            $ _fom_saysomething.set_mas_gui_visible(True)
 
             # Here it's safe to just take a sprite code as it's already
             # rendered and respective image is loaded into memory.
@@ -152,7 +152,7 @@ label fom_saysomething_event_retry:
 
             # Show or hide buttons depending on user preference.
             if persistent._fom_saysomething_hide_quick_buttons:
-                call fom_saysomething_event_buttons(_show=False)
+                $ _fom_saysomething.set_mas_gui_visible(False)
 
             # Pick up session items from the picker.
             # When not in session mode, session is None, so we should fall back
@@ -243,7 +243,7 @@ label fom_saysomething_event_retry:
 
                 # Anyway, recover buttons after we're done showing.
                 if persistent._fom_saysomething_hide_quick_buttons:
-                    call fom_saysomething_event_buttons(_show=True)
+                    $ _fom_saysomething.set_mas_gui_visible(True)
 
                 show monika 3tua at t11
                 m 3tua "Well? {w=0.3}Did I do it good enough?"
@@ -277,17 +277,7 @@ label fom_saysomething_event_retry:
     $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
     $ del created_expressions
 
-    call fom_saysomething_event_buttons(_show=True)
-    return
-
-label fom_saysomething_event_buttons(_show=True):
-    # Here we're recovering (since show=True when not called) buttons after
-    # player chose to hide them.
-    $ quick_menu = _show
-    if _show:
-        $ HKBShowButtons()
-    else:
-        $ HKBHideButtons()
+    $ _fom_saysomething.set_mas_gui_visible(True)
     return
 
 init python:
