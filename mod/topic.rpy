@@ -4,6 +4,8 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
+define persistent._fom_saysomething_seen_skip_hint = False
+define persistent._fom_saysomething_seen_screenshot_hint = False
 
 init 5 python:
     addEvent(
@@ -95,8 +97,7 @@ label fom_saysomething_event_retry:
 
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
-        if not persistent._fom_saysomething_allow_winking:
-            $ set_eyes_lock(exp, True)
+        $ set_eyes_lock(exp, True)
 
         # Show the GUI and await for interaction.
         $ _fom_saysomething.posing = True
@@ -129,9 +130,7 @@ label fom_saysomething_event_retry:
             $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
 
             # Lock winking/blinking on the new image.
-            if not persistent._fom_saysomething_allow_winking:
-                # Lock new expression.
-                $ set_eyes_lock(new_exp, True)
+            $ set_eyes_lock(new_exp, True)
 
             # Once out of GUI, unlock the winking/blinking on the previous
             # sprite. This would also unlock expression locked when in GUI.
@@ -201,8 +200,7 @@ label fom_saysomething_event_retry:
                 $ exp = picker.get_sprite_code()
 
                 # Lock winking/blinking for the current sprite code.
-                if not persistent._fom_saysomething_allow_winking:
-                    $ set_eyes_lock(exp, True)
+                $ set_eyes_lock(exp, True)
 
                 # Set flag as posing.
                 $ _fom_saysomething.posing = True
@@ -217,10 +215,7 @@ label fom_saysomething_event_retry:
 
                 # Finally, say text or show pose for 5 seconds.
                 if say:
-                    if persistent._fom_saysomething_markdown_enabled:
-                        $ quip = _fom_saysomething_markdown.render(picker.text)
-                    else:
-                        $ quip = picker.txt
+                    $ quip = _fom_saysomething_markdown.render(picker.text)
                     m "[quip]"
                 else:
                     window hide

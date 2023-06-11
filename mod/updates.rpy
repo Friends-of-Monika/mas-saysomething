@@ -20,3 +20,8 @@ label friends_of_monika_say_something_v1_7_0(version="v1_7_0"):
         for name in list(persistent._fom_saysomething_presets.keys()):
             persistent._fom_saysomething_presets[name] = persistent._fom_saysomething_presets[name][:-1]
     return
+
+label friends_of_monika_say_something_v1_8_0(version="v1_8_0"):
+    $ persistent.__dict__.pop("_fom_saysomething_markdown_enabled", None)
+    $ persistent.__dict__.pop("_fom_saysomething_allow_winking", None)
+    return
