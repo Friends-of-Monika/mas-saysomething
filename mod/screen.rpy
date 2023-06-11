@@ -1077,7 +1077,7 @@ screen fom_saysomething_picker(say=True):
 
         frame:
             background None
-            padding (0, 10)
+            padding (0, 10, 0, 0)
 
             hbox:
                 style_prefix "fom_saysomething_confirm"
@@ -1145,6 +1145,18 @@ screen fom_saysomething_picker(say=True):
                         # input (in the textbox) again.
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
+
+        # frame:
+        #     background None
+        #     padding (0, 10, 0, 0)
+
+        #     #style_prefix "check_scrollable_menu"
+
+        #     hbox:
+        #         textbutton _("Enab. Blinking"):
+        #             xysize (194, None)
+        #             xpos 176
+        #             action NullAction()
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent

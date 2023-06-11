@@ -4,13 +4,9 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 define persistent._fom_saysomething_show_code = False
-define persistent._fom_saysomething_allow_winking = False
 define persistent._fom_saysomething_hide_quick_buttons = False
-define persistent._fom_saysomething_seen_screenshot_hint = False
 define persistent._fom_saysomething_speech_mode_default = False
 define persistent._fom_saysomething_pose_pause = 5.0
-define persistent._fom_saysomething_markdown_enabled = True
-define persistent._fom_saysomething_seen_skip_hint = False
 define persistent._fom_saysomething_enable_codegen = False
 
 screen fom_saysomething_settings:
@@ -18,13 +14,13 @@ screen fom_saysomething_settings:
     $ pose_delay = "{:.2f}".format(persistent._fom_saysomething_pose_pause)
 
     vbox:
+        style_prefix "check"
+
         box_wrap False
         xfill True
         xmaximum 800
 
-        style_prefix "check"
-
-        grid 2 3:
+        grid 2 2:
             textbutton _("Show expression code"):
                 selected persistent._fom_saysomething_show_code
                 action ToggleField(persistent, "_fom_saysomething_show_code")
@@ -37,22 +33,10 @@ screen fom_saysomething_settings:
                 hovered SetField(tooltip, "value", _("Show quick menu and menu buttons (can be only toggled when in say/pose menu)."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
-            textbutton _("Allow winking/blinking"):
-                selected persistent._fom_saysomething_allow_winking
-                action [ToggleField(persistent, "_fom_saysomething_allow_winking"), Function(_fom_saysomething_allow_winking_callback)]
-                hovered SetField(tooltip, "value", _("Allow Monika to blink or wink when posing."))
-                unhovered SetField(tooltip, "value", tooltip.default)
-
             textbutton _("Enable speech/session mode by default"):
                 selected persistent._fom_saysomething_speech_mode_default
                 action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
                 hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
-                unhovered SetField(tooltip, "value", tooltip.default)
-
-            textbutton _("Enable Markdown"):
-                selected persistent._fom_saysomething_markdown_enabled
-                action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
-                hovered SetField(tooltip, "value", _("Enable Markdown text formatting when asking Monika to say something."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
             textbutton _("Enable code generation"):
@@ -62,15 +46,15 @@ screen fom_saysomething_settings:
                 unhovered SetField(tooltip, "value", tooltip.default)
 
         hbox:
-            xfill True
             text _("Pose delay: [pose_delay]"):
                 style "slider_label"
 
-        bar:
-            style "slider_slider"
-            value FieldValue(persistent, "_fom_saysomething_pose_pause", offset=1.0, range=6.0, step=0.1)
-            hovered SetField(tooltip, "value", _("Delay between changing poses when asking Monika to pose."))
-            unhovered SetField(tooltip, "value", tooltip.default)
+            bar:
+                style "slider_slider"
+                value FieldValue(persistent, "_fom_saysomething_pose_pause",
+                                 offset=1.0, range=4.0, step=0.5, force_step=True)
+                hovered SetField(tooltip, "value", _("Delay between changing poses when asking Monika to pose."))
+                unhovered SetField(tooltip, "value", tooltip.default)
 
 init python:
     def _fom_saysomething_allow_winking_callback():
