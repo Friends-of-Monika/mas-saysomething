@@ -32,7 +32,6 @@ init 100 python in _fom_saysomething:
     from store import FieldInputValue
     from store import MASMoniBlinkTransform, MASMoniWinkTransform
 
-    import math
     from collections import OrderedDict
 
 
@@ -121,6 +120,31 @@ init 100 python in _fom_saysomething:
         ]))
     ])
 
+    def get_sprite_code(pose_cursors):
+        """
+        Generate sprite code for a dictionary of pose cursors (see above for
+        detailed declaration of keys and IDs.)
+
+        IN:
+            post_cursors -> dict[str, int]:
+                Pose cursor dictionary.
+
+        OUT:
+            str:
+                MAS sprite code for Monika's pose.
+        """
+
+        code = list()
+        for key, data in EXPR_MAP.items():
+            _, values = data
+            cursor = pose_cursors[key]
+            if isinstance(cursor, tuple):
+                cursor = cursor[0]
+            value = values[cursor][0]
+            if value is not None:
+                code.append(value)
+        return "".join(code)
+
 
     # Positions list containing Monika table positions from leftmost [0] to
     # rightmost [9]. Items are usable with renpy.show(..., at=list[...]) call.
@@ -131,7 +155,7 @@ init 100 python in _fom_saysomething:
         (store.t42, "t42"), #3
 
         (store.t11, "t11"), #4, default middle screen position
-#       (store.t32, "t32"), # formerly #5, same as #4 so no need to keep it here
+       #(store.t32, "t32"), # formerly #5, same as #4 so no need to keep it here
         (store.t43, "t43"), #5
 
         (store.t22, "t22"), #6
@@ -139,6 +163,23 @@ init 100 python in _fom_saysomething:
 
         (store.t44, "t44")  #8
     ]
+
+    def get_position_code(position_cursor):
+        """
+        Gets position identifier for given Monika's position (see above for IDs
+        and naming of the positions.)
+
+        IN:
+            position_cursor -> int:
+                ID of the position Monika is at.
+
+        OUT:
+            str:
+                Name of Monika's position.
+        """
+
+        return POSITIONS[position_cursor][1]
+
 
     # Need this limitation because else we'll quickly run out of memory.
     MAX_SESSION_SIZE = 100
@@ -265,13 +306,7 @@ init 100 python in _fom_saysomething:
                     Sprite code for use in renpy.show(...)
             """
 
-            code = list()
-            for key, data in EXPR_MAP.items():
-                _, values = data
-                value = values[self.pose_cursors[key][0]][0]
-                if value is not None:
-                    code.append(value)
-            return "".join(code)
+            return get_sprite_code(self.pose_cursors)
 
         def get_position_label(self):
             """
@@ -286,7 +321,7 @@ init 100 python in _fom_saysomething:
             """
 
             if self.is_show_code():
-                return POSITIONS[self.position_adjustment.value][1]
+                return get_position_code(self.position_adjustment.value)
             return None
 
         def is_text_empty(self):
@@ -1251,14 +1286,82 @@ screen fom_saysomething_preset_name_input_modal:
                     action cancel_action
 
 
+# Modal screen used for entering new preset name.
+# NOTE: same as main screen refers to picker directly, in global scope.
+
+screen fom_saysomething_script_name_input_modal:
+    default script_name = _fom_saysomething.get_script_name_suggestion()
+
+    style_prefix "confirm"
+
+    modal True
+    zorder 200
+
+    add mas_getTimeFile("gui/overlay/confirm.png")
+
+    # Button alternative keybinds.
+
+    # If preset name is not empty, allow pressing Enter to confirm instead
+    # of button click.
+    if not picker.is_preset_name_empty():
+        key "K_RETURN":
+            action Return(script_name)
+
+    # Allow pressing Esc to cancel.
+    key "K_ESCAPE":
+        action Return(None)
+
+    frame:
+        vbox:
+            xmaximum 300
+            xfill True
+
+            align (0.5, 0.5)
+            spacing 30
+
+            # Title.
+
+            text _("Save this speech as:"):
+                style "confirm_prompt"
+                xalign 0.5
+
+            # Input field.
+
+            input:
+                style_prefix "input"
+
+                xalign 0.0
+                layout "nobreak"
+
+                length 30
+                pixel_width 300
+
+                value ScreenVariableInputValue("script_name")
+
+            # Save/cancel buttons.
+
+            hbox:
+                xalign 0.5
+                spacing 10
+
+                # Sensitivity of this button relies on emptiness of entered
+                # preset name.
+                textbutton _("Save"):
+                    action Return(script_name)
+                    sensitive bool(script_name)
+                textbutton _("Cancel"):
+                    action Return(False)
+
+
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_confirm_modal(message, ok_button, ok_action, title=None):
+screen fom_saysomething_confirm_modal(message, ok_button=_("Yes"), ok_action=Return(True), no_button=_("No"), no_action=Return(False), title=None):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
                    Hide("fom_saysomething_confirm_modal")]
-    $ cancel_action = [Play("sound", gui.activate_sound),
+    $ no_action = [Play("sound", gui.activate_sound),
+                       no_action or NullAction(),
                        Hide("fom_saysomething_confirm_modal")]
 
     style_prefix "confirm"
@@ -1275,7 +1378,7 @@ screen fom_saysomething_confirm_modal(message, ok_button, ok_action, title=None)
         action ok_action
 
     key "K_ESCAPE":
-        action cancel_action
+        action no_action
 
     frame:
         vbox:
@@ -1305,5 +1408,5 @@ screen fom_saysomething_confirm_modal(message, ok_button, ok_action, title=None)
 
                 textbutton ok_button:
                     action ok_action
-                textbutton _("Cancel"):
-                    action cancel_action
+                textbutton no_button:
+                    action no_action

@@ -11,6 +11,7 @@ define persistent._fom_saysomething_speech_mode_default = False
 define persistent._fom_saysomething_pose_pause = 5.0
 define persistent._fom_saysomething_markdown_enabled = True
 define persistent._fom_saysomething_seen_skip_hint = False
+define persistent._fom_saysomething_enable_codegen = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -23,7 +24,7 @@ screen fom_saysomething_settings:
 
         style_prefix "check"
 
-        grid 2 2:
+        grid 2 3:
             textbutton _("Show expression code"):
                 selected persistent._fom_saysomething_show_code
                 action ToggleField(persistent, "_fom_saysomething_show_code")
@@ -48,11 +49,16 @@ screen fom_saysomething_settings:
                 hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
-        grid 2 2:
             textbutton _("Enable Markdown"):
                 selected persistent._fom_saysomething_markdown_enabled
                 action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
                 hovered SetField(tooltip, "value", _("Enable Markdown text formatting when asking Monika to say something."))
+                unhovered SetField(tooltip, "value", tooltip.default)
+
+            textbutton _("Enable code generation"):
+                selected persistent._fom_saysomething_enable_codegen
+                action ToggleField(persistent, "_fom_saysomething_enable_codegen")
+                hovered SetField(tooltip, "value", _("Enable Ren'Py script file generation for said speeches."))
                 unhovered SetField(tooltip, "value", tooltip.default)
 
         hbox:

@@ -259,6 +259,13 @@ label fom_saysomething_event_retry:
                 else:
                     $ quip = _("pose for you again")
 
+                if persistent._fom_saysomething_enable_codegen:
+                    call screen fom_saysomething_confirm_modal(_(
+                        "Say Something can generate a simple topic with the speech you've just created. "
+                        "Would you like to do it now?"))
+                    if _return:
+                        call fom_saysomething_generate
+
                 m 3eub "Do you want me to [quip]?{nw}"
                 $ _history_list.pop()
                 menu:
@@ -294,6 +301,8 @@ init python:
             renpy.jump(_label)
         return skip
 
+# TODO: Just noticed we cannot skip anyhow if we don't have quick menu shown.
+# Need to use the same approach with speeches too.
 label fom_saysomething_create_skip_keybind(_label):
     $ config.keymap["_fom_skip"] = ["x", "X"]
     $ del config.keymap["derandom_topic"]
@@ -304,4 +313,41 @@ label fom_saysomething_remove_skip_keybind():
     $ config.keymap["derandom_topic"] = ["x", "X"]
     $ del config.keymap["_fom_skip"]
     $ config.underlay.pop(-1)
+    return
+
+# NOTE: picker instance (picker) is expected to be in the scope here.
+# GENERALLY MUST NOT BE CALLED FROM ANYWHERE EXCEPT fom_saysomething_event_retry!
+label fom_saysomething_generate:
+    # Ask for script name in a modal window
+    call screen fom_saysomething_script_name_input_modal
+
+    # User chose 'cancel'
+    if not _return:
+        # If they hit cancel, they will lose their script. Need to confirm.
+        call screen fom_saysomething_confirm_modal(_("Your speech script will be lost. Continue?"))
+
+        # Confirmed, discard the script and return back.
+        if _return:
+            return
+
+        # Refused to continue, jump back to input.
+        else:
+            jump fom_saysomething_generate
+
+    # User entered script name and clicked okay button.
+    $ script_name = _return
+
+    # Check if script name already exists, confirm overwriting if necessary.
+    if _fom_saysomething.is_script_name_exists(script_name):
+        # Ask for confirmation for overwrite.
+        call screen fom_saysomething_confirm_modal(_("Script with that name already exists. Do you want to overwrite it?"))
+
+        # User did not confirm, ask again.
+        if not _return:
+            jump fom_saysomething_generate
+
+    # Script name chosen, overwriting allowed if conflicted, write now.
+    $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
+    $ renpy.notify(_("Speech saved as {0}").format(script_path))
+
     return
