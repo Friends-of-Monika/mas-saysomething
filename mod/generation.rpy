@@ -330,7 +330,7 @@ init 101 python in _fom_saysomething:
             return "\n".join(map(lambda it: "    " + it, lines))
 
         # Create speeches directory if not exists, make path for script.
-        os.makedirs(SPEECHES_DIR_PATH, exists_ok=True)
+        os.makedirs(SPEECHES_DIR_PATH, exist_ok=True)
         path = os.path.join(SPEECHES_DIR_PATH, name + ".rpy.txt")
 
         # Write by filling template.
@@ -339,7 +339,7 @@ init 101 python in _fom_saysomething:
                 DEFAULT_EVENTLABEL_FORMAT.format(_get_sane_event_label(name)),
                 DEFAULT_CATEGORY,
                 _get_escaped_text(name),
-                get_dialog_lines(),
+                get_dialogue_lines(),
                 GENERATOR_IDENT))
 
         # Return newly created script path
