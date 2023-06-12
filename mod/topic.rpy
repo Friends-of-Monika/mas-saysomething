@@ -144,7 +144,7 @@ label fom_saysomething_event_retry:
                 $ picker_session = [picker._save_state()]
 
             # Run performance, speaking or posing.
-            call fom_saysomething_perform(picker_session)
+            call fom_saysomething_perform(picker_session, say, picker.pose_delay)
             $ del picker_session
 
             # Suggested to export current speech.
@@ -179,7 +179,7 @@ label fom_saysomething_event_retry:
     $ del stop_picker_loop, set_eyes_lock, say, picker
     return
 
-label fom_saysomething_perform(session):
+label fom_saysomething_perform(session, say=True, pose_delay=None):
     # Put Monika back in center and let her say a preamble.
     show monika 1esb at t11
     m 1esb "Alright, give me just a moment to prepare."
@@ -235,7 +235,7 @@ label fom_saysomething_perform(session):
 
         else:
             # Pause before continuing to another expression.
-            pause picker.pose_delay
+            pause pose_delay
 
     # Release sprites generated dynamically.
     $ _fom_saysomething.IMAGE_CACHE.release_all()
