@@ -55,15 +55,3 @@ screen fom_saysomething_settings:
                                  offset=1.0, range=4.0, step=0.5, force_step=True)
                 hovered SetField(tooltip, "value", _("Delay between changing poses when asking Monika to pose."))
                 unhovered SetField(tooltip, "value", tooltip.default)
-
-init python:
-    def _fom_saysomething_allow_winking_callback():
-        from store._fom_saysomething import picker
-        from store._fom_saysomething import posing
-        from store._fom_saysomething import set_eyes_lock
-
-        if picker is not None and posing:
-            # Ensure that when Monika is posing allowing winking will unlock
-            # eyes, and vice versa; disallowing winking will lock eyes.
-            exp = picker.get_sprite_code()
-            set_eyes_lock(exp, lock=not persistent._fom_saysomething_allow_winking)

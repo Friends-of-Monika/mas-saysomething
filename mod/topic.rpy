@@ -75,33 +75,22 @@ label fom_saysomething_event_retry:
     # 'Import' set_eyes_lock.
     $ set_eyes_lock = _fom_saysomething.set_eyes_lock
 
-    # Set of expressions to remove from Ren'Py image cache after we're done.
-    $ created_expressions = set()
-
     # We'll keep looping with screen calls since we need to do Monika rendering
     # out of screen, hence why we'll keep doing it until we get 'nevermind' from
     # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
     while stop_picker_loop is False:
-        # Get expression from picker.
+        # Get expression from picker and add to removal list if necessary.
         $ exp = picker.get_sprite_code()
-
-        # If there were too many images saved in cache, free them all.
-        if len(created_expressions) > 200:
-            $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
-
-        # If the spritecode isn't in cache already, mark it for removal.
-        if _fom_saysomething.is_renpy_image_cached(exp):
-            $ created_expressions.add(exp)
+        if not _fom_saysomething.is_renpy_image_cached(exp):
+            $ _fom_saysomething.IMAGE_CACHE.add_sprite(exp)
 
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
         $ set_eyes_lock(exp, True)
 
         # Show the GUI and await for interaction.
-        $ _fom_saysomething.posing = True
         call screen fom_saysomething_picker(say)
-        $ _fom_saysomething.posing = False
 
         if _return == _fom_saysomething.RETURN_CLOSE:
             # Player has changed their mind, so just stop and put Monika back.
@@ -118,22 +107,25 @@ label fom_saysomething_event_retry:
             m 1eka "Oh, okay."
 
         elif _return == _fom_saysomething.RETURN_RENDER:
+            # Save new expression while keeping previous; immediately lock
+            # blinking on it.
             $ new_exp = picker.get_sprite_code()
 
-            # Before rendering, check if the sprite that was already cached
-            # before render in pose picker; mark for removal later.
-            if _fom_saysomething.is_renpy_image_cached(exp):
-                $ created_expressions.add(exp)
+            # After rendering sprite, add it to cache for further removal.
+            if not _fom_saysomething.is_renpy_image_cached(new_exp):
+                $ _fom_saysomething.IMAGE_CACHE.add_sprite(new_exp)
+
+            # Unlock blinking on previous sprite.
+            $ set_eyes_lock(exp, False)
 
             # Position or pose/expression update is requested, so do it now.
             $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
 
-            # Lock winking/blinking on the new image.
+            # Lock blinking on new expression. NOTE: CAN ONLY BE DONE AFTER RENDERING!
             $ set_eyes_lock(new_exp, True)
 
-            # Once out of GUI, unlock the winking/blinking on the previous
-            # sprite. This would also unlock expression locked when in GUI.
-            $ set_eyes_lock(exp, False)
+            # Cleanup.
+            $ del new_exp
 
         elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
@@ -141,17 +133,8 @@ label fom_saysomething_event_retry:
             $ stop_picker_loop = True
             $ _fom_saysomething.set_mas_gui_visible(True)
 
-            # Here it's safe to just take a sprite code as it's already
-            # rendered and respective image is loaded into memory.
-            $ set_eyes_lock(picker.get_sprite_code(), False)
-
-            show monika 1esb at t11
-            m 1esb "Alright, give me just a moment to prepare."
-            m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
-
-            # Show or hide buttons depending on user preference.
-            if persistent._fom_saysomething_hide_quick_buttons:
-                $ _fom_saysomething.set_mas_gui_visible(False)
+            # Unlock blinking on last sprite code before closing.
+            $ set_eyes_lock(exp, False)
 
             # Pick up session items from the picker.
             # When not in session mode, session is None, so we should fall back
@@ -160,96 +143,119 @@ label fom_saysomething_event_retry:
             if picker_session is None:
                 $ picker_session = [picker._save_state()]
 
-            # Show screenshot hint.
-            if not persistent._fom_saysomething_seen_screenshot_hint:
-                $ scr_key = _fom_saysomething.get_friendly_key("screenshot")
-                if scr_key is not None:
-                    $ persistent._fom_saysomething_seen_screenshot_hint = True
-                    $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
-                $ del scr_key
+            # Run performance, speaking or posing.
+            call fom_saysomething_perform(picker_session)
+            $ del picker_session
 
-            # Memorize 5-poses for transitions.
-            $ pose_5 = False
+            # Suggested to export current speech.
+            if persistent._fom_saysomething_enable_codegen:
+                call screen fom_saysomething_confirm_modal(_(
+                    "Say Something can generate a simple topic with the speech you've just created. "
+                    "Would you like to do it now?"))
+                if _return: # User agreed they want to generate a topic
+                    call fom_saysomething_generate
 
-            # Ren'Py has no 'for' statement, so use 'while'.
-            $ state_i = 0
-            while state_i < len(picker_session):
-                $ picker._load_state(picker_session[state_i])
-                $ state_i += 1
+            # This is hacky, but there isn't any other way to do it with translation.
+            $ quip = _("say something else") if say else _("pose for you again")
+            m 3eub "Do you want me to [quip]?{nw}"
 
-                # Get current expression after it was changed.
-                $ exp = picker.get_sprite_code()
+            $ _history_list.pop()
+            menu:
+                m "Do you want me to [quip]?{fast}"
 
-                # Lock winking/blinking for the current sprite code.
-                $ set_eyes_lock(exp, True)
+                "Yes.":
+                    jump fom_saysomething_event_retry
 
-                # Set flag as posing.
-                $ _fom_saysomething.posing = True
+                "No.":
+                    m 1hua "Okay~"
 
-                # Show Monika with sprite code and at set position, optionally lock
-                # eyes blinking and say text. For entering and exiting 5-pose
-                # apply transition.
-                $ renpy.show("monika " + exp, [picker.position], zorder=MAS_MONIKA_Z)
-                if (not exp.startswith("5") and pose_5) or (exp.startswith("5") and not pose_5):
-                    $ renpy.with_statement(dissolve_monika)
-                    $ pose_5 = not pose_5
-
-                # Finally, say text or show pose for 5 seconds.
-                if say:
-                    $ quip = _fom_saysomething_markdown.render(picker.text)
-                    m "[quip]"
-                else:
-                    window hide
-                    pause picker.pose_delay
-                    window show
-
-            label _fom_saysomething_post_loop:
-                # Cleanup.
-                $ del state_i, picker_session
-
-                # No longer posing.
-                $ _fom_saysomething.posing = False
-
-                # Unlock winking/blinking.
-                $ set_eyes_lock(exp, False)
-
-                # Anyway, recover buttons after we're done showing.
-                if persistent._fom_saysomething_hide_quick_buttons:
-                    $ _fom_saysomething.set_mas_gui_visible(True)
-
-                show monika 3tua at t11
-                m 3tua "Well? {w=0.3}Did I do it good enough?"
-                m 1hub "Hope you liked it, ahaha~"
-
-                if say:
-                    $ quip = _("say something else")
-                else:
-                    $ quip = _("pose for you again")
-
-                if persistent._fom_saysomething_enable_codegen:
-                    call screen fom_saysomething_confirm_modal(_(
-                        "Say Something can generate a simple topic with the speech you've just created. "
-                        "Would you like to do it now?"))
-                    if _return:
-                        call fom_saysomething_generate
-
-                m 3eub "Do you want me to [quip]?{nw}"
-                $ _history_list.pop()
-                menu:
-                    m "Do you want me to [quip]?{fast}"
-
-                    "Yes.":
-                        jump fom_saysomething_event_retry
-
-                    "No.":
-                        m 1hua "Okay~"
+            # Cleanup the quip variable.
+            $ del quip
 
     # Once done with all the speech/posing, remove the images saved in cache
     # that weren't cached before (so that we don't touch MAS sprites.)
-    $ _fom_saysomething.remove_renpy_images_bulk(created_expressions)
-    $ del created_expressions
+    # Additionally, restore GUI visibility and cleanup variables.
+    $ _fom_saysomething.IMAGE_CACHE.release_all()
+    $ del stop_picker_loop, set_eyes_lock, say, picker
+    return
 
+label fom_saysomething_perform(session):
+    # Put Monika back in center and let her say a preamble.
+    show monika 1esb at t11
+    m 1esb "Alright, give me just a moment to prepare."
+    m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+    # When not in speech mode and only posing, no need to keep window open.
+    if not say:
+        window hide
+
+    # Show or hide buttons depending on user preference.
+    if persistent._fom_saysomething_hide_quick_buttons:
+        $ _fom_saysomething.set_mas_gui_visible(False)
+
+    # Show screenshot hint.
+    if not persistent._fom_saysomething_seen_screenshot_hint:
+        $ scr_key = _fom_saysomething.get_friendly_key("screenshot")
+        if scr_key is not None:
+            $ persistent._fom_saysomething_seen_screenshot_hint = True
+            $ renpy.notify(_("You can take a screenshot by pressing {0}.").format(scr_key))
+
+        # Cleanup.
+        $ del scr_key
+
+    # Memorize 5-poses for transitions.
+    $ pose_5 = False
+
+    # Ren'Py has no 'for' statement, so use 'while'.
+    $ state_i = 0
+    while state_i < len(session):
+        $ poses, pos, text = session[state_i]
+        $ state_i += 1
+
+        # Get current expression after it was changed. Also add it to cache so
+        # it can be released later, as player-made expressions may be unused in
+        # the rest of MAS at all.
+        $ exp = _fom_saysomething.get_sprite_code(poses)
+        if not _fom_saysomething.is_renpy_image_cached(exp):
+            $ _fom_saysomething.IMAGE_CACHE.add_sprite(exp)
+
+        # Show Monika with sprite code and at set position, optionally lock
+        # eyes blinking and say text. For entering and exiting 5-pose
+        # apply transition.
+        $ renpy.show("monika " + exp, [_fom_saysomething.POSITIONS[pos][0]], zorder=MAS_MONIKA_Z)
+        if (not exp.startswith("5") and pose_5) or (exp.startswith("5") and not pose_5):
+            $ renpy.with_statement(dissolve_monika)
+            $ pose_5 = not pose_5
+
+        if say:
+            # Render text and ask Monika to say it.
+            $ quip = _fom_saysomething_markdown.render(text)
+            m "[quip]"
+            $ del quip
+
+        else:
+            # Pause before continuing to another expression.
+            pause picker.pose_delay
+
+    # Release sprites generated dynamically.
+    $ _fom_saysomething.IMAGE_CACHE.release_all()
+
+    # When in posing mode, restore dialogue window.
+    if not say:
+        window show
+
+    # Anyway, recover buttons after we're done showing.
+    if persistent._fom_saysomething_hide_quick_buttons:
+        $ _fom_saysomething.set_mas_gui_visible(True)
+
+    # Return Monika back to center, say post-speech phrase.
+    show monika 3tua at t11
+    m 3tua "Well? {w=0.3}Did I do it good enough?"
+    m 1hub "Hope you liked it, ahaha~"
+
+    # Before finishing with performance, restore GUI visibility and cleanup.
     $ _fom_saysomething.set_mas_gui_visible(True)
+    $ del state_i, pose_5, exp, session, poses, pos, text
     return
 
 # NOTE: picker instance (picker) is expected to be in the scope here.
@@ -287,4 +293,6 @@ label fom_saysomething_generate:
     $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
     $ renpy.notify(_("Speech saved as {0}").format(script_path))
 
+    # Cleanup.
+    $ del script_name, script_path
     return

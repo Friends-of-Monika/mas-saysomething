@@ -180,9 +180,27 @@ init 100 python in _fom_saysomething:
 
         return POSITIONS[position_cursor][1]
 
+    def get_session_expressions(session):
+        """
+        Returns set of unique expressions used in the given session.
+
+        IN:
+            session -> <Picker session>:
+                Session to extract sprite codes from.
+
+        OUT:
+            set[str]:
+                Set of spritecodes.
+        """
+
+        return set(map(lambda it: get_sprite_code(it[0]), session))
+
 
     # Need this limitation because else we'll quickly run out of memory.
     MAX_SESSION_SIZE = 100
+
+    MAX_CACHED_IMAGES = 64
+    IMAGE_CACHE = MoniSpriteCache(MAX_CACHED_IMAGES)
 
 
     class Picker(object):
@@ -769,10 +787,6 @@ init 100 python in _fom_saysomething:
 
     # Declare picker as a variable.
     picker = None
-
-    # Boolean variable to tell if Monika is currently posing or not
-    # (used for locking/unlocking winking/blinking.)
-    posing = False
 
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.

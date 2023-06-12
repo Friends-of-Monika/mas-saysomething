@@ -5,7 +5,9 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 init -200 python in _fom_saysomething:
+
     import pygame
+    from collections import OrderedDict
 
     def set_eyes_lock(exp, lock):
         """
@@ -242,3 +244,52 @@ init -200 python in _fom_saysomething:
             store.HKBShowButtons()
         else:
             store.HKBHideButtons()
+
+    class MoniSpriteCache(object):
+        """
+        Simple OrderedDict-based LRU cache for Monika sprites. When capacity
+        is reached, oldest sprites get removed from both this cache and Ren'Py
+        images list.
+        """
+
+        def __init__(self, capacity):
+            """
+            Creates MoniSpriteCache with given capacity.
+
+            IN:
+                capacity -> int:
+                    Capacity of this cache.
+            """
+
+            self.cache = OrderedDict()
+            self.capacity = capacity
+
+        def add_sprite(self, sprite):
+            """
+            Adds sprite code to cache. NOTE: in order NOT to accidentally
+            release and remove EXISTING sprite that is already loaded, caller
+            must check if it is already in Ren'Py cache itself!
+
+            If added sprite caused excess count of cache contents, oldest
+            sprite is removed both from cache and Ren'Py images list.
+
+            IN:
+                sprite -> str:
+                    Sprite code to add to cache.
+            """
+
+            if sprite in self.cache:
+                self.cache.move_to_end(sprite)
+
+            self.cache[sprite] = None
+            if len(self.cache) > self.capacity:
+                _, exp = self.cache.popitem(last=False)
+                remove_renpy_image(exp)
+
+        def release_all(self):
+            """
+            Removes all images from this cache and from Ren'Py images list.
+            """
+
+            remove_renpy_images_bulk(list(self.cache.keys()))
+            self.cache.clear()
