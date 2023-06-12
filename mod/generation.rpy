@@ -303,18 +303,16 @@ init 101 python in _fom_saysomething:
 
             # State of leaning (5-pose) and position so that appropriate
             # transitions can be applied when moving from one position to
-            # another or when switching from non-leaning to leaning
+            # another or when switching from non-leaning to leaning.
+            # Assume we also have initial position t11 (center.)
             leaning = False
-            prev_pos = None
+            prev_pos = 4
 
             # Begin generation of text/transition lines
             for poses, pos, text in session:
-                # Save state if not memorized yet, append transition line
-                # if position has changed (e.g. so that we don't have a bunch
-                # of unnecessary 'show monika ...' lines.)
-                if prev_pos is None:
-                    prev_pos = pos
-                elif prev_pos != pos:
+                # Append transition line if position has changed (e.g. so that
+                # we don't have a bunch of unnecessary 'show monika ...' lines.)
+                if prev_pos != pos:
                     lines.append(get_trans_line(poses, pos))
 
                 # Only append transition lines for 5-poses (leaning) when

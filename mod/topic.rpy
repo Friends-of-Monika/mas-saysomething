@@ -249,7 +249,13 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         $ _fom_saysomething.set_mas_gui_visible(True)
 
     # Return Monika back to center, say post-speech phrase.
-    show monika 3tua at t11
+    if say and exp.startswith("5"):
+        # If finished with leaning pose, apply dissolve
+        show monika 3tua at t11 with dissolve_monika
+    else:
+        # In all the other cases just immediately change expression
+        show monika 3tua at t11
+
     m 3tua "Well? {w=0.3}Did I do it good enough?"
     m 1hub "Hope you liked it, ahaha~"
 
