@@ -185,8 +185,11 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
     m 1esb "Alright, give me just a moment to prepare."
     m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
-    # When not in speech mode and only posing, no need to keep window open.
     if not say:
+        # 'Import' set_eyes_lock.
+        $ set_eyes_lock = _fom_saysomething.set_eyes_lock
+
+        # When not in speech mode and only posing, no need to keep window open.
         window hide
 
     # Show or hide buttons depending on user preference.
@@ -234,8 +237,15 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
             $ del quip
 
         else:
+            # User most likely wants Monika to hold still while posing and
+            # not to blink or wink.
+            $ set_eyes_lock(exp, True)
+
             # Pause before continuing to another expression.
             pause pose_delay
+
+            # Unlock blinking.
+            $ set_eyes_lock(exp, False)
 
     # Release sprites generated dynamically.
     $ _fom_saysomething.IMAGE_CACHE.release_all()
@@ -261,7 +271,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
 
     # Before finishing with performance, restore GUI visibility and cleanup.
     $ _fom_saysomething.set_mas_gui_visible(True)
-    $ del state_i, pose_5, exp, session, poses, pos, text
+    $ del state_i, pose_5, exp, session, poses, pos, text, set_eyes_lock
     return
 
 # NOTE: picker instance (picker) is expected to be in the scope here.
