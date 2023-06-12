@@ -148,7 +148,7 @@ label fom_saysomething_event_retry:
             $ del picker_session
 
             # Suggested to export current speech.
-            if persistent._fom_saysomething_enable_codegen:
+            if persistent._fom_saysomething_enable_codegen and say:
                 call screen fom_saysomething_confirm_modal(_(
                     "Say Something can generate a simple topic with the speech you've just created. "
                     "Would you like to do it now?"))
