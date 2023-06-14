@@ -96,6 +96,42 @@ init 101 python in _fom_saysomething:
                 return new_name
             count += 1
 
+    def _get_unique_name_dict(name_dict, suggested_name):
+        """
+        Reliably gets unique name derived from the suggested name in the
+        'directory' represented by the keys of the provided dictionary. It
+        checks if the name is available and appends a numbered suffix to it
+        in an effort to make it guaranteed unique.
+
+        IN:
+            name_dict -> dict:
+                Dictionary with names to check against.
+            suggested_name -> str:
+                Name to ensure uniqueness for.
+
+        OUT:
+            str:
+                Processed name that is guaranteed unique in the dictionary.
+        """
+
+        # First try suggested name as is, if all good - return it
+        if suggested_name not in name_dict:
+            return suggested_name
+
+        # If not - start trying suffixes starting with 1
+        count = 1
+        while True:
+            # Split name to name and extension
+            sn_name, sn_ext = _get_split_name_ext(suggested_name)
+
+            # Derive new name by adding suffix before the extension
+            new_name = sn_name + " (" + str(count) + ")." + sn_ext
+
+            # Try new name, return if does not exist
+            if new_name not in name_dict:
+                return new_name
+            count += 1
+
     def get_script_name_suggestion():
         """
         Gets a suggested default name for the generated script, also ensuring
@@ -104,6 +140,26 @@ init 101 python in _fom_saysomething:
         OUT:
             str:
                 Guaranteed unique script name suggestion.
+        """
+
+        # Create a suggestion of the speech name using default name first,
+        # but ensure it is unique and if not, add suffix to it.
+        uniq_name = _get_unique_name(SPEECHES_DIR_PATH,
+                                     DEFAULT_SCRIPT_NAME + ".rpy.txt")
+
+        # Cut off the .rpy.txt (8 characters) remainder from it, to only have
+        # speech name remaining
+        uniq_name = uniq_name[:-8]
+        return uniq_name
+
+    def get_saved_speech_name_suggestion():
+        """
+        Gets a suggested default name for saved speech, also ensuring its
+        uniqueness in the speeches directory.
+
+        OUT:
+            str:
+                Guaranteed unique saved speech name suggestion.
         """
 
         # Create a suggestion of the speech name using default name first,

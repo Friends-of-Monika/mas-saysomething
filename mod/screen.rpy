@@ -5,7 +5,7 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 # Presets dictionary with premade presets.
-define persistent._fom_saysomething_presets = {
+default persistent._fom_saysomething_presets = {
     # Presets by dreamscached
     "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
     "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
@@ -998,7 +998,7 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize 360
+                        xsize 370
                         ysize 38
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
@@ -1025,7 +1025,7 @@ screen fom_saysomething_picker(say=True):
                 # List of presets.
 
                 fixed:
-                    xsize 350
+                    xsize 370
 
                     if not picker.is_show_code():
                         ysize 420
@@ -1055,7 +1055,7 @@ screen fom_saysomething_picker(say=True):
                                 for _key in picker.get_presets(picker.presets_search):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (350, None)
+                                        xysize (370, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
@@ -1065,7 +1065,7 @@ screen fom_saysomething_picker(say=True):
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        xalign 1.07
+                        xalign -0.07
 
         # Confirmation buttons area.
 
@@ -1429,3 +1429,132 @@ screen fom_saysomething_confirm_modal(message, ok_button=_("Yes"), ok_action=Ret
                     action ok_action
                 textbutton no_button:
                     action no_action
+
+
+init -10 python in _fom_saysomething_gui:
+
+    from store import persistent
+
+    def on_search_adjustment_range(adjustment):
+        """
+        Callback for presets menu search input to adjust cursor so it's
+        visible to the user.
+
+        IN:
+            adjustment -> ui.adjustment:
+                Adjustment that has changed.
+        """
+
+        widget = renpy.get_widget("fom_saysomething_speech_menu", "search_input", "screens")
+        caret_relative_pos = 1.0
+        if widget is not None:
+            caret_pos = widget.caret_pos
+            content_len = len(widget.content)
+
+            if content_len > 0:
+                caret_relative_pos = caret_pos / float(content_len)
+
+        # This ensures that the caret is always visible (close enough) to the user
+        # when they enter text
+        adjustment.change(adjustment.range * caret_relative_pos)
+
+    speech_menu_query = ""
+
+    def on_search_input_change(query):
+        global speech_menu_query
+        speech_menu_query = query.lower()
+        renpy.restart_interaction()
+
+    def reset_search_input():
+        global speech_menu_query
+        speech_menu_query = ""
+
+screen fom_saysomething_speech_menu:
+
+    $ matching_speeches = list(filter(lambda it: _fom_saysomething_gui.speech_menu_query in it.lower(),
+                                      persistent._fom_saysomething_speeches.keys()))
+
+    on "hide" action Function(_fom_saysomething_gui.reset_search_input)
+
+    # Speeches list menu.
+
+    frame:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1] - 55)
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize 40
+
+        # Text input.
+
+        background Solid(mas_ui.TEXT_FIELD_BG)
+
+        viewport:
+            draggable False
+            arrowkeys False
+            mousewheel "horizontal"
+            xsize 520
+            ysize 38
+            xadjustment ui.adjustment(ranged=_fom_saysomething_gui.on_search_adjustment_range)
+
+            input:
+                id "search_input"
+                style_prefix "input"
+                length 50
+                xalign 0.0
+                layout "nobreak"
+                changed _fom_saysomething_gui.on_search_input_change
+
+        # Hint text in search box visible if no text is entered.
+
+        if len(_fom_saysomething_gui.speech_menu_query) == 0:
+            text _("Search for a speech..."):
+                text_align 0.0
+                layout "nobreak"
+                color "#EEEEEEB2"
+                first_indent 10
+                line_leading 1
+                outlines []
+
+    # List of presets.
+
+    fixed:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1])
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize evhand.LEFT_AREA[3]
+
+        # Viewport wrapping long list.
+
+        vbox:
+            pos (0, 0)
+            anchor (0, 0)
+
+            viewport:
+                id "viewport"
+
+                yfill False
+                mousewheel True
+                arrowkeys True
+
+                vbox:
+                    spacing 10
+
+                    # Speech choice buttons; highlit when selected.
+
+                    for _key in matching_speeches:
+                        textbutton _key:
+                            style "scrollable_menu_button"
+                            xysize (530, None)
+                            action Return(_key)
+
+            null height 20
+
+            textbutton _("Nevermind."):
+                style "scrollable_menu_button"
+                xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+                action Return(False)
+
+        # Scrollbar used by list of speeches above.
+
+        bar:
+            style "classroom_vscrollbar"
+            value YScrollValue("viewport")
+            xalign evhand.LEFT_XALIGN / 2 + 0.005
