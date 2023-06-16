@@ -75,7 +75,7 @@ init -80 python in _fom_saysomething_markdown:
         ## Formatting
 
         def text(self, text): # Plain text
-            return text.replace("{", "{{")
+            return text.replace("{", "{{").replace("[", "[[")
 
         def emphasis(self, text): # *Emphasis*
             return '{i}' + text + '{/i}'
