@@ -247,7 +247,7 @@ init 5 python:
     )
 
 label fom_saysomething_speeches_recite:
-    m "Sure! What do you want to hear again?~"
+    m 1hub "Sure! What do you want to hear again?~"
 
     show monika at t21
     call screen fom_saysomething_speech_menu
@@ -255,7 +255,7 @@ label fom_saysomething_speeches_recite:
     show monika at t11
 
     if not chosen_speech:
-        m "Oh, okay. Feel free to ask anytime though, ehehe."
+        m 2eua "Oh, okay. Feel free to ask anytime though, ehehe."
         return
 
     $ speech = persistent._fom_saysomething_speeches[chosen_speech]
