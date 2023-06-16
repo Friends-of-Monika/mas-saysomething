@@ -149,15 +149,15 @@ label fom_saysomething_event_retry:
 
             # Suggested to save current speech.
             if say and picker.session is not None:
-                m "I can write this speech down for later, if you want, ehehe."
-                m "Do you want me to do that?{nw}"
+                m 3hua "By the way, I can write this speech down for later if you want, ehehe."
+                m 3eub "Do you want me to do that?{nw}"
 
                 $ _history_list.pop()
                 menu:
                     m "Do you want me to do that?{fast}"
 
                     "Yes, please!":
-                        m "Okay! How do you want me to title it?"
+                        m 1eua "Okay! How do you want me to title it?"
 
                         label fom_saysomething_event_save_enter_name:
                             $ suggested_name = _fom_saysomething.get_saved_speech_name_suggestion()
@@ -172,12 +172,12 @@ label fom_saysomething_event_retry:
                             jump fom_saysomething_event_dont_save
 
                         if len(speech_title) == 0:
-                            m "You need to tell me how to title it, [mas_get_player_nickname()], ahaha~"
+                            m 3lksdla "You need to tell me how to title it, [mas_get_player_nickname()], ahaha~"
                             jump fom_saysomething_event_save_enter_name
 
                         if speech_title in persistent._fom_saysomething_speeches:
-                            m "Ahaha, apparently I already wrote down one with the same name..."
-                            m "Should I discard the previous one?{nw}"
+                            m 3hksdlb "Ahaha, apparently I already wrote down one with the same name..."
+                            m 3eub "Should I discard the previous one?{nw}"
 
                             $ _history_list.pop()
                             menu:
@@ -187,16 +187,16 @@ label fom_saysomething_event_retry:
                                     pass
 
                                 "No.":
-                                    m "Alright, how should I title it then?"
+                                    m 1eua "Alright, how should I title it then?"
                                     jump fom_saysomething_event_save_enter_name
 
-                        m "Done, now I can recite it to you again if you want~"
+                        m 1hub "Done, now I can recite it to you again if you want~"
                         $ persistent._fom_saysomething_speeches[speech_title] = picker_session
                         $ mas_showEvent(mas_getEV("fom_saysomething_speeches_recite"), unlock=True)
 
                     "Not now, [m_name].":
                         label fom_saysomething_event_dont_save:
-                            m "Oh, alright!"
+                            m 1hua "Oh, alright!"
 
                 $ del picker_session
 
