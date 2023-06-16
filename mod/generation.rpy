@@ -121,11 +121,8 @@ init 101 python in _fom_saysomething:
         # If not - start trying suffixes starting with 1
         count = 1
         while True:
-            # Split name to name and extension
-            sn_name, sn_ext = _get_split_name_ext(suggested_name)
-
             # Derive new name by adding suffix before the extension
-            new_name = sn_name + " (" + str(count) + ")." + sn_ext
+            new_name = suggested_name + " (" + str(count) + ")"
 
             # Try new name, return if does not exist
             if new_name not in name_dict:
@@ -164,12 +161,8 @@ init 101 python in _fom_saysomething:
 
         # Create a suggestion of the speech name using default name first,
         # but ensure it is unique and if not, add suffix to it.
-        uniq_name = _get_unique_name(SPEECHES_DIR_PATH,
-                                     DEFAULT_SCRIPT_NAME + ".rpy.txt")
-
-        # Cut off the .rpy.txt (8 characters) remainder from it, to only have
-        # speech name remaining
-        uniq_name = uniq_name[:-8]
+        uniq_name = _get_unique_name_dict(persistent._fom_saysomething_speeches,
+                                          DEFAULT_SCRIPT_NAME)
         return uniq_name
 
     def is_script_name_exists(name):
@@ -187,7 +180,7 @@ init 101 python in _fom_saysomething:
         return os.path.exists(script_path)
 
 
-    def _get_escaped_text(text):
+    def _get_escaped_text(text, escape_curly=False, escape_square=False):
         """
         Escapes double quotes and backslashes in the given text. Useful for
         when it is necessary to inject a possibly unsafe string in a RenPy
@@ -196,6 +189,12 @@ init 101 python in _fom_saysomething:
         IN:
             text -> str:
                 String to escape backslashes and double quotes in.
+
+            escape_curly -> bool, default False:
+                If True, escapes curvy brackets by doubling them.
+
+            escape_square -> bool, default False:
+                If True, escapes square brackets by doubling them.
 
         OUT:
             str:
@@ -206,6 +205,12 @@ init 101 python in _fom_saysomething:
         text = text.replace("\\", "\\\\")
         # Escape quotes with backslashes (" -> \")
         text = text.replace("\"", "\\\"")
+
+        # Escape sensitive RenPy syntax
+        if escape_curly:
+            text = text.replace("{", "{{")
+        if escape_square:
+            text = text.replace("[", "[[")
 
         return text
 
@@ -387,14 +392,15 @@ init 101 python in _fom_saysomething:
         os.makedirs(SPEECHES_DIR_PATH, exist_ok=True)
         path = os.path.join(SPEECHES_DIR_PATH, name + ".rpy.txt")
 
+        # Create topic properties
+        event_label = DEFAULT_EVENTLABEL_FORMAT.format(_get_sane_event_label(name))
+        prompt = _get_escaped_text(name, escape_curly=True, escape_square=True)
+
         # Write by filling template.
         with open(path, "w") as f:
             f.write(DEFAULT_SCRIPT_FORMAT.format(
-                DEFAULT_EVENTLABEL_FORMAT.format(_get_sane_event_label(name)),
-                DEFAULT_CATEGORY,
-                _get_escaped_text(name),
-                get_dialogue_lines(),
-                GENERATOR_IDENT))
+                event_label, DEFAULT_CATEGORY, prompt,
+                get_dialogue_lines(), GENERATOR_IDENT))
 
         # Return newly created script path
         return path

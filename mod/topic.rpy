@@ -161,11 +161,12 @@ label fom_saysomething_event_retry:
 
                         label fom_saysomething_event_save_enter_name:
                             $ suggested_name = _fom_saysomething.get_saved_speech_name_suggestion()
-                            $ speech_title = mas_input(                            \
-                                "How do you want me to title it?",                 \
-                                length=30,                                         \
-                                screen_kwargs={"use_return_button": True,          \
-                                            "return_button_value": False}          \
+                            $ speech_title = mas_input(                                                                \
+                                "How do you want me to title it?",                                                     \
+                                length=30,                                                                             \
+                                default=_fom_saysomething.get_saved_speech_name_suggestion(),                          \
+                                screen_kwargs={"use_return_button": True,                                              \
+                                               "return_button_value": False}                                           \
                             ).strip()
 
                         if speech_title is False:
@@ -196,6 +197,7 @@ label fom_saysomething_event_retry:
                         # For some reason mas_showEVL didn't work, so falling back to this ugliness.
                         $ mas_showEvent(mas_getEV("fom_saysomething_speeches_recite"), unlock=True)
                         $ mas_showEvent(mas_getEV("fom_saysomething_speeches_remove"), unlock=True)
+                        $ mas_showEvent(mas_getEV("fom_saysomething_speeches_generate"), unlock=True)
 
                     "Not now, [m_name].":
                         label fom_saysomething_event_dont_save:
@@ -266,52 +268,6 @@ label fom_saysomething_speeches_recite:
     $ del chosen_speech, speech
 
     return
-
-
-init 5 python:
-    addEvent(
-        Event(
-            persistent.event_database,
-            eventlabel="fom_saysomething_speeches_remove",
-            category=["misc", "monika"],
-            prompt="Can you discard one of your speeches?",
-            pool=True,
-            unlocked=False,
-
-            # Allow this event to be bookmarked since it isn't prefixed with
-            # mas_ or monika_ and disable random unlocks.
-            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
-                   "no_unlock": None}
-        ),
-        code="EVE",
-
-        # Prevent this topic from restarting with 'Now, where was I...' on crash.
-        restartBlacklist=True
-    )
-
-label fom_saysomething_speeches_remove:
-    m "Oh, alright...{w=0.3} Which one is it?"
-
-    show monika at t21
-    call screen fom_saysomething_speech_menu
-    $ chosen_speech = _return
-    show monika at t11
-
-    if not chosen_speech:
-        m 2eua "Okay, feel free to ask anytime though."
-        return
-
-    $ del persistent._fom_saysomething_speeches[chosen_speech]
-    m "Okay, I erased it~"
-
-    # When no speeches left, lock these topics so they don't show up.
-    if len(persistent._fom_saysomething_speeches) == 0:
-        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_recite"), lock=True)
-        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_remove"), lock=True)
-
-    $ del chosen_speech
-    return
-
 
 label fom_saysomething_perform(session, say=True, pose_delay=None):
     # Put Monika back in center and let her say a preamble.
@@ -411,41 +367,95 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
     $ del state_i, pose_5, exp, session, poses, pos, text
     return
 
-# NOTE: picker instance (picker) is expected to be in the scope here.
-# GENERALLY MUST NOT BE CALLED FROM ANYWHERE EXCEPT fom_saysomething_event_retry!
-label fom_saysomething_generate:
-    # Ask for script name in a modal window
-    call screen fom_saysomething_script_name_input_modal
 
-    # User chose 'cancel'
-    if not _return:
-        # If they hit cancel, they will lose their script. Need to confirm.
-        call screen fom_saysomething_confirm_modal(_("Your speech script will be lost. Continue?"))
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_remove",
+            category=["misc", "monika"],
+            prompt="Can you discard one of your speeches?",
+            pool=True,
+            unlocked=False,
 
-        # Confirmed, discard the script and return back.
-        if _return:
-            return
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
 
-        # Refused to continue, jump back to input.
-        else:
-            jump fom_saysomething_generate
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
 
-    # User entered script name and clicked okay button.
-    $ script_name = _return
+label fom_saysomething_speeches_remove:
+    m "Oh, alright...{w=0.3} Which one is it?"
 
-    # Check if script name already exists, confirm overwriting if necessary.
-    if _fom_saysomething.is_script_name_exists(script_name):
-        # Ask for confirmation for overwrite.
-        call screen fom_saysomething_confirm_modal(_("Script with that name already exists. Do you want to overwrite it?"))
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
 
-        # User did not confirm, ask again.
-        if not _return:
-            jump fom_saysomething_generate
+    if not chosen_speech:
+        m 2eua "Okay, feel free to ask anytime though."
+        return
+
+    $ del persistent._fom_saysomething_speeches[chosen_speech]
+    m "Okay, I erased it~"
+
+    # When no speeches left, lock these topics so they don't show up.
+    if len(persistent._fom_saysomething_speeches) == 0:
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_recite"), lock=True)
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_remove"), lock=True)
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_generate"), lock=True)
+
+    $ del chosen_speech
+    return
+
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_generate",
+            category=["misc", "monika"],
+            prompt="Can you generate a topic from one of the speeches?",
+            pool=True,
+            unlocked=False,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
+
+label fom_saysomething_speeches_generate:
+    m "Sure! Which speech you want me to generate script for?"
+
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
+
+    if not chosen_speech:
+        m "Oh, alright! Feel free to ask me anythime though~"
+        return
+
+    m "Alright, let's do it! Give me a moment now..."
+    m 2dsc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
     # Script name chosen, overwriting allowed if conflicted, write now.
-    $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
-    $ renpy.notify(_("Speech saved as {0}").format(script_path))
+    $ session = persistent._fom_saysomething_speeches[chosen_speech]
+    $ _fom_saysomething.generate_script(session, chosen_speech)
+
+    m "Done! Thank you for helping me become even closer to your reality, [mas_get_player_nickname()]~"
 
     # Cleanup.
-    $ del script_name, script_path
+    $ del session, chosen_speech
     return
