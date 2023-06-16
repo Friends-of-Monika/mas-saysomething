@@ -192,7 +192,10 @@ label fom_saysomething_event_retry:
 
                         m 1hub "Done, now I can recite it to you again if you want~"
                         $ persistent._fom_saysomething_speeches[speech_title] = picker_session
+
+                        # For some reason mas_showEVL didn't work, so falling back to this ugliness.
                         $ mas_showEvent(mas_getEV("fom_saysomething_speeches_recite"), unlock=True)
+                        $ mas_showEvent(mas_getEV("fom_saysomething_speeches_remove"), unlock=True)
 
                     "Not now, [m_name].":
                         label fom_saysomething_event_dont_save:
@@ -263,6 +266,52 @@ label fom_saysomething_speeches_recite:
     $ del chosen_speech, speech
 
     return
+
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_remove",
+            category=["misc", "monika"],
+            prompt="Can you discard one of your speeches?",
+            pool=True,
+            unlocked=False,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
+
+label fom_saysomething_speeches_remove:
+    m "Oh, alright...{w=0.3} Which one is it?"
+
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
+
+    if not chosen_speech:
+        m 2eua "Okay, feel free to ask anytime though."
+        return
+
+    $ del persistent._fom_saysomething_speeches[chosen_speech]
+    m "Okay, I erased it~"
+
+    # When no speeches left, lock these topics so they don't show up.
+    if len(persistent._fom_saysomething_speeches) == 0:
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_recite"), lock=True)
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_remove"), lock=True)
+
+    $ del chosen_speech
+    return
+
 
 label fom_saysomething_perform(session, say=True, pose_delay=None):
     # Put Monika back in center and let her say a preamble.
