@@ -350,7 +350,7 @@ init 101 python in _fom_saysomething:
 
             def get_dialog_line(poses, pos, text):
                 """Generates a dialogue line of poses, position and text."""
-                text = markdown.render(_get_escaped_text(text))
+                text = markdown.render(_get_escaped_text(text, escape_square=True))
                 return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
 
             def get_trans_line(poses, pos, dissolve=False):
