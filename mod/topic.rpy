@@ -81,6 +81,7 @@ label fom_saysomething_event_retry:
     # out of screen, hence why we'll keep doing it until we get 'nevermind' from
     # the player or we'll get a signal to say something.
     $ stop_picker_loop = False
+    $ render_initial = True
     while stop_picker_loop is False:
         # Get expression from picker and add to removal list if necessary.
         $ exp = picker.get_sprite_code()
@@ -90,6 +91,12 @@ label fom_saysomething_event_retry:
         # During the pose picking, Monika must not blink or transition from
         # winking to fully open eyes, so here we lock these transitions.
         $ set_eyes_lock(exp, True)
+
+        # When first starting a picker, need to set Monika's pose and expression
+        # to what's already in the picker. Do so just once.
+        if render_initial:
+            $ render_initial = False
+            jump fom_saysomething_event_render
 
         # Show the GUI and await for interaction.
         call screen fom_saysomething_picker(say)
@@ -109,25 +116,28 @@ label fom_saysomething_event_retry:
             m 1eka "Oh, okay."
 
         elif _return == _fom_saysomething.RETURN_RENDER:
-            # Save new expression while keeping previous; immediately lock
-            # blinking on it.
-            $ new_exp = picker.get_sprite_code()
+            # NOTE: Need a label here to quickly render initial pose, which
+            # is first on the session entry list.
+            label fom_saysomething_event_render:
+                # Save new expression while keeping previous; immediately lock
+                # blinking on it.
+                $ new_exp = picker.get_sprite_code()
 
-            # After rendering sprite, add it to cache for further removal.
-            if not _fom_saysomething.is_renpy_image_cached(new_exp):
-                $ _fom_saysomething.IMAGE_CACHE.add_sprite(new_exp)
+                # After rendering sprite, add it to cache for further removal.
+                if not _fom_saysomething.is_renpy_image_cached(new_exp):
+                    $ _fom_saysomething.IMAGE_CACHE.add_sprite(new_exp)
 
-            # Unlock blinking on previous sprite.
-            $ set_eyes_lock(exp, False)
+                # Unlock blinking on previous sprite.
+                $ set_eyes_lock(exp, False)
 
-            # Position or pose/expression update is requested, so do it now.
-            $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
+                # Position or pose/expression update is requested, so do it now.
+                $ renpy.show("monika " + new_exp, [picker.position], zorder=MAS_MONIKA_Z)
 
-            # Lock blinking on new expression. NOTE: CAN ONLY BE DONE AFTER RENDERING!
-            $ set_eyes_lock(new_exp, True)
+                # Lock blinking on new expression. NOTE: CAN ONLY BE DONE AFTER RENDERING!
+                $ set_eyes_lock(new_exp, True)
 
-            # Cleanup.
-            $ del new_exp
+                # Cleanup.
+                $ del new_exp
 
         elif _return == _fom_saysomething.RETURN_DONE:
             # An actual text has been typed and expression is set, stop the loop
@@ -147,7 +157,9 @@ label fom_saysomething_event_retry:
 
             # Run performance, speaking or posing.
             # NOTE: Pose delay is hardcoded and is 3.0 seconds.
-            call fom_saysomething_perform(picker_session, say, 3.0)
+            # NOTE: Not cleaning up caches here, as everything we'll say there
+            # is already cached right here, in the picker topic.
+            call fom_saysomething_perform(picker_session, say, 3.0, cleanup_caches=False)
 
             # Suggested to save current speech.
             if say and picker.session is not None:
@@ -228,7 +240,7 @@ label fom_saysomething_event_retry:
     # that weren't cached before (so that we don't touch MAS sprites.)
     # Additionally, restore GUI visibility and cleanup variables.
     $ _fom_saysomething.IMAGE_CACHE.release_all()
-    $ del stop_picker_loop, say, picker
+    $ del stop_picker_loop, say, picker, render_initial
     return
 
 
@@ -271,7 +283,7 @@ label fom_saysomething_speeches_recite:
 
     return
 
-label fom_saysomething_perform(session, say=True, pose_delay=None):
+label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_caches=True):
     # Put Monika back in center and let her say a preamble.
     show monika 1esb at t11
     m 1esb "Alright, give me just a moment to prepare."
@@ -311,7 +323,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         # it can be released later, as player-made expressions may be unused in
         # the rest of MAS at all.
         $ exp = _fom_saysomething.get_sprite_code(poses)
-        if not _fom_saysomething.is_renpy_image_cached(exp):
+        if cleanup_caches and not _fom_saysomething.is_renpy_image_cached(exp):
             $ _fom_saysomething.IMAGE_CACHE.add_sprite(exp)
 
         # Show Monika with sprite code and at set position, optionally lock
@@ -346,7 +358,8 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
             $ set_eyes_lock(exp, False)
 
     # Release sprites generated dynamically.
-    $ _fom_saysomething.IMAGE_CACHE.release_all()
+    if cleanup_caches:
+        $ _fom_saysomething.IMAGE_CACHE.release_all()
 
     # When in posing mode, restore dialogue window.
     if not say:
