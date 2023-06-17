@@ -1053,7 +1053,7 @@ screen fom_saysomething_picker(say=True):
 
                                 # Preset buttons; highlit when selected.
 
-                                for _key in picker.get_presets(picker.presets_search):
+                                for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
                                         xysize (370, None)
@@ -1484,7 +1484,7 @@ screen fom_saysomething_speech_menu:
 
                     # Speech choice buttons; highlit when selected.
 
-                    for _key in matching_speeches:
+                    for _key in sorted(matching_speeches):
                         textbutton _key:
                             style "scrollable_menu_button"
                             xysize (530, None)
