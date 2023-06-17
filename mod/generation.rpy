@@ -278,6 +278,8 @@ init 101 python in _fom_saysomething:
                 persistent.event_database,
 
                 ## Feel free to put in whatever suits you here:
+                ## (But remember, here you can only put letters,
+                ## digits and underscores!)
                 eventlabel="{0}",
 
                 ## And here as well:
