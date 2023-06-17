@@ -96,6 +96,39 @@ init 101 python in _fom_saysomething:
                 return new_name
             count += 1
 
+    def _get_unique_name_dict(name_dict, suggested_name):
+        """
+        Reliably gets unique name derived from the suggested name in the
+        'directory' represented by the keys of the provided dictionary. It
+        checks if the name is available and appends a numbered suffix to it
+        in an effort to make it guaranteed unique.
+
+        IN:
+            name_dict -> dict:
+                Dictionary with names to check against.
+            suggested_name -> str:
+                Name to ensure uniqueness for.
+
+        OUT:
+            str:
+                Processed name that is guaranteed unique in the dictionary.
+        """
+
+        # First try suggested name as is, if all good - return it
+        if suggested_name not in name_dict:
+            return suggested_name
+
+        # If not - start trying suffixes starting with 1
+        count = 1
+        while True:
+            # Derive new name by adding suffix before the extension
+            new_name = suggested_name + " (" + str(count) + ")"
+
+            # Try new name, return if does not exist
+            if new_name not in name_dict:
+                return new_name
+            count += 1
+
     def get_script_name_suggestion():
         """
         Gets a suggested default name for the generated script, also ensuring
@@ -116,6 +149,22 @@ init 101 python in _fom_saysomething:
         uniq_name = uniq_name[:-8]
         return uniq_name
 
+    def get_saved_speech_name_suggestion():
+        """
+        Gets a suggested default name for saved speech, also ensuring its
+        uniqueness in the speeches directory.
+
+        OUT:
+            str:
+                Guaranteed unique saved speech name suggestion.
+        """
+
+        # Create a suggestion of the speech name using default name first,
+        # but ensure it is unique and if not, add suffix to it.
+        uniq_name = _get_unique_name_dict(persistent._fom_saysomething_speeches,
+                                          DEFAULT_SCRIPT_NAME)
+        return uniq_name
+
     def is_script_name_exists(name):
         """
         Checks if the specified script name already exists in the speeches
@@ -131,7 +180,7 @@ init 101 python in _fom_saysomething:
         return os.path.exists(script_path)
 
 
-    def _get_escaped_text(text):
+    def _get_escaped_text(text, escape_curly=False, escape_square=False):
         """
         Escapes double quotes and backslashes in the given text. Useful for
         when it is necessary to inject a possibly unsafe string in a RenPy
@@ -140,6 +189,12 @@ init 101 python in _fom_saysomething:
         IN:
             text -> str:
                 String to escape backslashes and double quotes in.
+
+            escape_curly -> bool, default False:
+                If True, escapes curvy brackets by doubling them.
+
+            escape_square -> bool, default False:
+                If True, escapes square brackets by doubling them.
 
         OUT:
             str:
@@ -150,6 +205,12 @@ init 101 python in _fom_saysomething:
         text = text.replace("\\", "\\\\")
         # Escape quotes with backslashes (" -> \")
         text = text.replace("\"", "\\\"")
+
+        # Escape sensitive RenPy syntax
+        if escape_curly:
+            text = text.replace("{", "{{")
+        if escape_square:
+            text = text.replace("[", "[[")
 
         return text
 
@@ -289,7 +350,7 @@ init 101 python in _fom_saysomething:
 
             def get_dialog_line(poses, pos, text):
                 """Generates a dialogue line of poses, position and text."""
-                text = markdown.render(_get_escaped_text(text))
+                text = markdown.render(text)
                 return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
 
             def get_trans_line(poses, pos, dissolve=False):
@@ -331,14 +392,15 @@ init 101 python in _fom_saysomething:
         os.makedirs(SPEECHES_DIR_PATH, exist_ok=True)
         path = os.path.join(SPEECHES_DIR_PATH, name + ".rpy.txt")
 
+        # Create topic properties
+        event_label = DEFAULT_EVENTLABEL_FORMAT.format(_get_sane_event_label(name))
+        prompt = _get_escaped_text(name, escape_curly=True, escape_square=True)
+
         # Write by filling template.
         with open(path, "w") as f:
             f.write(DEFAULT_SCRIPT_FORMAT.format(
-                DEFAULT_EVENTLABEL_FORMAT.format(_get_sane_event_label(name)),
-                DEFAULT_CATEGORY,
-                _get_escaped_text(name),
-                get_dialogue_lines(),
-                GENERATOR_IDENT))
+                event_label, DEFAULT_CATEGORY, prompt,
+                get_dialogue_lines(), GENERATOR_IDENT))
 
         # Return newly created script path
         return path

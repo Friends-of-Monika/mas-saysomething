@@ -4,7 +4,8 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-define persistent._fom_saysomething_seen_screenshot_hint = False
+default persistent._fom_saysomething_seen_screenshot_hint = False
+default persistent._fom_saysomething_speeches = dict()
 
 init 5 python:
     addEvent(
@@ -57,16 +58,17 @@ label fom_saysomething_event_pose:
 label fom_saysomething_event_entry(say=True):
     m 1hub "Of course!"
 
+    # Create new Picker and store it locally.
+    # NOTE: Creating it here so that it's not re-initialized on each loop.
+    $ _fom_saysomething.picker = _fom_saysomething.Picker()
+    $ picker = _fom_saysomething.picker
+
 label fom_saysomething_event_retry:
     # Need a fallthrough here so we can jump back here on retry.
     if say:
         m 1eua "Tell me how do you want me to pose and what do you want me to say~"
     else:
         m 1eua "Tell me how do you want me to pose~"
-
-    # Create new Picker and store it locally.
-    $ _fom_saysomething.picker = _fom_saysomething.Picker()
-    $ picker = _fom_saysomething.picker
 
     # If player wants speech/session mode by default, enable it now.
     if persistent._fom_saysomething_speech_mode_default:
@@ -144,16 +146,66 @@ label fom_saysomething_event_retry:
                 $ picker_session = [picker._save_state()]
 
             # Run performance, speaking or posing.
-            call fom_saysomething_perform(picker_session, say, picker.pose_delay)
-            $ del picker_session
+            # NOTE: Pose delay is hardcoded and is 3.0 seconds.
+            call fom_saysomething_perform(picker_session, say, 3.0)
 
-            # Suggested to export current speech.
-            if persistent._fom_saysomething_enable_codegen and say:
-                call screen fom_saysomething_confirm_modal(_(
-                    "Say Something can generate a simple topic with the speech you've just created. "
-                    "Would you like to do it now?"))
-                if _return: # User agreed they want to generate a topic
-                    call fom_saysomething_generate
+            # Suggested to save current speech.
+            if say and picker.session is not None:
+                m 3hua "By the way, I can write this speech down for later if you want, ehehe."
+                m 3eub "Do you want me to do that?{nw}"
+
+                $ _history_list.pop()
+                menu:
+                    m "Do you want me to do that?{fast}"
+
+                    "Yes, please!":
+                        m 1eua "Okay! How do you want me to title it?"
+
+                        label fom_saysomething_event_save_enter_name:
+                            $ suggested_name = _fom_saysomething.get_saved_speech_name_suggestion()
+                            $ speech_title = mas_input(                                                                \
+                                "How do you want me to title it?",                                                     \
+                                length=30,                                                                             \
+                                default=_fom_saysomething.get_saved_speech_name_suggestion(),                          \
+                                screen_kwargs={"use_return_button": True,                                              \
+                                               "return_button_value": False}                                           \
+                            ).strip()
+
+                        if speech_title is False:
+                            jump fom_saysomething_event_dont_save
+
+                        if len(speech_title) == 0:
+                            m 3lksdla "You need to tell me how to title it, [mas_get_player_nickname()], ahaha~"
+                            jump fom_saysomething_event_save_enter_name
+
+                        if speech_title in persistent._fom_saysomething_speeches:
+                            m 3hksdlb "Ahaha, apparently I already wrote down one with the same name..."
+                            m 3eub "Should I discard the previous one?{nw}"
+
+                            $ _history_list.pop()
+                            menu:
+                                m "Should I discard the previous one?{fast}"
+
+                                "Yes.":
+                                    pass
+
+                                "No.":
+                                    m 1eua "Alright, how should I title it then?"
+                                    jump fom_saysomething_event_save_enter_name
+
+                        m 1hub "Done, now I can recite it to you again if you want~"
+                        $ persistent._fom_saysomething_speeches[speech_title] = picker_session
+
+                        # For some reason mas_showEVL didn't work, so falling back to this ugliness.
+                        $ mas_showEvent(mas_getEV("fom_saysomething_speeches_recite"), unlock=True)
+                        $ mas_showEvent(mas_getEV("fom_saysomething_speeches_remove"), unlock=True)
+                        $ mas_showEvent(mas_getEV("fom_saysomething_speeches_generate"), unlock=True)
+
+                    "Not now, [m_name].":
+                        label fom_saysomething_event_dont_save:
+                            m 1hua "Oh, alright!"
+
+                $ del picker_session
 
             # This is hacky, but there isn't any other way to do it with translation.
             $ quip = _("say something else") if say else _("pose for you again")
@@ -176,7 +228,47 @@ label fom_saysomething_event_retry:
     # that weren't cached before (so that we don't touch MAS sprites.)
     # Additionally, restore GUI visibility and cleanup variables.
     $ _fom_saysomething.IMAGE_CACHE.release_all()
-    $ del stop_picker_loop, set_eyes_lock, say, picker
+    $ del stop_picker_loop, say, picker
+    return
+
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_recite",
+            category=["misc", "monika"],
+            prompt="Can you recite one of your speeches for me?",
+            pool=True,
+            unlocked=False,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
+
+label fom_saysomething_speeches_recite:
+    m 1hub "Sure! What do you want to hear again?~"
+
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
+
+    if not chosen_speech:
+        m 2eua "Oh, okay. Feel free to ask anytime though, ehehe."
+        return
+
+    $ speech = persistent._fom_saysomething_speeches[chosen_speech]
+    call fom_saysomething_perform(speech)
+    $ del chosen_speech, speech
+
     return
 
 label fom_saysomething_perform(session, say=True, pose_delay=None):
@@ -229,6 +321,9 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         if (not exp.startswith("5") and pose_5) or (exp.startswith("5") and not pose_5):
             $ renpy.with_statement(dissolve_monika)
             $ pose_5 = not pose_5
+        elif not say:
+            # NOTE: When posing, this is always applied
+            $ renpy.with_statement(dissolve_monika)
 
         if say:
             # Render text and ask Monika to say it.
@@ -242,7 +337,10 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
             $ set_eyes_lock(exp, True)
 
             # Pause before continuing to another expression.
-            pause pose_delay
+            # NOTE: Using custom screen here so we can more flexibly pause,
+            # especially when hiding window; this lets us make a soft pause
+            # with set timer and still allowing player to click skip it.
+            call screen fom_skippable_pause(pose_delay)
 
             # Unlock blinking.
             $ set_eyes_lock(exp, False)
@@ -255,8 +353,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         window show
 
     # Anyway, recover buttons after we're done showing.
-    if persistent._fom_saysomething_hide_quick_buttons:
-        $ _fom_saysomething.set_mas_gui_visible(True)
+    $ _fom_saysomething.set_mas_gui_visible(True)
 
     # Return Monika back to center, say post-speech phrase.
     if say and exp.startswith("5"):
@@ -269,46 +366,103 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
     m 3tua "Well? {w=0.3}Did I do it good enough?"
     m 1hub "Hope you liked it, ahaha~"
 
+    if not say:
+        $ del set_eyes_lock
+
     # Before finishing with performance, restore GUI visibility and cleanup.
     $ _fom_saysomething.set_mas_gui_visible(True)
-    $ del state_i, pose_5, exp, session, poses, pos, text, set_eyes_lock
+    $ del state_i, pose_5, exp, session, poses, pos, text
     return
 
-# NOTE: picker instance (picker) is expected to be in the scope here.
-# GENERALLY MUST NOT BE CALLED FROM ANYWHERE EXCEPT fom_saysomething_event_retry!
-label fom_saysomething_generate:
-    # Ask for script name in a modal window
-    call screen fom_saysomething_script_name_input_modal
 
-    # User chose 'cancel'
-    if not _return:
-        # If they hit cancel, they will lose their script. Need to confirm.
-        call screen fom_saysomething_confirm_modal(_("Your speech script will be lost. Continue?"))
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_remove",
+            category=["misc", "monika"],
+            prompt="Can you discard one of your speeches?",
+            pool=True,
+            unlocked=False,
 
-        # Confirmed, discard the script and return back.
-        if _return:
-            return
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
 
-        # Refused to continue, jump back to input.
-        else:
-            jump fom_saysomething_generate
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
 
-    # User entered script name and clicked okay button.
-    $ script_name = _return
+label fom_saysomething_speeches_remove:
+    m "Oh, alright...{w=0.3} Which one is it?"
 
-    # Check if script name already exists, confirm overwriting if necessary.
-    if _fom_saysomething.is_script_name_exists(script_name):
-        # Ask for confirmation for overwrite.
-        call screen fom_saysomething_confirm_modal(_("Script with that name already exists. Do you want to overwrite it?"))
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
 
-        # User did not confirm, ask again.
-        if not _return:
-            jump fom_saysomething_generate
+    if not chosen_speech:
+        m 2eua "Okay, feel free to ask anytime though."
+        return
+
+    $ del persistent._fom_saysomething_speeches[chosen_speech]
+    m "Okay, I erased it~"
+
+    # When no speeches left, lock these topics so they don't show up.
+    if len(persistent._fom_saysomething_speeches) == 0:
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_recite"), lock=True)
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_remove"), lock=True)
+        $ mas_hideEvent(mas_getEV("fom_saysomething_speeches_generate"), lock=True)
+
+    $ del chosen_speech
+    return
+
+
+init 5 python:
+    addEvent(
+        Event(
+            persistent.event_database,
+            eventlabel="fom_saysomething_speeches_generate",
+            category=["misc", "monika"],
+            prompt="Can you generate a topic from one of the speeches?",
+            pool=True,
+            unlocked=False,
+
+            # Allow this event to be bookmarked since it isn't prefixed with
+            # mas_ or monika_ and disable random unlocks.
+            rules={"bookmark_rule": mas_bookmarks_derand.WHITELIST,
+                   "no_unlock": None}
+        ),
+        code="EVE",
+
+        # Prevent this topic from restarting with 'Now, where was I...' on crash.
+        restartBlacklist=True
+    )
+
+label fom_saysomething_speeches_generate:
+    m 3eub "Sure! Which speech you want me to generate script for?"
+
+    show monika at t21
+    call screen fom_saysomething_speech_menu
+    $ chosen_speech = _return
+    show monika at t11
+
+    if not chosen_speech:
+        m 3eka "Oh, alright! Feel free to ask me anythime though~"
+        return
+
+    m 2hub "Alright, let's do it! Give me a moment now..."
+    m 2dsc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
     # Script name chosen, overwriting allowed if conflicted, write now.
-    $ script_path = _fom_saysomething.generate_script(picker.session, script_name)
-    $ renpy.notify(_("Speech saved as {0}").format(script_path))
+    $ session = persistent._fom_saysomething_speeches[chosen_speech]
+    $ _fom_saysomething.generate_script(session, chosen_speech)
+
+    m 3hub "Done! Thank you for helping me become even closer to your reality, [mas_get_player_nickname()]~"
 
     # Cleanup.
-    $ del script_name, script_path
+    $ del session, chosen_speech
     return

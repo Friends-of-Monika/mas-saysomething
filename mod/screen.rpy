@@ -5,7 +5,7 @@
 # https://github.com/friends-of-monika/mas-saysomething
 
 # Presets dictionary with premade presets.
-define persistent._fom_saysomething_presets = {
+default persistent._fom_saysomething_presets = {
     # Presets by dreamscached
     "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
     "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
@@ -247,9 +247,6 @@ init 100 python in _fom_saysomething:
             # Session states and current state cursor.
             self.session = None
             self.session_cursor = 0
-
-            # Delay between changing poses.
-            self.pose_delay = persistent._fom_saysomething_pose_pause
 
         def pose_switch_selector(self, key, forward):
             """
@@ -998,7 +995,7 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize 360
+                        xsize 370
                         ysize 38
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
@@ -1025,7 +1022,7 @@ screen fom_saysomething_picker(say=True):
                 # List of presets.
 
                 fixed:
-                    xsize 350
+                    xsize 370
 
                     if not picker.is_show_code():
                         ysize 420
@@ -1055,7 +1052,7 @@ screen fom_saysomething_picker(say=True):
                                 for _key in picker.get_presets(picker.presets_search):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (350, None)
+                                        xysize (370, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
@@ -1065,7 +1062,7 @@ screen fom_saysomething_picker(say=True):
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        xalign 1.07
+                        xalign -0.07
 
         # Confirmation buttons area.
 
@@ -1140,15 +1137,21 @@ screen fom_saysomething_picker(say=True):
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
+    # Additional buttons, such as menu hiding, etc.
+
     vbox:
         align (0.99, 0.977)
         xsize 210
 
+        # Have to use this to make buttons 'togglable.'
         style_prefix "check_scrollable_menu"
 
         textbutton _("Show Q. Menu"):
             xysize (210, None)
+
+            # Make this persist, so player doesn't have to always toggle it
             selected not persistent._fom_saysomething_hide_quick_buttons
+
             action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
                     Function(_fom_saysomething.set_mas_gui_visible,
                             persistent._fom_saysomething_hide_quick_buttons)]
@@ -1305,73 +1308,6 @@ screen fom_saysomething_preset_name_input_modal:
                     action cancel_action
 
 
-# Modal screen used for entering new preset name.
-# NOTE: same as main screen refers to picker directly, in global scope.
-
-screen fom_saysomething_script_name_input_modal:
-    default script_name = _fom_saysomething.get_script_name_suggestion()
-
-    style_prefix "confirm"
-
-    modal True
-    zorder 200
-
-    add mas_getTimeFile("gui/overlay/confirm.png")
-
-    # Button alternative keybinds.
-
-    # If preset name is not empty, allow pressing Enter to confirm instead
-    # of button click.
-    if not picker.is_preset_name_empty():
-        key "K_RETURN":
-            action Return(script_name)
-
-    # Allow pressing Esc to cancel.
-    key "K_ESCAPE":
-        action Return(None)
-
-    frame:
-        vbox:
-            xmaximum 300
-            xfill True
-
-            align (0.5, 0.5)
-            spacing 30
-
-            # Title.
-
-            text _("Save this speech as:"):
-                style "confirm_prompt"
-                xalign 0.5
-
-            # Input field.
-
-            input:
-                style_prefix "input"
-
-                xalign 0.0
-                layout "nobreak"
-
-                length 30
-                pixel_width 300
-
-                value ScreenVariableInputValue("script_name")
-
-            # Save/cancel buttons.
-
-            hbox:
-                xalign 0.5
-                spacing 10
-
-                # Sensitivity of this button relies on emptiness of entered
-                # preset name.
-                textbutton _("Save"):
-                    action Return(script_name)
-                    sensitive bool(script_name)
-                textbutton _("Cancel"):
-                    action Return(False)
-
-
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
@@ -1429,3 +1365,158 @@ screen fom_saysomething_confirm_modal(message, ok_button=_("Yes"), ok_action=Ret
                     action ok_action
                 textbutton no_button:
                     action no_action
+
+
+init -10 python in _fom_saysomething_gui:
+
+    from store import persistent
+
+    def on_search_adjustment_range(adjustment):
+        """
+        Callback for presets menu search input to adjust cursor so it's
+        visible to the user.
+
+        IN:
+            adjustment -> ui.adjustment:
+                Adjustment that has changed.
+        """
+
+        widget = renpy.get_widget("fom_saysomething_speech_menu", "search_input", "screens")
+        caret_relative_pos = 1.0
+        if widget is not None:
+            caret_pos = widget.caret_pos
+            content_len = len(widget.content)
+
+            if content_len > 0:
+                caret_relative_pos = caret_pos / float(content_len)
+
+        # This ensures that the caret is always visible (close enough) to the user
+        # when they enter text
+        adjustment.change(adjustment.range * caret_relative_pos)
+
+    speech_menu_query = ""
+
+    def on_search_input_change(query):
+        global speech_menu_query
+        speech_menu_query = query.lower()
+        renpy.restart_interaction()
+
+    def reset_search_input():
+        global speech_menu_query
+        speech_menu_query = ""
+
+screen fom_saysomething_speech_menu:
+
+    $ matching_speeches = list(filter(lambda it: _fom_saysomething_gui.speech_menu_query in it.lower(),
+                                      persistent._fom_saysomething_speeches.keys()))
+
+    on "hide" action Function(_fom_saysomething_gui.reset_search_input)
+
+    # Speeches list menu.
+
+    frame:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1] - 55)
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize 40
+
+        # Text input.
+
+        background Solid(mas_ui.TEXT_FIELD_BG)
+
+        viewport:
+            draggable False
+            arrowkeys False
+            mousewheel "horizontal"
+            xsize 520
+            ysize 38
+            xadjustment ui.adjustment(ranged=_fom_saysomething_gui.on_search_adjustment_range)
+
+            input:
+                id "search_input"
+                style_prefix "input"
+                length 50
+                xalign 0.0
+                layout "nobreak"
+                changed _fom_saysomething_gui.on_search_input_change
+
+        # Hint text in search box visible if no text is entered.
+
+        if len(_fom_saysomething_gui.speech_menu_query) == 0:
+            text _("Search for a speech..."):
+                text_align 0.0
+                layout "nobreak"
+                color "#EEEEEEB2"
+                first_indent 10
+                line_leading 1
+                outlines []
+
+    # List of presets.
+
+    fixed:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1])
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize evhand.LEFT_AREA[3]
+
+        # Viewport wrapping long list.
+
+        vbox:
+            pos (0, 0)
+            anchor (0, 0)
+
+            viewport:
+                id "viewport"
+
+                yfill False
+                mousewheel True
+                arrowkeys True
+
+                vbox:
+                    spacing 10
+
+                    # Speech choice buttons; highlit when selected.
+
+                    for _key in matching_speeches:
+                        textbutton _key:
+                            style "scrollable_menu_button"
+                            xysize (530, None)
+                            action Return(_key)
+
+            null height 20
+
+            textbutton _("Nevermind."):
+                style "scrollable_menu_button"
+                xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+                action Return(False)
+
+        # Scrollbar used by list of speeches above.
+
+        bar:
+            style "classroom_vscrollbar"
+            value YScrollValue("viewport")
+            xalign evhand.LEFT_XALIGN / 2 + 0.005
+
+
+screen fom_skippable_pause(duration=1.0):
+
+    # NOTE: For reference, here's zorders of other screens used in MAS.
+    # When deciding zorder, these were taken into account (must be able to click
+    # other things on the screen when pausing.)
+    # Music selector  zorder: 200 MODAL
+    # Say screen      zorder: 60
+    # Hotkey buttons  zorder: 50
+    # Calendar screen zorder: 6
+    zorder -100
+
+    # Wait for timer and return True, since pause went uninterrupted.
+    timer duration action Return(True)
+
+    # Add an invisible button to react on clicking.
+    # -- Actually, we don't need that anymore. `key` section below handles it.
+    # button action Return(False):
+    #     xsize config.screen_width
+    #     ysize config.screen_height
+
+    # Listen to dismiss keypresses and return False, since pause
+    # was interrupted by player keypress.
+    for _key in config.keymap["dismiss"]:
+        key _key action Return(False)
