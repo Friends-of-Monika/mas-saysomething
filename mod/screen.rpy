@@ -248,9 +248,6 @@ init 100 python in _fom_saysomething:
             self.session = None
             self.session_cursor = 0
 
-            # Delay between changing poses.
-            self.pose_delay = persistent._fom_saysomething_pose_pause
-
         def pose_switch_selector(self, key, forward):
             """
             Switches pose for selector by the specified key, forward or backward. If

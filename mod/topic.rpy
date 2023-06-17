@@ -58,16 +58,17 @@ label fom_saysomething_event_pose:
 label fom_saysomething_event_entry(say=True):
     m 1hub "Of course!"
 
+    # Create new Picker and store it locally.
+    # NOTE: Creating it here so that it's not re-initialized on each loop.
+    $ _fom_saysomething.picker = _fom_saysomething.Picker()
+    $ picker = _fom_saysomething.picker
+
 label fom_saysomething_event_retry:
     # Need a fallthrough here so we can jump back here on retry.
     if say:
         m 1eua "Tell me how do you want me to pose and what do you want me to say~"
     else:
         m 1eua "Tell me how do you want me to pose~"
-
-    # Create new Picker and store it locally.
-    $ _fom_saysomething.picker = _fom_saysomething.Picker()
-    $ picker = _fom_saysomething.picker
 
     # If player wants speech/session mode by default, enable it now.
     if persistent._fom_saysomething_speech_mode_default:
@@ -145,7 +146,8 @@ label fom_saysomething_event_retry:
                 $ picker_session = [picker._save_state()]
 
             # Run performance, speaking or posing.
-            call fom_saysomething_perform(picker_session, say, picker.pose_delay)
+            # NOTE: Pose delay is hardcoded and is 3.0 seconds.
+            call fom_saysomething_perform(picker_session, say, 3.0)
 
             # Suggested to save current speech.
             if say and picker.session is not None:
