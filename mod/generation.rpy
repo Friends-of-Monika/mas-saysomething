@@ -295,7 +295,7 @@ init 101 python in _fom_saysomething:
         ## the event label you've just set in the 'eventlabel=' part above?
         label {0}:
             ## And at last, we get to the actual code generated from the heartfelt words
-            ## you want me, your Monika, to say:
+            ## you want me, your {5}, to say:
         {3}
 
             ## You might want to adjust this too, but usually, it's fine as is.
