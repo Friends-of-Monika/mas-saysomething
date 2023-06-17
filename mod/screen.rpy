@@ -411,34 +411,36 @@ init 100 python in _fom_saysomething:
 
             return name in persistent._fom_saysomething_presets
 
-        def _reset_state(self):
-            # This dictionary contains key to 2-tuple of:
-            #  [0]: current expression cursor index
-            #  [1]: current expression human readable name
-            # Initially all cursors are at zero (with corresponding expression names.)
-            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+        def _reset_state(self, reset_pose=True, reset_text=True):
+            if reset_pose:
+                # This dictionary contains key to 2-tuple of:
+                #  [0]: current expression cursor index
+                #  [1]: current expression human readable name
+                # Initially all cursors are at zero (with corresponding expression names.)
+                self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
 
-            # Position object to use when showing Monika at her table. By
-            # default, her usual middle screen position.
-            self.position = POSITIONS[4][0]
+                # Position object to use when showing Monika at her table. By
+                # default, her usual middle screen position.
+                self.position = POSITIONS[4][0]
 
-            # Adjustment object to define slider properties for position slider
-            # and handle value changes.
-            self.position_adjustment = ui.adjustment(
-                range=len(POSITIONS) - 1,
-                value=4,
-                adjustable=True,
-                changed=self.on_position_change
-            )
+                # Adjustment object to define slider properties for position slider
+                # and handle value changes.
+                self.position_adjustment = ui.adjustment(
+                    range=len(POSITIONS) - 1,
+                    value=4,
+                    adjustable=True,
+                    changed=self.on_position_change
+                )
 
-            # Set GUI flip.
-            self.gui_flip = self.position_adjustment.value > 4
+                # Set GUI flip.
+                self.gui_flip = self.position_adjustment.value > 4
 
-            # Variable that stores entered user text prompt.
-            self.text = ""
+            if reset_text:
+                # Variable that stores entered user text prompt.
+                self.text = ""
 
-            # Ren'Py input value to allow disabling text input when needed.
-            self.text_value = FieldInputValue(self, "text", returnable=False)
+                # Ren'Py input value to allow disabling text input when needed.
+                self.text_value = FieldInputValue(self, "text", returnable=False)
 
             return RETURN_RENDER
 
@@ -589,7 +591,9 @@ init 100 python in _fom_saysomething:
 
             self.session.append(self._save_state())
             self.session_cursor += 1
-            self._reset_state()
+
+            # NOTE: reset just text, not pose
+            self._reset_state(reset_pose=False, reset_text=True)
 
             return RETURN_RENDER
 
@@ -1145,6 +1149,11 @@ screen fom_saysomething_picker(say=True):
 
         # Have to use this to make buttons 'togglable.'
         style_prefix "check_scrollable_menu"
+
+        textbutton _("Reset Pose"):
+            style_prefix "fom_saysomething_confirm"
+            xysize (210, None)
+            action Function(picker._reset_state)
 
         textbutton _("Show Q. Menu"):
             xysize (210, None)
