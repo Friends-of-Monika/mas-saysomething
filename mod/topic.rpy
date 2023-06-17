@@ -351,8 +351,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         window show
 
     # Anyway, recover buttons after we're done showing.
-    if persistent._fom_saysomething_hide_quick_buttons:
-        $ _fom_saysomething.set_mas_gui_visible(True)
+    $ _fom_saysomething.set_mas_gui_visible(True)
 
     # Return Monika back to center, say post-speech phrase.
     if say and exp.startswith("5"):

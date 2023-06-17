@@ -1140,15 +1140,21 @@ screen fom_saysomething_picker(say=True):
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
 
+    # Additional buttons, such as menu hiding, etc.
+
     vbox:
         align (0.99, 0.977)
         xsize 210
 
+        # Have to use this to make buttons 'togglable.'
         style_prefix "check_scrollable_menu"
 
         textbutton _("Show Q. Menu"):
             xysize (210, None)
+
+            # Make this persist, so player doesn't have to always toggle it
             selected not persistent._fom_saysomething_hide_quick_buttons
+
             action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
                     Function(_fom_saysomething.set_mas_gui_visible,
                             persistent._fom_saysomething_hide_quick_buttons)]
