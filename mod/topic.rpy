@@ -240,7 +240,7 @@ label fom_saysomething_event_retry:
     # that weren't cached before (so that we don't touch MAS sprites.)
     # Additionally, restore GUI visibility and cleanup variables.
     $ _fom_saysomething.IMAGE_CACHE.release_all()
-    $ del stop_picker_loop, say, picker
+    $ del stop_picker_loop, say, picker, render_initial
     return
 
 
