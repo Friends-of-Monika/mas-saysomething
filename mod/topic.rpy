@@ -319,6 +319,9 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
         if (not exp.startswith("5") and pose_5) or (exp.startswith("5") and not pose_5):
             $ renpy.with_statement(dissolve_monika)
             $ pose_5 = not pose_5
+        elif not say:
+            # NOTE: When posing, this is always applied
+            $ renpy.with_statement(dissolve_monika)
 
         if say:
             # Render text and ask Monika to say it.
@@ -332,7 +335,10 @@ label fom_saysomething_perform(session, say=True, pose_delay=None):
             $ set_eyes_lock(exp, True)
 
             # Pause before continuing to another expression.
-            pause pose_delay
+            # NOTE: Using custom screen here so we can more flexibly pause,
+            # especially when hiding window; this lets us make a soft pause
+            # with set timer and still allowing player to click skip it.
+            call screen fom_skippable_pause(pose_delay)
 
             # Unlock blinking.
             $ set_eyes_lock(exp, False)
@@ -436,7 +442,7 @@ init 5 python:
     )
 
 label fom_saysomething_speeches_generate:
-    m "Sure! Which speech you want me to generate script for?"
+    m 3eub "Sure! Which speech you want me to generate script for?"
 
     show monika at t21
     call screen fom_saysomething_speech_menu
@@ -444,17 +450,17 @@ label fom_saysomething_speeches_generate:
     show monika at t11
 
     if not chosen_speech:
-        m "Oh, alright! Feel free to ask me anythime though~"
+        m 3eka "Oh, alright! Feel free to ask me anythime though~"
         return
 
-    m "Alright, let's do it! Give me a moment now..."
+    m 2hub "Alright, let's do it! Give me a moment now..."
     m 2dsc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
 
     # Script name chosen, overwriting allowed if conflicted, write now.
     $ session = persistent._fom_saysomething_speeches[chosen_speech]
     $ _fom_saysomething.generate_script(session, chosen_speech)
 
-    m "Done! Thank you for helping me become even closer to your reality, [mas_get_player_nickname()]~"
+    m 3hub "Done! Thank you for helping me become even closer to your reality, [mas_get_player_nickname()]~"
 
     # Cleanup.
     $ del session, chosen_speech

@@ -1491,3 +1491,29 @@ screen fom_saysomething_speech_menu:
             style "classroom_vscrollbar"
             value YScrollValue("viewport")
             xalign evhand.LEFT_XALIGN / 2 + 0.005
+
+
+screen fom_skippable_pause(duration=1.0):
+
+    # NOTE: For reference, here's zorders of other screens used in MAS.
+    # When deciding zorder, these were taken into account (must be able to click
+    # other things on the screen when pausing.)
+    # Music selector  zorder: 200 MODAL
+    # Say screen      zorder: 60
+    # Hotkey buttons  zorder: 50
+    # Calendar screen zorder: 6
+    zorder -100
+
+    # Wait for timer and return True, since pause went uninterrupted.
+    timer duration action Return(True)
+
+    # Add an invisible button to react on clicking.
+    # -- Actually, we don't need that anymore. `key` section below handles it.
+    # button action Return(False):
+    #     xsize config.screen_width
+    #     ysize config.screen_height
+
+    # Listen to dismiss keypresses and return False, since pause
+    # was interrupted by player keypress.
+    for _key in config.keymap["dismiss"]:
+        key _key action Return(False)
