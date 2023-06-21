@@ -1,3 +1,10 @@
+# generation.rpy contains functions and utilities for topic script generation
+# for saved speeches.
+#
+# This file is part of Say Something (see link below):
+# https://github.com/friends-of-monika/mas-saysomething
+
+
 init 101 python in _fom_saysomething:
 
     import os, re, store

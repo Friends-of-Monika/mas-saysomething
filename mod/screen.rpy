@@ -4,29 +4,45 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-# Presets dictionary with premade presets.
+
+
+## PRESETS DICTIONARY DEFINITION ----------------------------------------------------------------------------------------------------------
+
+# Presets dictionary with premade presets. Structure is the following:
+# String key (warning: shown to user!), tuple value.
+# Tuple contains three items:
+# 1. Pose selectors dictionary (scroll to poses dictionary for more info)
+# 2. Position ID (again, scroll down to see positions)
+# 3. Text she says (always present and non None)
+
 default persistent._fom_saysomething_presets = {
     # Presets by dreamscached
-    "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
-    "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
-    "Daydreaming": ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
-    "Fact of the day": ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!"),
-    "Angry Monika": ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that..."),
-    "I love you": ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much..."),
-    "How embarrassing": ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha..."),
-    "Asking you out": ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~"),
-    "Feeling singy": ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
+    "Hey, everyone!":           ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
+    "Sparkly pretty eyes":      ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
+    "Daydreaming":              ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
+    "Fact of the day":          ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!"),
+    "Angry Monika":             ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that..."),
+    "I love you":               ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much..."),
+    "How embarrassing":         ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha..."),
+    "Asking you out":           ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~"),
+    "Feeling singy":            ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
     "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
     # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
-    "Sulks to you": ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
-    "Thinking deep": ({"eyebrows": 4, "eyes": 5, "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
-    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0, "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
-    "In loving worries": ({"eyebrows": 2, "eyes": 0, "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..")
+    "Sulks to you":        ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
+    "Thinking deep":       ({"eyebrows": 4, "eyes": 5,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
+    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0,  "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
+    "In loving worries":   ({"eyebrows": 2, "eyes": 0,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..")
 }
 
+## END PRESETS DICTIONARY DEFINITION ------------------------------------------------------------------------------------------------------
+
+
+
+## PICKER CLASS, CONSTANTS, POSES/POSITIONS -----------------------------------------------------------------------------------------------
 
 init 100 python in _fom_saysomething:
+
     import store
     from store import ui, persistent
     from store import FieldInputValue
@@ -48,6 +64,8 @@ init 100 python in _fom_saysomething:
     RETURN_DONE = 1
 
 
+    ## POSE SELECTORS DICTIONARY ----------------------------------------------------------------------------------------------------------
+
     # Orderect dictionary is used to preserve order when rendering a table of
     # selectors. This dictionary has the following structure:
     #  [key] -> tuple:
@@ -55,6 +73,7 @@ init 100 python in _fom_saysomething:
     #    [1] -> tuple:
     #      [0]: expression code/mnemonic
     #      [1]: expression human readable description
+
     EXPR_MAP = OrderedDict([
         ("pose", (_("Pose"), [
             ("1", _("Rest on hands")),
@@ -120,6 +139,7 @@ init 100 python in _fom_saysomething:
         ]))
     ])
 
+
     def get_sprite_code(pose_cursors):
         """
         Generate sprite code for a dictionary of pose cursors (see above for
@@ -145,6 +165,11 @@ init 100 python in _fom_saysomething:
                 code.append(value)
         return "".join(code)
 
+    ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
+
+
+
+    ## POSITIONS LIST ---------------------------------------------------------------------------------------------------------------------
 
     # Positions list containing Monika table positions from leftmost [0] to
     # rightmost [9]. Items are usable with renpy.show(..., at=list[...]) call.
@@ -180,6 +205,12 @@ init 100 python in _fom_saysomething:
 
         return POSITIONS[position_cursor][1]
 
+    ## END POSITIONS LIST -----------------------------------------------------------------------------------------------------------------
+
+
+
+    ## SESSION FUNCTIONS/CONSTANTS --------------------------------------------------------------------------------------------------------
+
     def get_session_expressions(session):
         """
         Returns set of unique expressions used in the given session.
@@ -199,9 +230,18 @@ init 100 python in _fom_saysomething:
     # Need this limitation because else we'll quickly run out of memory.
     MAX_SESSION_SIZE = 100
 
+    # How many images can we allow Ren'Py to keep in memory before we
+    # clean them up to reduce memory consumption?
     MAX_CACHED_IMAGES = 64
+
+    # Cache object to track and release images.
     IMAGE_CACHE = MoniSpriteCache(MAX_CACHED_IMAGES)
 
+    ## END SESSION FUNCTIONS/CONSTANTS ----------------------------------------------------------------------------------------------------
+
+
+
+    ## PICKER OBJECT AND METHODS ----------------------------------------------------------------------------------------------------------
 
     class Picker(object):
         """
@@ -247,6 +287,72 @@ init 100 python in _fom_saysomething:
             # Session states and current state cursor.
             self.session = None
             self.session_cursor = 0
+
+
+
+        ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
+
+        def _reset_state(self, reset_pose=True, reset_text=True):
+            if reset_pose:
+                # This dictionary contains key to 2-tuple of:
+                #  [0]: current expression cursor index
+                #  [1]: current expression human readable name
+                # Initially all cursors are at zero (with corresponding expression names.)
+                self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+
+                # Position object to use when showing Monika at her table. By
+                # default, her usual middle screen position.
+                self.position = POSITIONS[4][0]
+
+                # Adjustment object to define slider properties for position slider
+                # and handle value changes.
+                self.position_adjustment = ui.adjustment(
+                    range=len(POSITIONS) - 1,
+                    value=4,
+                    adjustable=True,
+                    changed=self.on_position_change
+                )
+
+                # Set GUI flip.
+                self.gui_flip = self.position_adjustment.value > 4
+
+            if reset_text:
+                # Variable that stores entered user text prompt.
+                self.text = ""
+
+                # Ren'Py input value to allow disabling text input when needed.
+                self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            return RETURN_RENDER
+
+        def _save_state(self):
+            return (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text  #2 - text
+            )
+
+        def _load_state(self, state):
+            pose_cur, pos, text = state
+
+            # Load selectors
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
+
+            # Load position
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            return RETURN_RENDER
+
+        ## END PICKER STATE MANAGEMENT FUNCTIONS ------------------------------------------------------------------------------------------
+
+
+
+        ## POSE/EXPRESSION SELECTOR FUNCTIONS ---------------------------------------------------------------------------------------------
 
         def pose_switch_selector(self, key, forward):
             """
@@ -330,6 +436,12 @@ init 100 python in _fom_saysomething:
                 return get_position_code(self.position_adjustment.value)
             return None
 
+        ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
+
+
+
+        ## VARIOUS CHECK FUNCTIONS --------------------------------------------------------------------------------------------------------
+
         def is_text_empty(self):
             """
             Checks if stored text is empty (e.g. length is zero not including
@@ -374,6 +486,12 @@ init 100 python in _fom_saysomething:
 
             return persistent._fom_saysomething_show_code
 
+        ## END VARIOUS CHECK FUNCTIONS ----------------------------------------------------------------------------------------------------
+
+
+
+        ## PRESET RELATED FUNCTION --------------------------------------------------------------------------------------------------------
+
         def get_presets(self, query):
             """
             Returns list of preset names matching query sorted lexicographically.
@@ -410,62 +528,6 @@ init 100 python in _fom_saysomething:
             """
 
             return name in persistent._fom_saysomething_presets
-
-        def _reset_state(self, reset_pose=True, reset_text=True):
-            if reset_pose:
-                # This dictionary contains key to 2-tuple of:
-                #  [0]: current expression cursor index
-                #  [1]: current expression human readable name
-                # Initially all cursors are at zero (with corresponding expression names.)
-                self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
-
-                # Position object to use when showing Monika at her table. By
-                # default, her usual middle screen position.
-                self.position = POSITIONS[4][0]
-
-                # Adjustment object to define slider properties for position slider
-                # and handle value changes.
-                self.position_adjustment = ui.adjustment(
-                    range=len(POSITIONS) - 1,
-                    value=4,
-                    adjustable=True,
-                    changed=self.on_position_change
-                )
-
-                # Set GUI flip.
-                self.gui_flip = self.position_adjustment.value > 4
-
-            if reset_text:
-                # Variable that stores entered user text prompt.
-                self.text = ""
-
-                # Ren'Py input value to allow disabling text input when needed.
-                self.text_value = FieldInputValue(self, "text", returnable=False)
-
-            return RETURN_RENDER
-
-        def _save_state(self):
-            return (
-                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
-                self.text  #2 - text
-            )
-
-        def _load_state(self, state):
-            pose_cur, pos, text = state
-
-            # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
-
-            # Load position
-            self.position_adjustment.value = pos
-            self.on_position_change(pos)
-
-            # Load text
-            self.text = text
-            self.on_text_change(text)
-
-            return RETURN_RENDER
 
         def save_preset(self, name):
             """
@@ -516,6 +578,12 @@ init 100 python in _fom_saysomething:
 
             self.preset_name = ""
             self.preset_cursor = None
+
+        ## END PRESET RELATED FUNCTION ----------------------------------------------------------------------------------------------------
+
+
+
+        ## SESSION MODE RELATED FUNCTIONS -------------------------------------------------------------------------------------------------
 
         def enable_session_mode(self):
             """
@@ -675,6 +743,12 @@ init 100 python in _fom_saysomething:
 
             return not (len(self.session) < MAX_SESSION_SIZE)
 
+        ## END SESSION MODE RELATED FUNCTIONS -------------------------------------------------------------------------------------------------
+
+
+
+        ## GUI CALLBACK FUNCTIONS ---------------------------------------------------------------------------------------------------------
+
         def on_position_change(self, value):
             """
             Callback function for position bar.
@@ -786,9 +860,16 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
+
     # Declare picker as a variable.
     picker = None
 
+    ## END PICKER OBJECT AND METHODS ------------------------------------------------------------------------------------------------------
+
+
+
+## STYLE CUSTOMIZATIONS/BACKPORTS ---------------------------------------------------------------------------------------------------------
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
 # Some elements have been adjusted for design of this submod's GUI.
@@ -827,6 +908,11 @@ style fom_saysomething_titlebox_dark is default:
     ypos gui.name_ypos
     ysize gui.namebox_height
 
+## END STYLE CUSTOMIZATIONS/BACKPORTS -----------------------------------------------------------------------------------------------------
+
+
+
+## PICKER GUI LAYOUT AND DEFINITIONS ------------------------------------------------------------------------------------------------------
 
 # Expression/pose, location and say text picker GUI screen.
 # NOTE: in this screen, picker is referenced directly as it is implied that it
@@ -836,7 +922,14 @@ screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
 
     vbox:
-        # Flip GUI to prevent hiding Monika behind it.
+
+
+
+        ## GUI FLIP LOGIC -----------------------------------------------------------------------------------------------------------------
+
+        # Based on Monika's position, it's necessary to flip GUI
+        # to let user fully see Monika's pose and face.
+
         if not picker.gui_flip:
             if picker.is_show_code():
                 align (0.99, 0.07)
@@ -848,12 +941,16 @@ screen fom_saysomething_picker(say=True):
             else:
                 align (0.01, 0.2)
 
+        ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
+
+
+
+        ## POSE/EXRESSION SELECTORS PANEL -------------------------------------------------------------------------------------------------
+
         vbox:
             spacing 10
 
             if not picker.presets_menu:
-
-                # Selectors panel.
 
                 frame:
                     padding (10, 10)
@@ -908,7 +1005,11 @@ screen fom_saysomething_picker(say=True):
                                     text picker.get_pose_label(key) xalign 0.5
                                     textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
 
-                # Position slider panel.
+                ## END POSE/EXPRESSION SELECTORS PANEL ------------------------------------------------------------------------------------
+
+
+
+                ## POSITION SLIDER/SELECTOR -----------------------------------------------------------------------------------------------
 
                 frame:
                     padding (10, 10)
@@ -924,7 +1025,11 @@ screen fom_saysomething_picker(say=True):
                             adjustment picker.position_adjustment
                             released Return(_fom_saysomething.RETURN_RENDER)
 
-                # Speech/session mode button.
+                ## END POSITION SLIDER/SELECTOR -------------------------------------------------------------------------------------------
+
+
+
+                ## ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK -------------------------------------------------------------------------
 
                 frame:
                     background None
@@ -935,8 +1040,10 @@ screen fom_saysomething_picker(say=True):
 
                         xmaximum 350
                         xfill True
-
                         spacing 10
+
+
+                        ## ENABLE SPEECH MODE BUTTON --------------------------------------------------------------------------------------
 
                         if picker.session is None:
                             textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
@@ -949,6 +1056,12 @@ screen fom_saysomething_picker(say=True):
                                                               _fom_saysomething.MAX_SESSION_SIZE),
                                             ok_button=_("OK"),
                                             ok_action=Function(picker.enable_session_mode))
+
+                        ## END ENABLE SPEECH MODE BUTTON ----------------------------------------------------------------------------------
+
+
+
+                        ## SESSION MODE RACK ----------------------------------------------------------------------------------------------
 
                         else:
                             textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
@@ -982,10 +1095,14 @@ screen fom_saysomething_picker(say=True):
                                 sensitive picker.session_switch_usable(forward=True)
                                 action Function(picker.session_switch_cursor, forward=True)
 
+                        ## END SESSION MODE RACK ------------------------------------------------------------------------------------------
+
+
+                ## END ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK ---------------------------------------------------------------------
 
             else:
 
-                # Presets menu.
+                ## PRESETS MENU -----------------------------------------------------------------------------------------------------------
 
                 frame:
                     xsize 370
@@ -1067,6 +1184,8 @@ screen fom_saysomething_picker(say=True):
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
                         xalign -0.07
+
+                ## END PRESETS MENU -------------------------------------------------------------------------------------------------------
 
         # Confirmation buttons area.
 
@@ -1231,6 +1350,11 @@ screen fom_saysomething_picker(say=True):
 
                 use quick_menu
 
+## END PICKER GUI LAYOUT AND DEFINITIONS --------------------------------------------------------------------------------------------------
+
+
+
+## CUSTOM SCREENS/MODALS ------------------------------------------------------------------------------------------------------------------
 
 # Modal screen used for entering new preset name.
 # NOTE: same as main screen refers to picker directly, in global scope.
@@ -1375,6 +1499,11 @@ screen fom_saysomething_confirm_modal(message, ok_button=_("Yes"), ok_action=Ret
                 textbutton no_button:
                     action no_action
 
+## END CUSTOM SCREENS/MODALS --------------------------------------------------------------------------------------------------------------
+
+
+
+## CUSTOM SCROLLABLE MENU WITH SEARCH BAR -------------------------------------------------------------------------------------------------
 
 init -10 python in _fom_saysomething_gui:
 
@@ -1413,6 +1542,7 @@ init -10 python in _fom_saysomething_gui:
     def reset_search_input():
         global speech_menu_query
         speech_menu_query = ""
+
 
 screen fom_saysomething_speech_menu:
 
@@ -1504,16 +1634,30 @@ screen fom_saysomething_speech_menu:
             value YScrollValue("viewport")
             xalign evhand.LEFT_XALIGN / 2 + 0.005
 
+## END CUSTOM SCROLLABLE MENU WITH SEARCH BAR ---------------------------------------------------------------------------------------------
 
+
+
+## PAUSE SCREEN IMPLEMENTATION ------------------------------------------------------------------------------------------------------------
+
+# We're using custom-made "pause" (which is basically just a screen with timer
+# and key handlers) because Ren'Py provides no ability to use pause statement
+# and let player click and skip it. This screen does what we need pause to do,
+# when called with 'call screen', it waits for the specified duration and
+# returns, optionally can be interrupted by pressing any key from 'dismiss'
+# key mapping (e.g. left click, enter, space, etc.)
 screen fom_skippable_pause(duration=1.0):
 
     # NOTE: For reference, here's zorders of other screens used in MAS.
     # When deciding zorder, these were taken into account (must be able to click
     # other things on the screen when pausing.)
-    # Music selector  zorder: 200 MODAL
-    # Say screen      zorder: 60
-    # Hotkey buttons  zorder: 50
-    # Calendar screen zorder: 6
+    # - Music selector  zorder: 200 modal
+    # - Textbox screen  zorder: 60  not modal
+    # - Hotkey buttons  zorder: 50  not modal
+    # - Calendar screen zorder: 6   not modal
+
+    # Since out pause screen must be clickable, but must not interfere with
+    # other UI elements, let it have the lowest z-order.
     zorder -100
 
     # Wait for timer and return True, since pause went uninterrupted.
@@ -1529,3 +1673,5 @@ screen fom_skippable_pause(duration=1.0):
     # was interrupted by player keypress.
     for _key in config.keymap["dismiss"]:
         key _key action Return(False)
+
+## END PAUSE SCREEN IMPLEMENTATION --------------------------------------------------------------------------------------------------------
