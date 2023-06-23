@@ -9,7 +9,6 @@ define persistent._fom_saysomething_speech_mode_default = False
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
-    $ pose_delay = "{:.2f}".format(persistent._fom_saysomething_pose_pause)
 
     vbox:
         style_prefix "check"
