@@ -384,7 +384,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
 
     # Before finishing with performance, restore GUI visibility and cleanup.
     $ _fom_saysomething.set_mas_gui_visible(True)
-    $ del state_i, pose_5, exp, session, poses, pos, text
+    $ del state_i, pose_5, exp, poses, pos, text
     return
 
 

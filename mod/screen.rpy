@@ -304,17 +304,11 @@ init 100 python in _fom_saysomething:
                 # default, her usual middle screen position.
                 self.position = POSITIONS[4][0]
 
-                # Adjustment object to define slider properties for position slider
-                # and handle value changes.
-                self.position_adjustment = ui.adjustment(
-                    range=len(POSITIONS) - 1,
-                    value=4,
-                    adjustable=True,
-                    changed=self.on_position_change
-                )
+                # Position cursor, an index to POSITIONS list to pick position by.
+                self.position_cursor = 4
 
                 # Set GUI flip.
-                self.gui_flip = self.position_adjustment.value > 4
+                self.gui_flip = self.position_cursor > 4
 
             if reset_text:
                 # Variable that stores entered user text prompt.
@@ -328,7 +322,7 @@ init 100 python in _fom_saysomething:
         def _save_state(self):
             return (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
+                self.position_cursor,  #1 - position
                 self.text  #2 - text
             )
 
@@ -339,7 +333,7 @@ init 100 python in _fom_saysomething:
             self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
 
             # Load position
-            self.position_adjustment.value = pos
+            self.position_cursor = pos
             self.on_position_change(pos)
 
             # Load text
@@ -422,19 +416,74 @@ init 100 python in _fom_saysomething:
 
         def get_position_label(self):
             """
-            Returns human readable (tXX notation) position label for position.
+            Returns human readable (cursor + 1 or tXX notation depending on
+            user preferences) position label for position.
 
             OUT:
                 str:
-                    Position label if user wants to display expression codes.
-
-                None:
-                    If user does not need to display expression codes.
+                    Position label.
             """
 
             if self.is_show_code():
-                return get_position_code(self.position_adjustment.value)
-            return None
+                return POSITIONS[self.position_cursor][1]
+            return "#" + str(self.position_cursor + 1)
+
+        def position_switch_usable(self, forward):
+            """
+            Returns if position switch (backward or forward) is usable and
+            should be sensitive.
+
+            IN:
+                forward -> bool:
+                    True if forward, False if backward.
+
+            OUT:
+                True:
+                    True if can increment/decrement, False otherwise.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+            if forward:
+                return curr < _max
+            else:
+                return curr > 0
+
+        def position_switch_selector(self, forward):
+            """
+            Switches position forward or backward. If cursor reaches zero or max
+            value, prevents it from going further.
+
+            IN:
+                forward -> bool:
+                    True if to increment, False to decrement.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+
+            new = curr
+            if forward:
+                if curr != _max:
+                    new = curr + 1
+            else:
+                if curr != 0:
+                    new = curr - 1
+
+            self.position_cursor = new
+            self.position = POSITIONS[self.position_cursor][0]
+            self.gui_flip = self.position_cursor > 4
+            return RETURN_RENDER
 
         ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
 
@@ -1018,12 +1067,30 @@ screen fom_saysomething_picker(say=True):
                         xmaximum 350
                         xfill True
 
-                        text _("Position")
-                        bar:
+                        # Split into two hboxes to align arrows and labels
+                        # properly, so that one can click them without
+                        # missing if label is too big; this layout preserves
+                        # space for big labels.
+
+                        hbox:
+                            xfill True
+                            xmaximum 110
+                            text "Position"
+
+                        hbox:
+                            xmaximum 240
+                            xfill True
                             xalign 1.0
-                            yalign 0.5
-                            adjustment picker.position_adjustment
-                            released Return(_fom_saysomething.RETURN_RENDER)
+
+                            textbutton "<":
+                                xalign 0.0
+                                action Function(picker.position_switch_selector, forward=False)
+                                sensitive picker.position_switch_usable(forward=False)
+                            text picker.get_position_label() xalign 0.5
+                            textbutton ">":
+                                xalign 1.0
+                                action Function(picker.position_switch_selector, forward=True)
+                                sensitive picker.position_switch_usable(forward=True)
 
                 ## END POSITION SLIDER/SELECTOR -------------------------------------------------------------------------------------------
 
@@ -1265,24 +1332,28 @@ screen fom_saysomething_picker(say=True):
     vbox:
         align (0.99, 0.977)
         xsize 210
+        spacing 10
 
-        # Have to use this to make buttons 'togglable.'
-        style_prefix "check_scrollable_menu"
-
-        textbutton _("Reset Pose"):
+        hbox:
             style_prefix "fom_saysomething_confirm"
-            xysize (210, None)
-            action Function(picker._reset_state)
 
-        textbutton _("Show Q. Menu"):
-            xysize (210, None)
+            textbutton _("Reset Pose"):
+                xysize (210, None)
+                action Function(picker._reset_state)
 
-            # Make this persist, so player doesn't have to always toggle it
-            selected not persistent._fom_saysomething_hide_quick_buttons
+        hbox:
+            # Have to use this to make buttons 'togglable.'
+            style_prefix "check_scrollable_menu"
 
-            action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
-                    Function(_fom_saysomething.set_mas_gui_visible,
-                            persistent._fom_saysomething_hide_quick_buttons)]
+            textbutton _("Show Q. Menu"):
+                xysize (210, None)
+
+                # Make this persist, so player doesn't have to always toggle it
+                selected not persistent._fom_saysomething_hide_quick_buttons
+
+                action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
+                        Function(_fom_saysomething.set_mas_gui_visible,
+                                 persistent._fom_saysomething_hide_quick_buttons)]
 
         # textbutton _("Lock Blinking"):
         #     xysize (210, None)
@@ -1301,11 +1372,11 @@ screen fom_saysomething_picker(say=True):
     # of pressing 'Pose'. When in session mode, this will add current state to
     # the session.
 
-    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say) capture True
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say)
 
     if say:
         # This handles Enter key press and adds a new line.
-        key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
+        key "noshift_K_RETURN" action Function(picker.on_enter_press)
 
         window:
             align (0.5, 0.99)
