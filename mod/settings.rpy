@@ -17,7 +17,7 @@ screen fom_saysomething_settings:
         xfill True
         xmaximum 800
 
-        grid 2 2:
+        hbox:
             textbutton _("Show expression code"):
                 selected persistent._fom_saysomething_show_code
                 action ToggleField(persistent, "_fom_saysomething_show_code")
