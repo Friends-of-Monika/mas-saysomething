@@ -283,7 +283,7 @@ init -200 python in _fom_saysomething:
 
             self.cache[sprite] = None
             if len(self.cache) > self.capacity:
-                _, exp = self.cache.popitem(last=False)
+                exp, _ = self.cache.popitem(last=False)
                 remove_renpy_image(exp)
 
         def release_all(self):
