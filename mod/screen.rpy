@@ -47,6 +47,7 @@ init 100 python in _fom_saysomething:
     from store import ui, persistent
     from store import FieldInputValue
     from store import MASMoniBlinkTransform, MASMoniWinkTransform
+    from store import pygame
 
     from collections import OrderedDict
 
@@ -165,6 +166,44 @@ init 100 python in _fom_saysomething:
                 code.append(value)
         return "".join(code)
 
+    def get_pose_cursors(sprite_code):
+        """
+        Generate pose cursors for a sprite code.
+
+        IN:
+            sprite_code -> str:
+                MAS sprite code for Monika's pose.
+
+        OUT:
+            pose_cursors -> dict[str, int]:
+                Pose cursor dictionary.
+        """
+        # Flatten the EXPR_MAP into a dictionary for easier search
+        flat_map = {}
+        for key, data in EXPR_MAP.items():
+            _, values = data
+            for i, (code, _) in enumerate(values):
+                if code is not None:
+                    flat_map[code] = (key, i)
+
+        # Sort the codes by length in descending order for greedy matching
+        sorted_codes = sorted(flat_map.keys(), key=len, reverse=True)
+
+        # Initialize pose_cursors with all keys from EXPR_MAP set to 0
+        pose_cursors = {key: 0 for key in EXPR_MAP.keys()}
+
+        while sprite_code:
+            for code in sorted_codes:
+                if sprite_code.startswith(code):
+                    key, cursor = flat_map[code]
+                    pose_cursors[key] = cursor
+                    sprite_code = sprite_code[len(code):]
+                    break
+            else:
+                raise ValueError(f"Unknown code in sprite_code: {sprite_code}")
+
+        return pose_cursors
+
     ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
 
 
@@ -236,6 +275,9 @@ init 100 python in _fom_saysomething:
 
     # Cache object to track and release images.
     IMAGE_CACHE = MoniSpriteCache(MAX_CACHED_IMAGES)
+
+    # Maximum length of processable clipboard content.
+    MAX_CLIP_INPUT = 32
 
     ## END SESSION FUNCTIONS/CONSTANTS ----------------------------------------------------------------------------------------------------
 
@@ -330,7 +372,7 @@ init 100 python in _fom_saysomething:
             pose_cur, pos, text = state
 
             # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
+            self._load_pose_cursors(pose_cur)
 
             # Load position
             self.position_cursor = pos
@@ -341,6 +383,9 @@ init 100 python in _fom_saysomething:
             self.on_text_change(text)
 
             return RETURN_RENDER
+
+        def _load_pose_cursors(self, pose_cursors):
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cursors.items()}
 
         ## END PICKER STATE MANAGEMENT FUNCTIONS ------------------------------------------------------------------------------------------
 
@@ -483,6 +528,48 @@ init 100 python in _fom_saysomething:
             self.position_cursor = new
             self.position = POSITIONS[self.position_cursor][0]
             self.gui_flip = self.position_cursor > 4
+            return RETURN_RENDER
+
+        def select_from_clipboard(self):
+            """
+            Receives text from clipboard and parses expression code from it.
+            If text is longer than MAX_CLIP_INPUT, returns None.
+            If syntax is incorrect, returns None.
+
+            OUT:
+                None:
+                    Returns None on failure.
+                RETURN_RENDER:
+                    Returns RETURN_RENDER on success.
+            """
+
+            clip = pygame.scrap.get(pygame.SCRAP_TEXT)
+            if len(clip) > MAX_CLIP_INPUT:
+                return
+
+            clip = clip.decode("utf-8")
+
+            try:
+                cursors = get_pose_cursors(clip)
+                if not cursors:
+                    return
+            except ValueError:
+                return
+
+            self._load_pose_cursors(cursors)
+            return RETURN_RENDER
+
+        def copy_to_clipboard(self):
+            """
+            Retrieves sprite code from pickers state and saves it to clipboard.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER.
+            """
+
+            code = get_sprite_code(self.pose_cursors)
+            pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
             return RETURN_RENDER
 
         ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
@@ -1328,7 +1415,23 @@ screen fom_saysomething_picker(say=True):
         xsize 210
         spacing 10
 
+        # Have to use this to make buttons 'togglable.'
+        style_prefix "check_scrollable_menu"
+
         hbox:
+            style_prefix "fom_saysomething_confirm"
+            xysize (210, None)
+            spacing 5
+
+            textbutton _("Copy"):
+                xysize(103, None)
+                action Function(picker.copy_to_clipboard)
+
+            textbutton _("Paste"):
+                xysize(102, None)
+                action Function(picker.select_from_clipboard)
+
+        textbutton _("Reset Pose"):
             style_prefix "fom_saysomething_confirm"
 
             textbutton _("Reset Pose"):
