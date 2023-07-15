@@ -569,7 +569,7 @@ init 100 python in _fom_saysomething:
             """
 
             code = get_sprite_code(self.pose_cursors)
-            pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
+            pygame.scrap.put(pygame.SCRAP_TEXT, code.encode("utf-8"))
             return RETURN_RENDER
 
         ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
