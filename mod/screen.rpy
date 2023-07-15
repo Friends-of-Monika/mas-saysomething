@@ -1306,12 +1306,6 @@ screen fom_saysomething_picker(say=True):
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
                         selected False
-                    if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
-                                                    title=_("Delete this preset?"),
-                                                    message=picker.preset_name,
-                                                    ok_button=_("Delete"),
-                                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
@@ -1373,6 +1367,16 @@ screen fom_saysomething_picker(say=True):
     # the session.
 
     key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say)
+
+    ## It's necessary to put keys *here* and not where they're actually used...
+    ## Because thanks to Ren'Py, keys somehow affect spacing.
+
+    if picker.presets_menu and picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
+                                    title=_("Delete this preset?"),
+                                    message=picker.preset_name,
+                                    ok_button=_("Delete"),
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
     if say:
         # This handles Enter key press and adds a new line.
