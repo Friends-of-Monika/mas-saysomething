@@ -200,7 +200,7 @@ init 100 python in _fom_saysomething:
                     sprite_code = sprite_code[len(code):]
                     break
             else:
-                raise ValueError(f"Unknown code in sprite_code: {sprite_code}")
+                raise ValueError(sprite_code)
 
         return pose_cursors
 
@@ -1431,7 +1431,7 @@ screen fom_saysomething_picker(say=True):
                 xysize(102, None)
                 action Function(picker.select_from_clipboard)
 
-        textbutton _("Reset Pose"):
+        hbox:
             style_prefix "fom_saysomething_confirm"
 
             textbutton _("Reset Pose"):
