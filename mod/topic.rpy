@@ -440,7 +440,7 @@ init 5 python:
             persistent.event_database,
             eventlabel="fom_saysomething_speeches_generate",
             category=["misc", "monika"],
-            prompt="Can you generate a topic from one of the speeches?",
+            prompt="Can you write a script for one of the speeches?",
             pool=True,
             unlocked=False,
 
