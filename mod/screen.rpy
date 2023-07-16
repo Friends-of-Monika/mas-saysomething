@@ -902,6 +902,7 @@ init 100 python in _fom_saysomething:
 
             self.position = POSITIONS[value][0]
             self.gui_flip = value > 5
+            self.changed = True
 
         def on_text_change(self, value):
             """
