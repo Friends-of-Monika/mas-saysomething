@@ -1436,7 +1436,7 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            spacing 5
+            spacing 10
 
             textbutton _("Copy"):
                 xysize(100, None)
