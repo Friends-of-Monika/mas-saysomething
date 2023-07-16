@@ -532,6 +532,7 @@ init 100 python in _fom_saysomething:
             self.position_cursor = new
             self.position = POSITIONS[self.position_cursor][0]
             self.gui_flip = self.position_cursor > 4
+            self.changed = True
             return RETURN_RENDER
 
         def select_from_clipboard(self):
