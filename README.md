@@ -1,5 +1,8 @@
-<h1 align="center">🗨️ Say Something Submod</h1>
-<h3 align="center">Ask your Monika to say something and pose for you~</h3>
+<p align="center">
+  <img src="doc/SaySomething.png"
+       width="320" height="320">
+  <h3 align="center">Ask your Monika to say something and pose for you~</h3>
+</p>
 
 <p align="center">
   <a href="https://github.com/friends-of-monika/mas-saysomething/releases/latest">
@@ -33,8 +36,19 @@
 
 ## 🖼️ Screenshots
 
-![Monika is wondering, what is that menu...][12]
-![Monika is impressed][13]
+<details>
+  <summary>Show all screenshots...</summary>
+  <table>
+    <tr>
+      <td><img src="doc/screenshots/Screenshot0.png" alt="GUI example"></td>
+      <td><img src="doc/screenshots/Screenshot1.png" alt="Topics overview"></td>
+    </tr>
+    <tr>
+      <td><img src="doc/screenshots/Screenshot2.png" alt="Speech saving"></td>
+      <td><img src="doc/screenshots/Screenshot3.png" alt="Generating topic"></td>
+    </tr>
+  </table>
+</details>
 
 ## ❓ Installing
 
@@ -75,6 +89,8 @@ We're up to chat! Come join submod author's Discord server [here][8].
 [8]: https://dcache.me/discord
 [9]: https://mon.icu/discord
 [10]: https://discordapp.com/api/guilds/1029849988953546802/widget.png?style=banner3
-[12]: doc/screenshots/1.png
-[13]: doc/screenshots/2.png
+[12]: doc/screenshots/Screenshot0.png
+[13]: doc/screenshots/Screenshot1.png
 [14]: https://github.com/mayday-mayjay
+[15]: doc/screenshots/Screenshot2.png
+[16]: doc/screenshots/Screenshot3.png

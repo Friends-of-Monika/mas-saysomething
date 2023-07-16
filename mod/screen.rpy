@@ -722,7 +722,7 @@ init 100 python in _fom_saysomething:
                     self._load_state(self.session[self.session_cursor])
                 else:
                     self.session_cursor = len(self.session)
-                    self._reset_state()
+                    self._reset_state(reset_pose=False, reset_text=True)
                 return RETURN_RENDER
             else:
                 if self.session_cursor > 0:
