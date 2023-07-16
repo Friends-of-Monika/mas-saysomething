@@ -4,27 +4,42 @@
 # This file is part of Say Something (see link below):
 # https://github.com/friends-of-monika/mas-saysomething
 
-# Presets dictionary with premade presets.
-define persistent._fom_saysomething_presets = {
+
+
+## PRESETS DICTIONARY DEFINITION ----------------------------------------------------------------------------------------------------------
+
+# Presets dictionary with premade presets. Structure is the following:
+# String key (warning: shown to user!), tuple value.
+# Tuple contains three items:
+# 1. Pose selectors dictionary (scroll to poses dictionary for more info)
+# 2. Position ID (again, scroll down to see positions)
+# 3. Text she says (always present and non None)
+
+default persistent._fom_saysomething_presets = {
     # Presets by dreamscached
-    "Hey, everyone!": ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
-    "Sparkly pretty eyes": ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
-    "Daydreaming": ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
-    "Fact of the day": ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!"),
-    "Angry Monika": ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that..."),
-    "I love you": ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much..."),
-    "How embarrassing": ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha..."),
-    "Asking you out": ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~"),
-    "Feeling singy": ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
+    "Hey, everyone!":           ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
+    "Sparkly pretty eyes":      ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
+    "Daydreaming":              ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
+    "Fact of the day":          ({"pose": 6, "eyes": 7, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Here's another fun fact of the day!"),
+    "Angry Monika":             ({"pose": 1, "eyes": 3, "eyebrows": 1, "blush": 0, "tears": 0, "sweat": 0, "mouth": 2}, 4, "You should not have done that..."),
+    "I love you":               ({"pose": 4, "eyes": 0, "eyebrows": 2, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "I... I love you so much..."),
+    "How embarrassing":         ({"pose": 1, "eyes": 6, "eyebrows": 2, "blush": 0, "tears": 0, "sweat": 1, "mouth": 1}, 4, "I really hope you didn't mind that, ahaha..."),
+    "Asking you out":           ({"pose": 2, "eyes": 7, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 0}, 4, "Got any plans for this evening?~"),
+    "Feeling singy":            ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
     "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
     # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
-    "Sulks to you": ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
-    "Thinking deep": ({"eyebrows": 4, "eyes": 5, "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
-    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0, "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
-    "In loving worries": ({"eyebrows": 2, "eyes": 0, "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..")
+    "Sulks to you":        ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
+    "Thinking deep":       ({"eyebrows": 4, "eyes": 5,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
+    "Bringing up a topic": ({"eyebrows": 0, "eyes": 0,  "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
+    "In loving worries":   ({"eyebrows": 2, "eyes": 0,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 1, "tears": 0}, 4, "Honey, is everything alright?..")
 }
 
+## END PRESETS DICTIONARY DEFINITION ------------------------------------------------------------------------------------------------------
+
+
+
+## PICKER CLASS, CONSTANTS, POSES/POSITIONS -----------------------------------------------------------------------------------------------
 
 init -200 python in mas_ui:
     import store
@@ -34,12 +49,13 @@ init -200 python in mas_ui:
 
 
 init 100 python in _fom_saysomething:
+
     import store
     from store import ui, persistent
     from store import FieldInputValue
     from store import MASMoniBlinkTransform, MASMoniWinkTransform
+    from store import pygame
 
-    import math
     from collections import OrderedDict
 
 
@@ -56,6 +72,8 @@ init 100 python in _fom_saysomething:
     RETURN_DONE = 1
 
 
+    ## POSE SELECTORS DICTIONARY ----------------------------------------------------------------------------------------------------------
+
     # Orderect dictionary is used to preserve order when rendering a table of
     # selectors. This dictionary has the following structure:
     #  [key] -> tuple:
@@ -63,71 +81,141 @@ init 100 python in _fom_saysomething:
     #    [1] -> tuple:
     #      [0]: expression code/mnemonic
     #      [1]: expression human readable description
+
     EXPR_MAP = OrderedDict([
-        ("pose", ("Pose", [
-            ("1", "Rest on hands"),
-            ("2", "Cross"),
-            ("3", "Point right, rest"),
-            ("4", "Point right"),
-            ("5", "Lean"),
-            ("6", "Down"),
-            ("7", "Point right, down")
+        ("pose", (_("Pose"), [
+            ("1", _("Rest on hands")),
+            ("2", _("Cross")),
+            ("3", _("Point right, rest")),
+            ("4", _("Point right")),
+            ("5", _("Lean")),
+            ("6", _("Down")),
+            ("7", _("Point right, down"))
         ])),
-        ("eyes", ("Eyes", [
-            ("e", "Normal"),
-            ("w", "Wide"),
-            ("s", "Sparkle"),
-            ("t", "Smug"),
-            ("c", "Crazy"),
-            ("r", "Look right"),
-            ("l", "Look left"),
-            ("h", "Closed, happy"),
-            ("d", "Closed, sad"),
-            ("k", "Wink left"),
-            ("n", "Wink right"),
-            ("f", "Soft"),
-            ("m", "Smug, left"),
-            ("g", "Smug, right")
+        ("eyes", (_("Eyes"), [
+            ("e", _("Normal")),
+            ("w", _("Wide")),
+            ("s", _("Sparkle")),
+            ("t", _("Smug")),
+            ("c", _("Crazy")),
+            ("r", _("Look right")),
+            ("l", _("Look left")),
+            ("h", _("Closed, happy")),
+            ("d", _("Closed, sad")),
+            ("k", _("Wink left")),
+            ("n", _("Wink right")),
+            ("f", _("Soft")),
+            ("m", _("Smug, left")),
+            ("g", _("Smug, right"))
         ])),
-        ("eyebrows", ("Eyebrows", [
-            ("u", "Up"),
-            ("f", "Furrowed"),
-            ("k", "Knit"),
-            ("s", "Straight"),
-            ("t", "Thinking")
+        ("eyebrows", (_("Eyebrows"), [
+            ("u", _("Up")),
+            ("f", _("Furrowed")),
+            ("k", _("Knit")),
+            ("s", _("Straight")),
+            ("t", _("Thinking"))
         ])),
-        ("blush", ("Blush", [
-            (None, "None"),
-            ("bl", "Line"),
-            ("bs", "Shade"),
-            ("bf", "Full")
+        ("blush", (_("Blush"), [
+            (None, _("None")),
+            ("bl", _("Line")),
+            ("bs", _("Shade")),
+            ("bf", _("Full"))
         ])),
-        ("tears", ("Tears", [
-            (None, "None"),
-            ("ts", "Streaming"),
-            ("td", "Dried"),
-            ("tp", "Pooled"),
-            ("tu", "Tearing up")
+        ("tears", (_("Tears"), [
+            (None, _("None")),
+            ("ts", _("Streaming")),
+            ("td", _("Dried")),
+            ("tp", _("Pooled")),
+            ("tu", _("Tearing up"))
         ])),
-        ("sweat", ("Sweat", [
-            (None, "None"),
-            ("sdl", "Left cheek"),
-            ("sdr", "Right cheek"),
+        ("sweat", (_("Sweat"), [
+            (None, _("None")),
+            ("sdl", _("Left cheek")),
+            ("sdr", _("Right cheek")),
         ])),
-        ("mouth", ("Mouth", [
-            ("a", "Smile, closed"),
-            ("b", "Smile, open"),
-            ("c", "Straight"),
-            ("d", "Open"),
-            ("o", "Gasp"),
-            ("u", "Smug"),
-            ("w", "Wide"),
-            ("x", "Grit teeth"),
-            ("p", "Pout"),
-            ("t", "Triangle")
+        ("mouth", (_("Mouth"), [
+            ("a", _("Smile, closed")),
+            ("b", _("Smile, open")),
+            ("c", _("Straight")),
+            ("d", _("Open")),
+            ("o", _("Gasp")),
+            ("u", _("Smug")),
+            ("w", _("Wide")),
+            ("x", _("Grit teeth")),
+            ("p", _("Pout")),
+            ("t", _("Triangle"))
         ]))
     ])
 
+
+    def get_sprite_code(pose_cursors):
+        """
+        Generate sprite code for a dictionary of pose cursors (see above for
+        detailed declaration of keys and IDs.)
+
+        IN:
+            post_cursors -> dict[str, int]:
+                Pose cursor dictionary.
+
+        OUT:
+            str:
+                MAS sprite code for Monika's pose.
+        """
+
+        code = list()
+        for key, data in EXPR_MAP.items():
+            _, values = data
+            cursor = pose_cursors[key]
+            if isinstance(cursor, tuple):
+                cursor = cursor[0]
+            value = values[cursor][0]
+            if value is not None:
+                code.append(value)
+        return "".join(code)
+
+    def get_pose_cursors(sprite_code):
+        """
+        Generate pose cursors for a sprite code.
+
+        IN:
+            sprite_code -> str:
+                MAS sprite code for Monika's pose.
+
+        OUT:
+            pose_cursors -> dict[str, int]:
+                Pose cursor dictionary.
+        """
+        # Flatten the EXPR_MAP into a dictionary for easier search
+        flat_map = {}
+        for key, data in EXPR_MAP.items():
+            _, values = data
+            for i, (code, _) in enumerate(values):
+                if code is not None:
+                    flat_map[code] = (key, i)
+
+        # Sort the codes by length in descending order for greedy matching
+        sorted_codes = sorted(flat_map.keys(), key=len, reverse=True)
+
+        # Initialize pose_cursors with all keys from EXPR_MAP set to 0
+        pose_cursors = {key: 0 for key in EXPR_MAP.keys()}
+
+        while sprite_code:
+            for code in sorted_codes:
+                if sprite_code.startswith(code):
+                    key, cursor = flat_map[code]
+                    pose_cursors[key] = cursor
+                    sprite_code = sprite_code[len(code):]
+                    break
+            else:
+                raise ValueError(f"Unknown code in sprite_code: {sprite_code}")
+
+        return pose_cursors
+
+    ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
+
+
+
+    ## POSITIONS LIST ---------------------------------------------------------------------------------------------------------------------
 
     # Positions list containing Monika table positions from leftmost [0] to
     # rightmost [9]. Items are usable with renpy.show(..., at=list[...]) call.
@@ -138,7 +226,7 @@ init 100 python in _fom_saysomething:
         (store.t42, "t42"), #3
 
         (store.t11, "t11"), #4, default middle screen position
-#       (store.t32, "t32"), # formerly #5, same as #4 so no need to keep it here
+       #(store.t32, "t32"), # formerly #5, same as #4 so no need to keep it here
         (store.t43, "t43"), #5
 
         (store.t22, "t22"), #6
@@ -147,6 +235,62 @@ init 100 python in _fom_saysomething:
         (store.t44, "t44")  #8
     ]
 
+    def get_position_code(position_cursor):
+        """
+        Gets position identifier for given Monika's position (see above for IDs
+        and naming of the positions.)
+
+        IN:
+            position_cursor -> int:
+                ID of the position Monika is at.
+
+        OUT:
+            str:
+                Name of Monika's position.
+        """
+
+        return POSITIONS[position_cursor][1]
+
+    ## END POSITIONS LIST -----------------------------------------------------------------------------------------------------------------
+
+
+
+    ## SESSION FUNCTIONS/CONSTANTS --------------------------------------------------------------------------------------------------------
+
+    def get_session_expressions(session):
+        """
+        Returns set of unique expressions used in the given session.
+
+        IN:
+            session -> <Picker session>:
+                Session to extract sprite codes from.
+
+        OUT:
+            set[str]:
+                Set of spritecodes.
+        """
+
+        return set(map(lambda it: get_sprite_code(it[0]), session))
+
+
+    # Need this limitation because else we'll quickly run out of memory.
+    MAX_SESSION_SIZE = 100
+
+    # How many images can we allow Ren'Py to keep in memory before we
+    # clean them up to reduce memory consumption?
+    MAX_CACHED_IMAGES = 64
+
+    # Cache object to track and release images.
+    IMAGE_CACHE = MoniSpriteCache(MAX_CACHED_IMAGES)
+
+    # Maximum length of processable clipboard content.
+    MAX_CLIP_INPUT = 32
+
+    ## END SESSION FUNCTIONS/CONSTANTS ----------------------------------------------------------------------------------------------------
+
+
+
+    ## PICKER OBJECT AND METHODS ----------------------------------------------------------------------------------------------------------
 
     class Picker(object):
         """
@@ -193,8 +337,77 @@ init 100 python in _fom_saysomething:
             self.session = None
             self.session_cursor = 0
 
-            # Delay between changing poses.
-            self.pose_delay = persistent._fom_saysomething_pose_pause
+            # Flag to indicate that any changes were made to ask for confirmation
+            self.changed = False
+
+
+        ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
+
+        def _reset_state(self, reset_pose=True, reset_text=True):
+            if reset_pose:
+                # This dictionary contains key to 2-tuple of:
+                #  [0]: current expression cursor index
+                #  [1]: current expression human readable name
+                # Initially all cursors are at zero (with corresponding expression names.)
+                self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+
+                # Position object to use when showing Monika at her table. By
+                # default, her usual middle screen position.
+                self.position = POSITIONS[4][0]
+
+                # Adjustment object to define slider properties for position slider
+                # and handle value changes.
+                self.position_adjustment = ui.adjustment(
+                    range=len(POSITIONS) - 1,
+                    value=4,
+                    adjustable=True,
+                    changed=self.on_position_change
+                )
+
+                # Set GUI flip.
+                self.gui_flip = self.position_adjustment.value > 4
+
+            if reset_text:
+                # Variable that stores entered user text prompt.
+                self.text = ""
+
+                # Ren'Py input value to allow disabling text input when needed.
+                self.text_value = FieldInputValue(self, "text", returnable=False)
+
+            return RETURN_RENDER
+
+        def _save_state(self):
+            return (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_adjustment.value,  #1 - position
+                self.text  #2 - text
+            )
+
+        def _load_state(self, state):
+            pose_cur, pos, text = state
+
+            # Load selectors
+            self._load_pose_cursors(pose_cur)
+
+            # Load position
+            self.position_adjustment.value = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            self.changed = True
+            return RETURN_RENDER
+
+        def _load_pose_cursors(self, pose_cursors):
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cursors.items()}
+
+        ## END PICKER STATE MANAGEMENT FUNCTIONS ------------------------------------------------------------------------------------------
+
+
+
+        ## POSE/EXPRESSION SELECTOR FUNCTIONS ---------------------------------------------------------------------------------------------
 
         def pose_switch_selector(self, key, forward):
             """
@@ -232,6 +445,7 @@ init 100 python in _fom_saysomething:
 
             # This is equivalent to using Return(RETURN_RENDER) action.
             # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
+            self.changed = True
             return RETURN_RENDER
 
         def get_pose_label(self, key):
@@ -331,13 +545,56 @@ init 100 python in _fom_saysomething:
                     Sprite code for use in renpy.show(...)
             """
 
-            code = list()
-            for key, data in EXPR_MAP.items():
-                _, values = data
-                value = values[self.pose_cursors[key][0]][0]
-                if value is not None:
-                    code.append(value)
-            return "".join(code)
+            return get_sprite_code(self.pose_cursors)
+
+        def select_from_clipboard(self):
+            """
+            Receives text from clipboard and parses expression code from it.
+            If text is longer than MAX_CLIP_INPUT, returns None.
+            If syntax is incorrect, returns None.
+
+            OUT:
+                None:
+                    Returns None on failure.
+                RETURN_RENDER:
+                    Returns RETURN_RENDER on success.
+            """
+
+            clip = pygame.scrap.get(pygame.SCRAP_TEXT)
+            if len(clip) > MAX_CLIP_INPUT:
+                return
+
+            clip = clip.decode("utf-8")
+
+            try:
+                cursors = get_pose_cursors(clip)
+                if not cursors:
+                    return
+            except ValueError:
+                return
+
+            self._load_pose_cursors(cursors)
+            self.changed = True
+            return RETURN_RENDER
+
+        def copy_to_clipboard(self):
+            """
+            Retrieves sprite code from pickers state and saves it to clipboard.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returns RETURN_RENDER.
+            """
+
+            code = get_sprite_code(self.pose_cursors)
+            pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
+            return RETURN_RENDER
+
+        ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
+
+
+
+        ## VARIOUS CHECK FUNCTIONS --------------------------------------------------------------------------------------------------------
 
         def is_text_empty(self):
             """
@@ -382,6 +639,12 @@ init 100 python in _fom_saysomething:
             """
 
             return persistent._fom_saysomething_show_code
+
+        ## END VARIOUS CHECK FUNCTIONS ----------------------------------------------------------------------------------------------------
+
+
+
+        ## PRESET RELATED FUNCTION --------------------------------------------------------------------------------------------------------
 
         def get_presets(self, query):
             """
@@ -501,7 +764,6 @@ init 100 python in _fom_saysomething:
             # visual track of current preset.)
             self.preset_name = name
             self.preset_cursor = name
-
             return self._load_state(persistent._fom_saysomething_presets[name])
 
         def delete_preset(self, name):
@@ -517,6 +779,12 @@ init 100 python in _fom_saysomething:
 
             self.preset_name = ""
             self.preset_cursor = None
+
+        ## END PRESET RELATED FUNCTION ----------------------------------------------------------------------------------------------------
+
+
+
+        ## SESSION MODE RELATED FUNCTIONS -------------------------------------------------------------------------------------------------
 
         def enable_session_mode(self):
             """
@@ -581,12 +849,21 @@ init 100 python in _fom_saysomething:
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
+
+            RAISES:
+                ValueError:
+                    If session entries count is too big.
             """
+
+            if self.is_session_maximum_reached():
+                raise ValueError("Maximum count of session entries reached.")
 
             self.session.append(self._save_state())
             self.session_cursor += 1
-            self._reset_state()
 
+            # NOTE: reset just text, not pose
+            self._reset_state(reset_pose=False, reset_text=True)
+            self.changed = True
             return RETURN_RENDER
 
         def edit_session_item(self):
@@ -653,6 +930,26 @@ init 100 python in _fom_saysomething:
                 return False
             return self.session_cursor != len(self.session)
 
+        def is_session_maximum_reached(self):
+            """
+            Checks if the session has reached its maximum capacity.
+
+            OUT:
+                True:
+                    If the session is full and has reached the maximum size.
+
+                False:
+                    If the session has not yet reached the maximum size.
+            """
+
+            return not (len(self.session) < MAX_SESSION_SIZE)
+
+        ## END SESSION MODE RELATED FUNCTIONS -------------------------------------------------------------------------------------------------
+
+
+
+        ## GUI CALLBACK FUNCTIONS ---------------------------------------------------------------------------------------------------------
+
         def on_position_change(self, value):
             """
             Callback function for position bar.
@@ -666,6 +963,7 @@ init 100 python in _fom_saysomething:
 
             self.position = POSITIONS[value][0]
             self.gui_flip = value > 5
+            self.changed = True
 
         def on_text_change(self, value):
             """
@@ -678,6 +976,8 @@ init 100 python in _fom_saysomething:
             """
 
             self.text = value
+            if len(self.text) > 0:
+                self.changed = True
             renpy.restart_interaction()
 
         def on_shift_enter_press(self, say):
@@ -728,6 +1028,7 @@ init 100 python in _fom_saysomething:
 
             if self.text.count("\n") < 2:
                 self.text += "\n"
+            self.changed = True
             return RETURN_RENDER
 
         def on_search_input_change(self, value):
@@ -764,13 +1065,16 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
+
     # Declare picker as a variable.
     picker = None
 
-    # Boolean variable to tell if Monika is currently posing or not
-    # (used for locking/unlocking winking/blinking.)
-    posing = False
+    ## END PICKER OBJECT AND METHODS ------------------------------------------------------------------------------------------------------
 
+
+
+## STYLE CUSTOMIZATIONS/BACKPORTS ---------------------------------------------------------------------------------------------------------
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
 # Some elements have been adjusted for design of this submod's GUI.
@@ -809,6 +1113,11 @@ style fom_saysomething_titlebox_dark is default:
     ypos gui.name_ypos
     ysize gui.namebox_height
 
+## END STYLE CUSTOMIZATIONS/BACKPORTS -----------------------------------------------------------------------------------------------------
+
+
+
+## PICKER GUI LAYOUT AND DEFINITIONS ------------------------------------------------------------------------------------------------------
 
 # Expression/pose, location and say text picker GUI screen.
 # NOTE: in this screen, picker is referenced directly as it is implied that it
@@ -826,24 +1135,35 @@ screen fom_saysomething_picker(say=True):
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
 
     vbox:
-        # Flip GUI to prevent hiding Monika behind it.
+
+
+
+        ## GUI FLIP LOGIC -----------------------------------------------------------------------------------------------------------------
+
+        # Based on Monika's position, it's necessary to flip GUI
+        # to let user fully see Monika's pose and face.
+
         if not picker.gui_flip:
             if picker.is_show_code():
                 align (0.99, 0.07)
             else:
-                align (0.97, 0.2)
+                align (0.99, 0.2)
         else:
             if picker.is_show_code():
                 align (0.01, 0.07)
             else:
-                align (0.03, 0.2)
+                align (0.01, 0.2)
+
+        ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
+
+
+
+        ## POSE/EXRESSION SELECTORS PANEL -------------------------------------------------------------------------------------------------
 
         vbox:
             spacing 10
 
             if not picker.presets_menu:
-
-                # Selectors panel.
 
                 frame:
                     padding (10, 10)
@@ -862,7 +1182,7 @@ screen fom_saysomething_picker(say=True):
                                 hbox:
                                     xfill True
                                     xmaximum 110
-                                    text "Expression"
+                                    text _("Expression")
 
                                 hbox:
                                     xmaximum 240
@@ -870,7 +1190,7 @@ screen fom_saysomething_picker(say=True):
                                     xalign 1.0
 
                                     if picker.is_show_code():
-                                        text picker.get_sprite_code() + " at " + picker.get_position_label() xalign 0.5
+                                        text _("{0} at {1}").format(picker.get_sprite_code(), picker.get_position_label()) xalign 0.5
                                     else:
                                         text picker.get_sprite_code() xalign 0.5
 
@@ -898,7 +1218,11 @@ screen fom_saysomething_picker(say=True):
                                     text picker.get_pose_label(key) xalign 0.5
                                     textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
 
-                # Position selector panel.
+                ## END POSE/EXPRESSION SELECTORS PANEL ------------------------------------------------------------------------------------
+
+
+
+                ## POSITION SLIDER/SELECTOR -----------------------------------------------------------------------------------------------
 
                 frame:
                     padding (10, 10)
@@ -932,7 +1256,11 @@ screen fom_saysomething_picker(say=True):
                                 action Function(picker.position_switch_selector, forward=True)
                                 sensitive picker.position_switch_usable(forward=True)
 
-                # Speech/session mode button.
+                ## END POSITION SLIDER/SELECTOR -------------------------------------------------------------------------------------------
+
+
+
+                ## ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK -------------------------------------------------------------------------
 
                 frame:
                     background None
@@ -943,30 +1271,48 @@ screen fom_saysomething_picker(say=True):
 
                         xmaximum 350
                         xfill True
-
                         spacing 10
 
+
+                        ## ENABLE SPEECH MODE BUTTON --------------------------------------------------------------------------------------
+
                         if picker.session is None:
-                            textbutton "Enable " + ("speech" if say else "session") + " mode":
+                            textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
                                 xysize (370, None)
                                 action Show("fom_saysomething_confirm_modal",
-                                            title="Enable " + ("speech" if say else "session") + " mode?",
-                                            message="You will be able to save multiple " + ("sentences" if say else "poses") + " "
-                                                    "for Monika to do them one after another in a row.\n\n"
-                                                    "When done, click on {i}" + ("Say" if say else "Pose") + "{/i} button.\n\n"
-                                                    "{i}You can enable " + ("speech" if say else "session") + " mode by default in submod settings.{/i}",
-                                            ok_button="OK",
+                                            message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
+                                                      "click on {{i}}{1}{{/i}} button.\n\n"
+                                                      "{{i}}You can enable {0} mode by default in submod settings.{{/i}}")
+                                                      .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
+                                                              _fom_saysomething.MAX_SESSION_SIZE),
+                                            ok_button=_("OK"),
                                             ok_action=Function(picker.enable_session_mode))
 
+                        ## END ENABLE SPEECH MODE BUTTON ----------------------------------------------------------------------------------
+
+
+
+                        ## SESSION MODE RACK ----------------------------------------------------------------------------------------------
+
                         else:
-                            textbutton ("Add" if not picker.is_editing_session_item() else "Edit"):
+                            textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
                                 sensitive not say or not picker.is_text_empty()
                                 if picker.is_editing_session_item():
                                     action Function(picker.edit_session_item)
-                                else:
-                                    action Function(picker.add_session_item)
 
-                            textbutton "Remove":
+                                else:
+                                    if not picker.is_session_maximum_reached():
+                                        # While limit is not reached, keep adding iteams
+                                        action Function(picker.add_session_item)
+
+                                    else:
+                                        # When reached, show a nice message about it.
+                                        action Show("dialog",
+                                                    message=_("You have reached the maximum amount\nof {0}.")
+                                                            .format(_("phrases for Monika to say") if say else _("poses for Monika to do")),
+                                                    ok_action=Hide("dialog"))
+
+                            textbutton _("Remove"):
                                 sensitive picker.can_remove_session()
                                 action Function(picker.remove_session_item)
 
@@ -980,10 +1326,14 @@ screen fom_saysomething_picker(say=True):
                                 sensitive picker.session_switch_usable(forward=True)
                                 action Function(picker.session_switch_cursor, forward=True)
 
+                        ## END SESSION MODE RACK ------------------------------------------------------------------------------------------
+
+
+                ## END ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK ---------------------------------------------------------------------
 
             else:
 
-                # Presets menu.
+                ## PRESETS MENU -----------------------------------------------------------------------------------------------------------
 
                 frame:
                     xsize 370
@@ -997,7 +1347,7 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize 360
+                        xsize 370
                         ysize 38
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
@@ -1013,7 +1363,7 @@ screen fom_saysomething_picker(say=True):
                     # Hint text in search box visible if no text is entered.
 
                     if len(picker.presets_search) == 0:
-                        text "Search for a preset...":
+                        text _("Search for a preset..."):
                             text_align 0.0
                             layout "nobreak"
                             color "#EEEEEEB2"
@@ -1024,7 +1374,7 @@ screen fom_saysomething_picker(say=True):
                 # List of presets.
 
                 fixed:
-                    xsize 350
+                    xsize 370
 
                     if not picker.is_show_code():
                         ysize 420
@@ -1051,10 +1401,10 @@ screen fom_saysomething_picker(say=True):
 
                                 # Preset buttons; highlit when selected.
 
-                                for _key in picker.get_presets(picker.presets_search):
+                                for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (350, None)
+                                        xysize (370, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
@@ -1064,13 +1414,15 @@ screen fom_saysomething_picker(say=True):
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        xalign 1.07
+                        xalign -0.07
+
+                ## END PRESETS MENU -------------------------------------------------------------------------------------------------------
 
         # Confirmation buttons area.
 
         frame:
             background None
-            padding (0, 10)
+            padding (0, 10, 0, 0)
 
             hbox:
                 style_prefix "fom_saysomething_confirm"
@@ -1086,16 +1438,16 @@ screen fom_saysomething_picker(say=True):
                     if say:
                         # Note: this button sensitivity relies on Ren'Py interaction
                         # restart that is done in text input field callback.
-                        textbutton "Say":
+                        textbutton _("Say"):
                             action Return(_fom_saysomething.RETURN_DONE)
                             sensitive picker.session is None and not picker.is_text_empty() or picker.session is not None and len(picker.session) > 0
 
                     else:
-                        textbutton "Pose":
+                        textbutton _("Pose"):
                             action Return(_fom_saysomething.RETURN_DONE)
                             sensitive picker.session is None or len(picker.session) > 0
 
-                    textbutton "Presets":
+                    textbutton _("Presets"):
                         # NOTE: DisableAllInputValues will re-focus on search
                         # text input.
                         action [SetField(picker, "presets_menu", True),
@@ -1106,15 +1458,15 @@ screen fom_saysomething_picker(say=True):
                 # selected state which is unwanted.
 
                 else:
-                    textbutton "Save":
+                    textbutton _("Save"):
                         action [Show("fom_saysomething_preset_name_input_modal"),
                                 picker.presets_search_value.Disable()]
                         selected False
-                    textbutton "Delete":
+                    textbutton _("Delete"):
                         action Show("fom_saysomething_confirm_modal",
-                                    title="Delete this preset?",
+                                    title=_("Delete this preset?"),
                                     message=picker.preset_name,
-                                    ok_button="Delete",
+                                    ok_button=_("Delete"),
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
                         selected False
@@ -1123,15 +1475,70 @@ screen fom_saysomething_picker(say=True):
                 # the logic. For selectors panel it will close the GUI
                 # altogether, for presets it will take back to selectors.
 
-                textbutton ("Close" if not picker.presets_menu else "Back"):
+                textbutton (_("Close") if not picker.presets_menu else _("Back")):
                     xysize (118, None)
                     if not picker.presets_menu:
-                        action Return(_fom_saysomething.RETURN_CLOSE)
+                        if picker.changed:
+                            action Show("fom_saysomething_confirm_modal",
+                                        message=_("You're going to lose any unsaved changes. Continue?"),
+                                        ok_action=Return(_fom_saysomething.RETURN_CLOSE),
+                                        no_action=None)
+                        else:
+                            action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
                         # NOTE: DisableAllInputValues will re-focus on say text
                         # input (in the textbox) again.
                         action [SetField(picker, "presets_menu", False),
                                 DisableAllInputValues()]
+
+    # Additional buttons, such as menu hiding, etc.
+
+    vbox:
+        align (0.99, 0.977)
+        xsize 210
+
+        # Have to use this to make buttons 'togglable.'
+        style_prefix "check_scrollable_menu"
+
+        hbox:
+            style_prefix "fom_saysomething_confirm"
+            xysize (210, None)
+            spacing 10
+
+            textbutton _("Copy"):
+                xysize(100, None)
+                action Function(picker.copy_to_clipboard)
+
+            textbutton _("Paste"):
+                xysize(100, None)
+                action Function(picker.select_from_clipboard)
+
+        textbutton _("Reset Pose"):
+            style_prefix "fom_saysomething_confirm"
+            xysize (210, None)
+            action Function(picker._reset_state)
+
+        textbutton _("Show Q. Menu"):
+            xysize (210, None)
+
+            # Make this persist, so player doesn't have to always toggle it
+            selected not persistent._fom_saysomething_hide_quick_buttons
+
+            action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
+                    Function(_fom_saysomething.set_mas_gui_visible,
+                            persistent._fom_saysomething_hide_quick_buttons)]
+
+        # textbutton _("Lock Blinking"):
+        #     xysize (210, None)
+        #     selected not persistent._fom_saysomething_allow_winking
+        #     action ToggleField(persistent, "_fom_saysomething_allow_winking")
+
+        # vbox:
+        #     style_prefix "fom_saysomething_confirm"
+        #     textbutton _("Markdown Help"):
+        #         xysize (210, None)
+        #         selected not persistent._fom_saysomething_markdown_enabled
+        #         action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent
@@ -1154,7 +1561,7 @@ screen fom_saysomething_picker(say=True):
                 style "fom_saysomething_titlebox"
                 align (0.5, 0.0)
 
-                text "What do you want me to say?~"
+                text _("What do you want me to say?~")
 
             vbox:
                 align (0.5, 0.58)
@@ -1196,6 +1603,12 @@ screen fom_saysomething_picker(say=True):
                                     ok_button="Delete",
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
 
+## END PICKER GUI LAYOUT AND DEFINITIONS --------------------------------------------------------------------------------------------------
+
+
+
+## CUSTOM SCREENS/MODALS ------------------------------------------------------------------------------------------------------------------
+
 # Modal screen used for entering new preset name.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
@@ -1207,9 +1620,9 @@ screen fom_saysomething_preset_name_input_modal:
     else:
         $ ok_action = [Play("sound", gui.activate_sound),
                        Show("fom_saysomething_confirm_modal",
-                            title="Overwrite this preset?",
+                            title=_("Overwrite this preset?"),
                             message=picker.preset_cursor,
-                            ok_button="Overwrite",
+                            ok_button=_("Overwrite"),
                             ok_action=Function(picker.save_preset, picker.preset_cursor)),
                        Hide("fom_saysomething_preset_name_input_modal")]
     $ cancel_action = [Play("sound", gui.activate_sound),
@@ -1247,7 +1660,7 @@ screen fom_saysomething_preset_name_input_modal:
 
             # Title.
 
-            text "Save this preset as:":
+            text _("Save this preset as:"):
                 style "confirm_prompt"
                 xalign 0.5
 
@@ -1274,21 +1687,22 @@ screen fom_saysomething_preset_name_input_modal:
 
                 # Sensitivity of this button relies on emptiness of entered
                 # preset name.
-                textbutton "Save":
+                textbutton _("Save"):
                     action ok_action
                     sensitive not picker.is_preset_name_empty()
-                textbutton "Cancel":
+                textbutton _("Cancel"):
                     action cancel_action
 
 
 # Modal screen shared between confirming preset deletion and overwrite confirmation.
 # NOTE: same as main screen refers to picker directly, in global scope.
 
-screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
+screen fom_saysomething_confirm_modal(message, ok_button=_("Yes"), ok_action=Return(True), no_button=_("No"), no_action=Return(False), title=None):
     $ ok_action = [Play("sound", gui.activate_sound),
                    ok_action,
                    Hide("fom_saysomething_confirm_modal")]
-    $ cancel_action = [Play("sound", gui.activate_sound),
+    $ no_action = [Play("sound", gui.activate_sound),
+                       no_action or NullAction(),
                        Hide("fom_saysomething_confirm_modal")]
 
     style_prefix "confirm"
@@ -1305,20 +1719,21 @@ screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
         action ok_action
 
     key "K_ESCAPE":
-        action cancel_action
+        action no_action
 
     frame:
         vbox:
-            xmaximum 500
+            xmaximum 650
 
             align (0.5, 0.5)
             spacing 30
 
             # Title.
 
-            text title:
-                style "confirm_prompt"
-                xalign 0.5
+            if title:
+                text title:
+                    style "confirm_prompt"
+                    xalign 0.5
 
             # Text.
 
@@ -1334,5 +1749,182 @@ screen fom_saysomething_confirm_modal(title, message, ok_button, ok_action):
 
                 textbutton ok_button:
                     action ok_action
-                textbutton "Cancel":
-                    action cancel_action
+                textbutton no_button:
+                    action no_action
+
+## END CUSTOM SCREENS/MODALS --------------------------------------------------------------------------------------------------------------
+
+
+
+## CUSTOM SCROLLABLE MENU WITH SEARCH BAR -------------------------------------------------------------------------------------------------
+
+init -10 python in _fom_saysomething_gui:
+
+    from store import persistent
+
+    def on_search_adjustment_range(adjustment):
+        """
+        Callback for presets menu search input to adjust cursor so it's
+        visible to the user.
+
+        IN:
+            adjustment -> ui.adjustment:
+                Adjustment that has changed.
+        """
+
+        widget = renpy.get_widget("fom_saysomething_speech_menu", "search_input", "screens")
+        caret_relative_pos = 1.0
+        if widget is not None:
+            caret_pos = widget.caret_pos
+            content_len = len(widget.content)
+
+            if content_len > 0:
+                caret_relative_pos = caret_pos / float(content_len)
+
+        # This ensures that the caret is always visible (close enough) to the user
+        # when they enter text
+        adjustment.change(adjustment.range * caret_relative_pos)
+
+    speech_menu_query = ""
+
+    def on_search_input_change(query):
+        global speech_menu_query
+        speech_menu_query = query.lower()
+        renpy.restart_interaction()
+
+    def reset_search_input():
+        global speech_menu_query
+        speech_menu_query = ""
+
+
+screen fom_saysomething_speech_menu:
+
+    $ matching_speeches = list(filter(lambda it: _fom_saysomething_gui.speech_menu_query in it.lower(),
+                                      persistent._fom_saysomething_speeches.keys()))
+
+    on "hide" action Function(_fom_saysomething_gui.reset_search_input)
+
+    # Speeches list menu.
+
+    frame:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1] - 55)
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize 40
+
+        # Text input.
+
+        background Solid(mas_ui.TEXT_FIELD_BG)
+
+        viewport:
+            draggable False
+            arrowkeys False
+            mousewheel "horizontal"
+            xsize 520
+            ysize 38
+            xadjustment ui.adjustment(ranged=_fom_saysomething_gui.on_search_adjustment_range)
+
+            input:
+                id "search_input"
+                style_prefix "input"
+                length 50
+                xalign 0.0
+                layout "nobreak"
+                changed _fom_saysomething_gui.on_search_input_change
+
+        # Hint text in search box visible if no text is entered.
+
+        if len(_fom_saysomething_gui.speech_menu_query) == 0:
+            text _("Search for a speech..."):
+                text_align 0.0
+                layout "nobreak"
+                color "#EEEEEEB2"
+                first_indent 10
+                line_leading 1
+                outlines []
+
+    # List of presets.
+
+    fixed:
+        pos (evhand.LEFT_AREA[0], evhand.LEFT_AREA[1])
+        xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+        ysize evhand.LEFT_AREA[3]
+
+        # Viewport wrapping long list.
+
+        vbox:
+            pos (0, 0)
+            anchor (0, 0)
+
+            viewport:
+                id "viewport"
+
+                yfill False
+                mousewheel True
+                arrowkeys True
+
+                vbox:
+                    spacing 10
+
+                    # Speech choice buttons; highlit when selected.
+
+                    for _key in sorted(matching_speeches):
+                        textbutton _key:
+                            style "scrollable_menu_button"
+                            xysize (530, None)
+                            action Return(_key)
+
+            null height 20
+
+            textbutton _("Nevermind."):
+                style "scrollable_menu_button"
+                xsize evhand.RIGHT_AREA[0] - evhand.LEFT_AREA[0] + evhand.RIGHT_AREA[2]
+                action Return(False)
+
+        # Scrollbar used by list of speeches above.
+
+        bar:
+            style "classroom_vscrollbar"
+            value YScrollValue("viewport")
+            xalign evhand.LEFT_XALIGN / 2 + 0.005
+
+## END CUSTOM SCROLLABLE MENU WITH SEARCH BAR ---------------------------------------------------------------------------------------------
+
+
+
+## PAUSE SCREEN IMPLEMENTATION ------------------------------------------------------------------------------------------------------------
+
+# We're using custom-made "pause" (which is basically just a screen with timer
+# and key handlers) because Ren'Py provides no ability to use pause statement
+# and let player click and skip it. This screen does what we need pause to do,
+# when called with 'call screen', it waits for the specified duration and
+# returns, optionally can be interrupted by pressing any key from 'dismiss'
+# key mapping (e.g. left click, enter, space, etc.)
+screen fom_skippable_pause(duration=1.0):
+
+    # NOTE: For reference, here's zorders of other screens used in MAS.
+    # When deciding zorder, these were taken into account (must be able to click
+    # other things on the screen when pausing.)
+    # - Music selector  zorder: 200 modal
+    # - Textbox screen  zorder: 60  not modal
+    # - Hotkey buttons  zorder: 50  not modal
+    # - Calendar screen zorder: 6   not modal
+
+    # Since out pause screen must be clickable, but must not interfere with
+    # other UI elements, let it have the lowest z-order.
+    zorder -100
+
+    # Wait for timer and return True, since pause went uninterrupted.
+    timer duration action Return(True)
+
+    # Add an invisible button to react on clicking.
+    # -- Actually, we don't need that anymore. `key` section below handles it.
+    # button action Return(False):
+    #     xsize config.screen_width
+    #     ysize config.screen_height
+
+    # Listen to dismiss keypresses and return False, since pause
+    # was interrupted by player keypress.
+    for _key in config.keymap["dismiss"]:
+        key _key action Return(False)
+
+## END PAUSE SCREEN IMPLEMENTATION --------------------------------------------------------------------------------------------------------
