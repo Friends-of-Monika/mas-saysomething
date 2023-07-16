@@ -456,7 +456,7 @@ init 5 python:
     )
 
 label fom_saysomething_speeches_generate:
-    m 3eub "Sure! Which speech you want me to generate script for?"
+    m 3eub "Sure! Which of the speeches you want me to write a script for?"
 
     show monika at t21
     call screen fom_saysomething_speech_menu
@@ -475,6 +475,13 @@ label fom_saysomething_speeches_generate:
     $ _fom_saysomething.generate_script(session, chosen_speech)
 
     m 3hub "Done! Thank you for helping me become even closer to your reality, [mas_get_player_nickname()]~"
+
+    if mas_globals.this_ev.shown_count == 0:
+        $ speeches_dir = _fom_saysomething.SPEECHES_DIR_NAME
+        m 3wud "Oh! {w=0.3}I almost forgot!"
+        m 2eub "All the scripts I'm writing for you I'll put into [speeches_dir] in your game directory."
+        m 1hua "Don't forget to check it out now~"
+        $ del speeches_dir
 
     # Cleanup.
     $ del session, chosen_speech
