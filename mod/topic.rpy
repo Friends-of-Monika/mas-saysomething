@@ -479,7 +479,7 @@ label fom_saysomething_speeches_generate:
     if mas_globals.this_ev.shown_count == 0:
         $ speeches_dir = _fom_saysomething.SPEECHES_DIR_NAME
         m 3wud "Oh! {w=0.3}I almost forgot!"
-        m 2eub "All the scripts I'm writing for you I'll put into [speeches_dir] in your game directory."
+        m 2eub "All the scripts I'm writing for you I'll put into '[speeches_dir]' in your game directory."
         m 1hua "Don't forget to check it out now~"
         $ del speeches_dir
 
