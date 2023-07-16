@@ -330,6 +330,8 @@ init 100 python in _fom_saysomething:
             self.session = None
             self.session_cursor = 0
 
+            # Flag to indicate that any changes were made to ask for confirmation
+            self.changed = False
 
 
         ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
@@ -382,6 +384,7 @@ init 100 python in _fom_saysomething:
             self.text = text
             self.on_text_change(text)
 
+            self.changed = True
             return RETURN_RENDER
 
         def _load_pose_cursors(self, pose_cursors):
@@ -429,6 +432,7 @@ init 100 python in _fom_saysomething:
 
             # This is equivalent to using Return(RETURN_RENDER) action.
             # https://lemmasoft.renai.us/forums/viewtopic.php?p=536626#p536626
+            self.changed = True
             return RETURN_RENDER
 
         def get_pose_label(self, key):
@@ -557,6 +561,7 @@ init 100 python in _fom_saysomething:
                 return
 
             self._load_pose_cursors(cursors)
+            self.changed = True
             return RETURN_RENDER
 
         def copy_to_clipboard(self):
@@ -698,7 +703,6 @@ init 100 python in _fom_saysomething:
             # visual track of current preset.)
             self.preset_name = name
             self.preset_cursor = name
-
             return self._load_state(persistent._fom_saysomething_presets[name])
 
         def delete_preset(self, name):
@@ -798,7 +802,7 @@ init 100 python in _fom_saysomething:
 
             # NOTE: reset just text, not pose
             self._reset_state(reset_pose=False, reset_text=True)
-
+            self.changed = True
             return RETURN_RENDER
 
         def edit_session_item(self):
@@ -910,6 +914,8 @@ init 100 python in _fom_saysomething:
             """
 
             self.text = value
+            if len(self.text) > 0:
+                self.changed = True
             renpy.restart_interaction()
 
         def on_shift_enter_press(self, say):
@@ -960,6 +966,7 @@ init 100 python in _fom_saysomething:
 
             if self.text.count("\n") < 2:
                 self.text += "\n"
+            self.changed = True
             return RETURN_RENDER
 
         def on_search_input_change(self, value):
@@ -1401,7 +1408,13 @@ screen fom_saysomething_picker(say=True):
                 textbutton (_("Close") if not picker.presets_menu else _("Back")):
                     xysize (118, None)
                     if not picker.presets_menu:
-                        action Return(_fom_saysomething.RETURN_CLOSE)
+                        if picker.changed:
+                            action Show("fom_saysomething_confirm_modal",
+                                        message=_("You're going to lose any unsaved changes. Continue?"),
+                                        ok_action=Return(_fom_saysomething.RETURN_CLOSE),
+                                        no_action=None)
+                        else:
+                            action Return(_fom_saysomething.RETURN_CLOSE)
                     else:
                         # NOTE: DisableAllInputValues will re-focus on say text
                         # input (in the textbox) again.
