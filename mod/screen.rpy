@@ -1439,11 +1439,11 @@ screen fom_saysomething_picker(say=True):
             spacing 5
 
             textbutton _("Copy"):
-                xysize(103, None)
+                xysize(100, None)
                 action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(102, None)
+                xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
         hbox:
