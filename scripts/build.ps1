@@ -20,6 +20,7 @@ $Mod = "$Temp\game\Submods"
 New-Item -ItemType Directory -Force -Path $Mod | Out-Null
 $Mod = "$Mod\$Name"
 
+Copy-Item -Recurse $Dir\lib $Mod
 Copy-Item -Recurse $Dir\mod $Mod
 
 Compress-Archive -Update -Path $Temp\game -DestinationPath $Build\$Package-$Version.zip
