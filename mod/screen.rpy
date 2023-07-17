@@ -749,31 +749,6 @@ init 100 python in _fom_saysomething:
 
             return name in persistent._fom_saysomething_presets
 
-        def _reset_state(self):
-            # This dictionary contains key to 2-tuple of:
-            #  [0]: current expression cursor index
-            #  [1]: current expression human readable name
-            # Initially all cursors are at zero (with corresponding expression names.)
-            self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
-
-            # Position object to use when showing Monika at her table. By
-            # default, her usual middle screen position.
-            self.position = POSITIONS[4][0]
-
-            # Position cursor, an index to POSITIONS list to pick position by.
-            self.position_cursor = 4
-
-            # Set GUI flip.
-            self.gui_flip = self.position_cursor > 5
-
-            # Variable that stores entered user text prompt.
-            self.text = ""
-
-            # Ren'Py input value to allow disabling text input when needed.
-            self.text_value = FieldInputValue(self, "text", returnable=False)
-
-            return RETURN_RENDER
-
         def _save_state(self):
             return (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
