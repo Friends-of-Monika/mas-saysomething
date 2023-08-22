@@ -1,6 +1,6 @@
 <p align="center">
   <img src="doc/SaySomething.png"
-       width="320" height="320">
+       width="360" height="200">
   <h3 align="center">Ask your Monika to say something and pose for you~</h3>
 </p>
 
