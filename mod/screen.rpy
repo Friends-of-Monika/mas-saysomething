@@ -1323,10 +1323,10 @@ screen fom_saysomething_picker(say=True):
                                 action Show("fom_saysomething_confirm_modal",
                                             message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
                                                       "click on {{i}}{1}{{/i}} button.\n\n"
-                                                      "{{i}}You can enable {0} mode by default in submod settings.{{/i}}")
+                                                      "{{i}}You can enable {1} mode by default in submod settings.{{/i}}")
                                                       .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
                                                               _fom_saysomething.MAX_SESSION_SIZE),
-                                            ok_button=_("OK"),
+                                            ok_button=_("Yes"),
                                             ok_action=Function(picker.enable_session_mode))
 
                         ## END ENABLE SPEECH MODE BUTTON ----------------------------------------------------------------------------------

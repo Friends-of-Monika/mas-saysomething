@@ -83,7 +83,7 @@ class HTMLParser(_markupbase.ParserBase):
 
     CDATA_CONTENT_ELEMENTS = ("script", "style")
 
-    def __init__(self, *, convert_charrefs=True):
+    def __init__(self, convert_charrefs=True):
         """Initialize and reset this instance.
 
         If convert_charrefs is True (the default), all character references
