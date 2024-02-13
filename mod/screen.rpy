@@ -1276,6 +1276,9 @@ screen fom_saysomething_picker(say=True):
                 fixed:
                     xsize 370
 
+                    # NOTE: the values are hand-picked to match the expression
+                    # picker menu visually; there isn't much logic beside just that.
+
                     if not picker.is_show_code():
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
@@ -1283,7 +1286,7 @@ screen fom_saysomething_picker(say=True):
                             else:
                                 ysize 366
                         else:
-                            ysize 410
+                            ysize 396
                     else:
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
@@ -1291,7 +1294,7 @@ screen fom_saysomething_picker(say=True):
                             else:
                                 ysize 392
                         else:
-                            ysize 442
+                            ysize 440
 
                     # Viewport wrapping long list.
 
@@ -1421,23 +1424,14 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            if _fom_saysomething.comfy_ui_adjust:
-                spacing 5
-            else:
-                spacing 10
+            spacing 5
 
             textbutton _("Copy"):
-                if _fom_saysomething.comfy_ui_adjust:
-                    xysize(103, None)
-                else:
-                    xysize(100, None)
+                xysize(103, None)
                 action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                if _fom_saysomething.comfy_ui_adjust:
-                    xysize(102, None)
-                else:
-                    xysize(100, None)
+                xysize(102, None)
                 action Function(picker.select_from_clipboard)
 
         textbutton _("Reset Pose"):
