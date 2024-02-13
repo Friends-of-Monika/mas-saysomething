@@ -16,7 +16,8 @@
 # 3. Text she says (always present and non None)
 
 default persistent._fom_saysomething_presets = {
-    # Presets by dreamscached
+#   Presets by dreamscached
+#   Preset display name                Pose       Eyes       Eyebrows       Blush       Tears       Sweat       Mouth Pos  Line
     "Hey, everyone!":           ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
     "Sparkly pretty eyes":      ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
     "Daydreaming":              ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
@@ -28,7 +29,8 @@ default persistent._fom_saysomething_presets = {
     "Feeling singy":            ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
     "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
-    # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Preset display name                Pose       Eyes    Eyebrows       Blush       Tears      Sweat       Mouth Pos  Line
     "Sulks to you":        ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
     "Thinking deep":       ({"eyebrows": 4, "eyes": 5,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
     "Bringing up a topic": ({"eyebrows": 0, "eyes": 0,  "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
