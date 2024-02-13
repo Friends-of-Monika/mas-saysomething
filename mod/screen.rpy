@@ -966,6 +966,27 @@ init 100 python in _fom_saysomething:
 
 
 
+## COMFY UI ADJUSTMENTS -------------------------------------------------------------------------------------------------------------------
+
+# As ComfyUI changes line height, paddings, other style properties etc., we should
+# adjust the style using control flags here.
+
+# VARIABLES:
+# - comfy_ui_adjust: bool - true if Comfy UI is installed and a theme is used
+# - comfy_ui_theme:  str  - <theme id> if Comfy UI theme is used, NOT DEFINED otherise
+
+# init 100 python in _fom_saysomething:
+    # Check if Comfy UI is installed and is not disabled (has installed themes)
+    comfy_ui_adjust = store.mas_submod_utils.isSubmodInstalled("Comfy UI") and \
+        len(store.comfy_ui.theme_mgr.settings["installed_files"]) > 0
+    # Set current theme ID if available
+    if comfy_ui_adjust:
+        comfy_ui_theme = store.comfy_ui.theme_mgr.get_current_theme()["id"]
+
+## END COMFY UI ADJUSTMENTS ---------------------------------------------------------------------------------------------------------------
+
+
+
 ## STYLE CUSTOMIZATIONS/BACKPORTS ---------------------------------------------------------------------------------------------------------
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
@@ -1031,12 +1052,19 @@ screen fom_saysomething_picker(say=True):
             if picker.is_show_code():
                 align (0.99, 0.07)
             else:
-                align (0.99, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.99, 0.1)
+                else:
+                    align (0.99, 0.2)
+
         else:
             if picker.is_show_code():
                 align (0.01, 0.07)
             else:
-                align (0.01, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.01, 0.1)
+                else:
+                    align (0.01, 0.2)
 
         ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
 
@@ -1053,7 +1081,13 @@ screen fom_saysomething_picker(say=True):
                     padding (10, 10)
 
                     vbox:
-                        spacing 10
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if picker.is_show_code():
+                                spacing 3
+                            else:
+                                spacing 5
+                        else:
+                            spacing 10
 
                         if picker.is_show_code():
                             hbox:
@@ -1243,9 +1277,21 @@ screen fom_saysomething_picker(say=True):
                     xsize 370
 
                     if not picker.is_show_code():
-                        ysize 420
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 397
+                            else:
+                                ysize 366
+                        else:
+                            ysize 410
                     else:
-                        ysize 442
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 427
+                            else:
+                                ysize 392
+                        else:
+                            ysize 442
 
                     # Viewport wrapping long list.
 
@@ -1375,14 +1421,23 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            spacing 10
+            if _fom_saysomething.comfy_ui_adjust:
+                spacing 5
+            else:
+                spacing 10
 
             textbutton _("Copy"):
-                xysize(100, None)
+                if _fom_saysomething.comfy_ui_adjust:
+                    xysize(103, None)
+                else:
+                    xysize(100, None)
                 action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(100, None)
+                if _fom_saysomething.comfy_ui_adjust:
+                    xysize(102, None)
+                else:
+                    xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
         textbutton _("Reset Pose"):
@@ -1390,7 +1445,7 @@ screen fom_saysomething_picker(say=True):
             xysize (210, None)
             action Function(picker._reset_state)
 
-        textbutton _("Show Q. Menu"):
+        textbutton _("Show Menu"):
             xysize (210, None)
 
             # Make this persist, so player doesn't have to always toggle it
