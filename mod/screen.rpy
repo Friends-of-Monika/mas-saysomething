@@ -149,7 +149,7 @@ init 100 python in _fom_saysomething:
         detailed declaration of keys and IDs.)
 
         IN:
-            post_cursors -> dict[str, int]:
+            pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
 
         OUT:
@@ -517,16 +517,23 @@ init 100 python in _fom_saysomething:
             self.changed = True
             return RETURN_RENDER
 
-        def copy_to_clipboard(self):
+        def copy_to_clipboard(self, line=False):
             """
             Retrieves sprite code from pickers state and saves it to clipboard.
+
+            IN:
+                line -> bool, default False:
+                    Whether to copy a sprite code or an entire statement.
 
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
             """
 
-            code = get_sprite_code(self.pose_cursors)
+            if line:
+                code = generate_line(self.pose_cursors, self.text)
+            else:
+                code = get_sprite_code(self.pose_cursors)
             pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
             return RETURN_RENDER
 
@@ -1428,7 +1435,10 @@ screen fom_saysomething_picker(say=True):
 
             textbutton _("Copy"):
                 xysize(103, None)
-                action Function(picker.copy_to_clipboard)
+                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+                    action Function(picker.copy_to_clipboard, line=True)
+                else:
+                    action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
                 xysize(102, None)
