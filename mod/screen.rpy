@@ -1449,18 +1449,6 @@ screen fom_saysomething_picker(say=True):
                     Function(_fom_saysomething.set_mas_gui_visible,
                             persistent._fom_saysomething_hide_quick_buttons)]
 
-        # textbutton _("Lock Blinking"):
-        #     xysize (210, None)
-        #     selected not persistent._fom_saysomething_allow_winking
-        #     action ToggleField(persistent, "_fom_saysomething_allow_winking")
-
-        # vbox:
-        #     style_prefix "fom_saysomething_confirm"
-        #     textbutton _("Markdown Help"):
-        #         xysize (210, None)
-        #         selected not persistent._fom_saysomething_markdown_enabled
-        #         action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
-
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent
     # of pressing 'Pose'. When in session mode, this will add current state to
@@ -1827,12 +1815,6 @@ screen fom_skippable_pause(duration=1.0):
 
     # Wait for timer and return True, since pause went uninterrupted.
     timer duration action Return(True)
-
-    # Add an invisible button to react on clicking.
-    # -- Actually, we don't need that anymore. `key` section below handles it.
-    # button action Return(False):
-    #     xsize config.screen_width
-    #     ysize config.screen_height
 
     # Listen to dismiss keypresses and return False, since pause
     # was interrupted by player keypress.
