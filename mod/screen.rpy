@@ -16,7 +16,8 @@
 # 3. Text she says (always present and non None)
 
 default persistent._fom_saysomething_presets = {
-    # Presets by dreamscached
+#   Presets by dreamscached
+#   Preset display name                Pose       Eyes       Eyebrows       Blush       Tears       Sweat       Mouth Pos  Line
     "Hey, everyone!":           ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
     "Sparkly pretty eyes":      ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
     "Daydreaming":              ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
@@ -28,7 +29,8 @@ default persistent._fom_saysomething_presets = {
     "Feeling singy":            ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
     "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
-    # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Preset display name                Pose       Eyes    Eyebrows       Blush       Tears      Sweat       Mouth Pos  Line
     "Sulks to you":        ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
     "Thinking deep":       ({"eyebrows": 4, "eyes": 5,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
     "Bringing up a topic": ({"eyebrows": 0, "eyes": 0,  "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
@@ -1115,6 +1117,27 @@ init 100 python in _fom_saysomething:
 
 
 
+## COMFY UI ADJUSTMENTS -------------------------------------------------------------------------------------------------------------------
+
+# As ComfyUI changes line height, paddings, other style properties etc., we should
+# adjust the style using control flags here.
+
+# VARIABLES:
+# - comfy_ui_adjust: bool - true if Comfy UI is installed and a theme is used
+# - comfy_ui_theme:  str  - <theme id> if Comfy UI theme is used, NOT DEFINED otherise
+
+# init 100 python in _fom_saysomething:
+    # Check if Comfy UI is installed and is not disabled (has installed themes)
+    comfy_ui_adjust = store.mas_submod_utils.isSubmodInstalled("Comfy UI") and \
+        len(store.comfy_ui.theme_mgr.settings["installed_files"]) > 0
+    # Set current theme ID if available
+    if comfy_ui_adjust:
+        comfy_ui_theme = store.comfy_ui.theme_mgr.get_current_theme()["id"]
+
+## END COMFY UI ADJUSTMENTS ---------------------------------------------------------------------------------------------------------------
+
+
+
 ## STYLE CUSTOMIZATIONS/BACKPORTS ---------------------------------------------------------------------------------------------------------
 
 # GUI elements styling, mostly reused to keep up with MAS theme and style.
@@ -1188,12 +1211,19 @@ screen fom_saysomething_picker(say=True):
             if picker.is_show_code():
                 align (0.99, 0.07)
             else:
-                align (0.99, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.99, 0.1)
+                else:
+                    align (0.99, 0.2)
+
         else:
             if picker.is_show_code():
                 align (0.01, 0.07)
             else:
-                align (0.01, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.01, 0.1)
+                else:
+                    align (0.01, 0.2)
 
         ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
 
@@ -1210,7 +1240,13 @@ screen fom_saysomething_picker(say=True):
                     padding (10, 10)
 
                     vbox:
-                        spacing 10
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if picker.is_show_code():
+                                spacing 3
+                            else:
+                                spacing 5
+                        else:
+                            spacing 10
 
                         if picker.is_show_code():
                             hbox:
@@ -1417,10 +1453,25 @@ screen fom_saysomething_picker(say=True):
                 fixed:
                     xsize 370
 
+                    # NOTE: the values are hand-picked to match the expression
+                    # picker menu visually; there isn't much logic beside just that.
+
                     if not picker.is_show_code():
-                        ysize 420
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 397
+                            else:
+                                ysize 366
+                        else:
+                            ysize 396
                     else:
-                        ysize 442
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 427
+                            else:
+                                ysize 392
+                        else:
+                            ysize 440
 
                     # Viewport wrapping long list.
 
@@ -1545,14 +1596,14 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            spacing 10
+            spacing 5
 
             textbutton _("Copy"):
-                xysize(100, None)
+                xysize(103, None)
                 action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(100, None)
+                xysize(102, None)
                 action Function(picker.select_from_clipboard)
 
         hbox:
@@ -1566,7 +1617,7 @@ screen fom_saysomething_picker(say=True):
             # Have to use this to make buttons 'togglable.'
             style_prefix "check_scrollable_menu"
 
-            textbutton _("Show Q. Menu"):
+            textbutton _("Show Menu"):
                 xysize (210, None)
 
                 # Make this persist, so player doesn't have to always toggle it
