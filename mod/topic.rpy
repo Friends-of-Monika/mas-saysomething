@@ -503,6 +503,12 @@ label fom_saysomething_speeches_generate:
     $ del session, chosen_speech
     return
 
+
+# Reactions API. This allows us to inspect the content of say session and
+# depending on what was said (or other conditions, up to implementation)
+# to modify the parts she says before and after the speech.
+# See implementation example in the next 'init ... python' section below.
+
 init 10 python in _fom_saysomething_reactions:
     import random
 
@@ -532,17 +538,42 @@ init 10 python in _fom_saysomething_reactions:
             return None
         return random.choice(matches)
 
+# "may the lord forgive me" - dreamscached
+# Example implementation of a reaction based on a memey line.
+# Register the handler with @register_handler, which takes label name
+# as a parameter. Note that you have to create *two* labels, <name>_before and
+# <name>_after, otherwise the reaction handler will not be eligible.
+
 init 10 python in _fom_saysomething_reactions:
     @register_handler("fom_saysomething_reaction_imposter")
     def handle_reaction_imposter(session):
-        return len(session) == 1 and session[0][2] == "when imposter is sus"
+        # We only need to make it one line
+        if len(session) > 1:
+            return False
 
+        # Normalize the line
+        line = session[0][2].lower().strip()
+
+        # Check for variations
+        return (
+            line == "'when the imposter is sus'" or
+            line == "'when imposter is sus'" or
+            line == "'when the impostor is sus'" or
+            line == "'when impostor is sus'" or
+            line == "when imposter is sus" or
+            line == "when impostor is sus" or
+        )
+
+# This label will be called before the speech and
+# INSTEAD of the default "let me prepare".
 label fom_saysomething_reaction_imposter_before:
     m 2dfc "Fine...{w=0.3} Fine, [player], I'll say that."
     m 2dsd "Here goes nothing."
     m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
     return
 
+# This label will be called after the speech and
+# INSTEAD of the default "did I say it well?"
 label fom_saysomething_reaction_imposter_after:
     m 2mkp "...I hope you're happy now."
     return
