@@ -305,11 +305,6 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
         $ renpy.call(reaction + "_before")
         $ persistent._fom_saysomething_seen_reactions = True
 
-        # If reaction stipulates to cancel the speech, return and notify the
-        # caller why we cancelled
-        if _return == "cancel":
-            return "cancel"
-
     if not say:
         # 'Import' set_eyes_lock.
         $ set_eyes_lock = _fom_saysomething.set_eyes_lock
@@ -551,11 +546,6 @@ init 10 python in _fom_saysomething_reactions:
 # Register the handler with @register_handler, which takes label name
 # as a parameter. Note that you have to create *two* labels, <name>_before and
 # <name>_after, otherwise the reaction handler will not be eligible.
-#
-# The label can return various special values to additionally modify
-# the behavior of the speech interaction. The following values are supported:
-# - "cancel" - cancels *this session*; Monika will refuse to say the speech
-#   and will simply ask the player if they want to ask her something else.
 
 init 10 python in _fom_saysomething_reactions:
     @register_handler("fom_saysomething_reaction_imposter")
