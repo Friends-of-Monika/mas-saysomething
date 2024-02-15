@@ -574,6 +574,89 @@ label fom_saysomething_reaction_foobar_after:
 
 
 init 10 python in _fom_saysomething_reactions:
+    from store import MASMailbox
+    import re
+
+    class FOM_CursesMailbox(MASMailbox):
+        WORD_STATS = "__fom_wordstats"
+
+    curses_mailbox = FOM_CursesMailbox()
+    curses_thres = 0.2
+
+    @register_handler("fom_saysomething_reaction_curses")
+    def handle_reaction_curses(session):
+        # Normalize the lines, lowercase, strip etc and turn to words
+        words = [
+            word.replace(".!?", "")
+            for words in map(lambda it: it[2].lower().strip().split(" "), session)
+            for word in words
+        ]
+
+        # VERY simplified regexp list for sake of simply detecting very
+        # few impolite statements; we don't need any false positives.
+        bad_re = re.compile("|".join([
+            r"\bboob\b",
+            r"\bcoom\b",
+            r"\bcum\b",
+            r"\bcunt\b",
+            r"\bfaggot\b",
+            r"fuck",
+            r"jigolo",
+            r"jizz",
+            r"\bnigg(a|er)\b",
+            r"retard\b",
+            r"slut",
+            r"\bthot\b",
+            r"whore"
+        ]), re.I)
+
+        # Count found bad words from the above wordlist
+        hits = list(map(lambda it: bool(bad_re.search(it)), words)).count(True)
+        ratio = hits / len(words)
+
+        if ratio >= curses_thres:
+            curses_mailbox.send(FOM_CursesMailbox.WORD_STATS, (hits, len(words), ratio))
+            return True
+
+        return False
+
+label fom_saysomething_reaction_curses_before:
+    $ hits, words, ratio = _fom_saysomething_reactions.curses_mailbox          \
+        .read(_fom_saysomething_reactions.FOM_CursesMailbox.WORD_STATS)
+
+    if ratio <= 0.33: # 20% to 33% of words are curses
+        m 1rksdlb "Ahaha, I wouldn't really...{w=0.3} say some of these words..."
+        m 1hksdla "But...{w=0.3} just give me a moment..."
+        m 2dsc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    elif ratio <= 0.5: # 33% to 50% of words are curses
+        m 2dsc "[player]...{w=0.3} that really isn't polite."
+        m 2etd "Do you really want me to say...{w=0.3} that?"
+        m 1dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}alright."
+    else: # 50% and more (more than half)
+        m 2tsx "[player]!{w=0.3} That's disgusting!"
+        m 1dfc "I would never, {i}ever{/i} say that to anyone."
+        m 2efd "Why would you want me to do that?!"
+        m 1dud "...fine.{w=0.5} Fine.{w=0.5} I guess I just have to."
+        m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+    $ del hits, words, ratio
+    return
+
+label fom_saysomething_reaction_curses_after:
+    $ hits, words, ratio = _fom_saysomething_reactions.curses_mailbox          \
+        .read(_fom_saysomething_reactions.FOM_CursesMailbox.WORD_STATS)
+    if ratio <= 0.5:
+        m 2dfc "..."
+        m 2efc "Are you happy now?"
+    else:
+        m 2tsc "...Happy now?{w=0.5}{nw} "
+        extend 2dfc "Sheesh."
+
+    $ del hits, words, ratio
+    return
+
+
+init 10 python in _fom_saysomething_reactions:
     @register_handler("fom_saysomething_reaction_imposter")
     def handle_reaction_imposter(session):
         # We only need to make it one line
