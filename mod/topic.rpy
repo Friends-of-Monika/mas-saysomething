@@ -541,11 +541,37 @@ init 10 python in _fom_saysomething_reactions:
             return None
         return random.choice(matches)
 
-# Example implementation of a reaction based on a memey line.
-#
+# Example implementation of a reaction to a single line "foobar"
+# you ask her to say.
 # Register the handler with @register_handler, which takes label name
 # as a parameter. Note that you have to create *two* labels, <name>_before and
 # <name>_after, otherwise the reaction handler will not be eligible.
+
+init 10 python in _fom_saysomething_reactions:
+    @register_handler("fom_saysomething_reaction_foobar")
+    def handle_reaction_foobar(session):
+        # We only need to make it one line
+        if len(session) > 1:
+            return False
+
+        # Normalize the line
+        line = session[0][2].lower().strip()
+        return line == "foobar" or line == "foo bar"
+
+# This label will be called before the speech and
+# INSTEAD of the default "let me prepare".
+label fom_saysomething_reaction_foobar_before:
+    m 1tuu "Testing something, aren't you, [player]?"
+    m 3hubsa "You know I'm very happy to assist~"
+    m 2dua "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    return
+
+# This label will be called after the speech and
+# INSTEAD of the default "did I say it well?"
+label fom_saysomething_reaction_foobar_after:
+    m 1tua "Well, was it good enough?{w=0.3} Ahaha~"
+    return
+
 
 init 10 python in _fom_saysomething_reactions:
     @register_handler("fom_saysomething_reaction_imposter")
@@ -564,11 +590,9 @@ init 10 python in _fom_saysomething_reactions:
             line == "'when the impostor is sus'" or
             line == "'when impostor is sus'" or
             line == "when imposter is sus" or
-            line == "when impostor is sus" or
+            line == "when impostor is sus"
         )
 
-# This label will be called before the speech and
-# INSTEAD of the default "let me prepare".
 label fom_saysomething_reaction_imposter_before:
     # "may the lord forgive me" - dreamscached
     m 2dfc "Fine...{w=0.3} Fine, [player], I'll say that."
