@@ -589,5 +589,5 @@ label fom_saysomething_reaction_imposter_before:
 # This label will be called after the speech and
 # INSTEAD of the default "did I say it well?"
 label fom_saysomething_reaction_imposter_after:
-    m 2mkp "...I hope you're happy now."
+    m 2mkp "...I hope you're happy now. Geez."
     return
