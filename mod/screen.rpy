@@ -180,29 +180,25 @@ init 100 python in _fom_saysomething:
             pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
         """
-        # Flatten the EXPR_MAP into a dictionary for easier search
-        flat_map = {}
-        for key, data in EXPR_MAP.items():
-            _, values = data
-            for i, (code, _) in enumerate(values):
-                if code is not None:
-                    flat_map[code] = (key, i)
 
-        # Sort the codes by length in descending order for greedy matching
-        sorted_codes = sorted(flat_map.keys(), key=len, reverse=True)
+        pose_cursors = dict()
+        for key, (_, values) in EXPR_MAP.items():
+            # Scan through selector values to check if next bit in
+            # the expression code contains any of them
+            for i, (value, _) in enumerate(values):
+                # Skip None values (they are omitted in exp code)
+                if value is None:
+                    continue
 
-        # Initialize pose_cursors with all keys from EXPR_MAP set to 0
-        pose_cursors = {key: 0 for key in EXPR_MAP.keys()}
-
-        while sprite_code:
-            for code in sorted_codes:
-                if sprite_code.startswith(code):
-                    key, cursor = flat_map[code]
-                    pose_cursors[key] = cursor
-                    sprite_code = sprite_code[len(code):]
+                # Assign selector value if found
+                if sprite_code.startswith(value):
+                    pose_cursors[key] = i
+                    sprite_code = sprite_code[len(value):]
                     break
+
             else:
-                raise ValueError(f"Unknown code in sprite_code: {sprite_code}")
+                # By default, set to 0
+                pose_cursors[key] = 0
 
         return pose_cursors
 
