@@ -6,6 +6,7 @@
 
 default persistent._fom_saysomething_seen_screenshot_hint = False
 default persistent._fom_saysomething_speeches = dict()
+default persistent._fom_saysomething_seen_reactions = False
 
 init 5 python:
     addEvent(
@@ -286,8 +287,20 @@ label fom_saysomething_speeches_recite:
 label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_caches=True):
     # Put Monika back in center and let her say a preamble.
     show monika 1esb at t11
-    m 1esb "Alright, give me just a moment to prepare."
-    m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+    if say and persistent._fom_saysomething_enable_reactions:
+        $ reaction = _fom_saysomething_reactions.get_random_reaction(session)
+    else:
+        $ reaction = None
+
+    if reaction is None:
+        m 1esb "Alright, give me just a moment to prepare."
+        m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    else:
+        $ renpy.call(reaction + "_before")
+        if not persistent._fom_saysomething_seen_reactions:
+            $ renpy.notify(_("You can disable Monika's reactions in settings."))
+        $ persistent._fom_saysomething_seen_reactions = True
 
     if not say:
         # 'Import' set_eyes_lock.
@@ -376,8 +389,11 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
         # In all the other cases just immediately change expression
         show monika 3tua at t11
 
-    m 3tua "Well? {w=0.3}Did I do it good enough?"
-    m 1hub "Hope you liked it, ahaha~"
+    if not say or reaction is None:
+        m 3tua "Well? {w=0.3}Did I do it good enough?"
+        m 1hub "Hope you liked it, ahaha~"
+    else:
+        $ renpy.call(reaction + "_after")
 
     if not say:
         $ del set_eyes_lock
@@ -485,4 +501,48 @@ label fom_saysomething_speeches_generate:
 
     # Cleanup.
     $ del session, chosen_speech
+    return
+
+init 10 python in _fom_saysomething_reactions:
+    import random
+
+    REACTION_HANDLERS = list()
+
+    def register_handler(label):
+        def decorator(func):
+            REACTION_HANDLERS.append((label, func))
+            def wrapper(session):
+                return func(session)
+
+            return wrapper
+        return decorator
+
+    def get_random_reaction(session):
+        matches = list()
+
+        for label, match in REACTION_HANDLERS:
+            before, after = label + "_before", label + "_after"
+            if not (renpy.has_label(before) and renpy.has_label(after)):
+                continue
+
+            if match(session):
+                matches.append(label)
+
+        if not matches:
+            return None
+        return random.choice(matches)
+
+init 10 python in _fom_saysomething_reactions:
+    @register_handler("fom_saysomething_reaction_imposter")
+    def handle_reaction_imposter(session):
+        return len(session) == 1 and session[0][2] == "when imposter is sus"
+
+label fom_saysomething_reaction_imposter_before:
+    m 2dfc "Fine...{w=0.3} Fine, [player], I'll say that."
+    m 2dsd "Here goes nothing."
+    m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    return
+
+label fom_saysomething_reaction_imposter_after:
+    m 2mkp "...I hope you're happy now."
     return
