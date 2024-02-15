@@ -156,7 +156,7 @@ init 100 python in _fom_saysomething:
         detailed declaration of keys and IDs.)
 
         IN:
-            post_cursors -> dict[str, int]:
+            pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
 
         OUT:
@@ -187,29 +187,25 @@ init 100 python in _fom_saysomething:
             pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
         """
-        # Flatten the EXPR_MAP into a dictionary for easier search
-        flat_map = {}
-        for key, data in EXPR_MAP.items():
-            _, values = data
-            for i, (code, _) in enumerate(values):
-                if code is not None:
-                    flat_map[code] = (key, i)
 
-        # Sort the codes by length in descending order for greedy matching
-        sorted_codes = sorted(flat_map.keys(), key=len, reverse=True)
+        pose_cursors = dict()
+        for key, (_, values) in EXPR_MAP.items():
+            # Scan through selector values to check if next bit in
+            # the expression code contains any of them
+            for i, (value, _) in enumerate(values):
+                # Skip None values (they are omitted in exp code)
+                if value is None:
+                    continue
 
-        # Initialize pose_cursors with all keys from EXPR_MAP set to 0
-        pose_cursors = {key: 0 for key in EXPR_MAP.keys()}
-
-        while sprite_code:
-            for code in sorted_codes:
-                if sprite_code.startswith(code):
-                    key, cursor = flat_map[code]
-                    pose_cursors[key] = cursor
-                    sprite_code = sprite_code[len(code):]
+                # Assign selector value if found
+                if sprite_code.startswith(value):
+                    pose_cursors[key] = i
+                    sprite_code = sprite_code[len(value):]
                     break
+
             else:
-                raise ValueError(sprite_code)
+                # By default, set to 0
+                pose_cursors[key] = 0
 
         return pose_cursors
 
@@ -645,17 +641,24 @@ init 100 python in _fom_saysomething:
             self.changed = True
             return RETURN_RENDER
 
-        def copy_to_clipboard(self):
+        def copy_to_clipboard(self, line=False):
             """
             Retrieves sprite code from pickers state and saves it to clipboard.
+
+            IN:
+                line -> bool, default False:
+                    Whether to copy a sprite code or an entire statement.
 
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
             """
 
-            code = get_sprite_code(self.pose_cursors)
-            pygame.scrap.put(pygame.SCRAP_TEXT, code.encode("utf-8"))
+            if line:
+                code = generate_line(self.pose_cursors, self.text)
+            else:
+                code = get_sprite_code(self.pose_cursors)
+            pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
             return RETURN_RENDER
 
         ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
@@ -1600,7 +1603,10 @@ screen fom_saysomething_picker(say=True):
 
             textbutton _("Copy"):
                 xysize(103, None)
-                action Function(picker.copy_to_clipboard)
+                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+                    action Function(picker.copy_to_clipboard, line=True)
+                else:
+                    action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
                 xysize(102, None)
@@ -1626,18 +1632,6 @@ screen fom_saysomething_picker(say=True):
                 action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
                         Function(_fom_saysomething.set_mas_gui_visible,
                                  persistent._fom_saysomething_hide_quick_buttons)]
-
-        # textbutton _("Lock Blinking"):
-        #     xysize (210, None)
-        #     selected not persistent._fom_saysomething_allow_winking
-        #     action ToggleField(persistent, "_fom_saysomething_allow_winking")
-
-        # vbox:
-        #     style_prefix "fom_saysomething_confirm"
-        #     textbutton _("Markdown Help"):
-        #         xysize (210, None)
-        #         selected not persistent._fom_saysomething_markdown_enabled
-        #         action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent
@@ -2024,12 +2018,6 @@ screen fom_skippable_pause(duration=1.0):
 
     # Wait for timer and return True, since pause went uninterrupted.
     timer duration action Return(True)
-
-    # Add an invisible button to react on clicking.
-    # -- Actually, we don't need that anymore. `key` section below handles it.
-    # button action Return(False):
-    #     xsize config.screen_width
-    #     ysize config.screen_height
 
     # Listen to dismiss keypresses and return False, since pause
     # was interrupted by player keypress.
