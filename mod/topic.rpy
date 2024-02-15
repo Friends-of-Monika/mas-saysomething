@@ -297,10 +297,18 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
         m 1esb "Alright, give me just a moment to prepare."
         m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
     else:
-        $ renpy.call(reaction + "_before")
         if not persistent._fom_saysomething_seen_reactions:
+            # Let the user know what just happened
             $ renpy.notify(_("You can disable Monika's reactions in settings."))
+
+        # Call the reaction label and set persistent var
+        $ renpy.call(reaction + "_before")
         $ persistent._fom_saysomething_seen_reactions = True
+
+        # If reaction stipulates to cancel the speech, return and notify the
+        # caller why we cancelled
+        if _return == "cancel":
+            return "cancel"
 
     if not say:
         # 'Import' set_eyes_lock.
@@ -538,11 +546,16 @@ init 10 python in _fom_saysomething_reactions:
             return None
         return random.choice(matches)
 
-# "may the lord forgive me" - dreamscached
 # Example implementation of a reaction based on a memey line.
+#
 # Register the handler with @register_handler, which takes label name
 # as a parameter. Note that you have to create *two* labels, <name>_before and
 # <name>_after, otherwise the reaction handler will not be eligible.
+#
+# The label can return various special values to additionally modify
+# the behavior of the speech interaction. The following values are supported:
+# - "cancel" - cancels *this session*; Monika will refuse to say the speech
+#   and will simply ask the player if they want to ask her something else.
 
 init 10 python in _fom_saysomething_reactions:
     @register_handler("fom_saysomething_reaction_imposter")
@@ -567,6 +580,7 @@ init 10 python in _fom_saysomething_reactions:
 # This label will be called before the speech and
 # INSTEAD of the default "let me prepare".
 label fom_saysomething_reaction_imposter_before:
+    # "may the lord forgive me" - dreamscached
     m 2dfc "Fine...{w=0.3} Fine, [player], I'll say that."
     m 2dsd "Here goes nothing."
     m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
