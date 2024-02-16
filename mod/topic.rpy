@@ -587,7 +587,7 @@ init 10 python in _fom_saysomething_reactions:
     def handle_reaction_curses(session):
         # Normalize the lines, lowercase, strip etc and turn to words
         words = [
-            word.replace(".!?", "")
+            word.replace(".!?'\"", "")
             for words in map(lambda it: it[2].lower().strip().split(" "), session)
             for word in words
         ]
