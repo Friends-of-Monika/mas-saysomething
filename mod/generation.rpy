@@ -342,6 +342,23 @@ init 101 python in _fom_saysomething:
         # underscores, and converts the entire string to lowercase.
         return re.sub("[^a-zA-Z0-9_]", "_", name).strip("_").lower()
 
+    def generate_line(poses, text):
+        """
+        Generates a dialogue line of poses, position and text.
+
+        IN:
+            poses -> dict[str, int]:
+                Pose cursor dictionary.
+            text -> str:
+                Current text input.
+
+        OUT:
+            RenPy script statement with sprite code and with Markdown rendered.
+        """
+
+        text = markdown.render(text)
+        return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
+
     def generate_script(session, name):
         """
         Generates script of the provided session (see Picker in screen.rpy)
@@ -360,11 +377,6 @@ init 101 python in _fom_saysomething:
 
         def get_dialogue_lines():
             """Generates dialogue lines indented by four spaces."""
-
-            def get_dialog_line(poses, pos, text):
-                """Generates a dialogue line of poses, position and text."""
-                text = markdown.render(text)
-                return ('m {0} "{1}"'.format(get_sprite_code(poses), text))
 
             def get_trans_line(poses, pos, dissolve=False):
                 """Generates a transition line of poses, position and dissolve."""
@@ -396,7 +408,7 @@ init 101 python in _fom_saysomething:
                     leaning = poses["pose"] == 4
 
                 # Append dialog line.
-                lines.append(get_dialog_line(poses, pos, text))
+                lines.append(generate_line(poses, text))
 
             # Glue dialog lines, prepending them with indent.
             return "\n".join(map(lambda it: "    " + it, lines))

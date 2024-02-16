@@ -16,7 +16,8 @@
 # 3. Text she says (always present and non None)
 
 default persistent._fom_saysomething_presets = {
-    # Presets by dreamscached
+#   Presets by dreamscached
+#   Preset display name                Pose       Eyes       Eyebrows       Blush       Tears       Sweat       Mouth Pos  Line
     "Hey, everyone!":           ({"pose": 3, "eyes": 0, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Hey, everyone!"),
     "Sparkly pretty eyes":      ({"pose": 0, "eyes": 2, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Is this... Is this for me?"),
     "Daydreaming":              ({"pose": 4, "eyes": 8, "eyebrows": 3, "blush": 0, "tears": 0, "sweat": 0, "mouth": 0}, 4, "..."),
@@ -28,7 +29,8 @@ default persistent._fom_saysomething_presets = {
     "Feeling singy":            ({"pose": 0, "eyes": 8, "eyebrows": 0, "blush": 0, "tears": 0, "sweat": 0, "mouth": 1}, 4, "Every day, I imagine a future where I can be with you~"),
     "Cutest smug in existence": ({"pose": 0, "eyes": 9, "eyebrows": 0, "blush": 2, "tears": 0, "sweat": 0, "mouth": 5}, 4, "If you know what I mean, ehehe~"),
 
-    # Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Contributed by Sevi (u/lost_localcat) with small edits by dreamscached
+#   Preset display name                Pose       Eyes    Eyebrows       Blush       Tears      Sweat       Mouth Pos  Line
     "Sulks to you":        ({"eyebrows": 3, "eyes": 12, "blush": 2, "mouth": 8, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmph..."),
     "Thinking deep":       ({"eyebrows": 4, "eyes": 5,  "blush": 0, "mouth": 2, "sweat": 0, "pose": 4, "tears": 0}, 4, "Hmm, I wonder..."),
     "Bringing up a topic": ({"eyebrows": 0, "eyes": 0,  "blush": 0, "mouth": 3, "sweat": 0, "pose": 0, "tears": 0}, 4, "Darling, have you ever thought of..."),
@@ -50,6 +52,7 @@ init 100 python in _fom_saysomething:
     from store import pygame
 
     from collections import OrderedDict
+    import random
 
 
     # Value to return from picker screen to indicate that it has to be called
@@ -147,7 +150,7 @@ init 100 python in _fom_saysomething:
         detailed declaration of keys and IDs.)
 
         IN:
-            post_cursors -> dict[str, int]:
+            pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
 
         OUT:
@@ -178,31 +181,41 @@ init 100 python in _fom_saysomething:
             pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
         """
-        # Flatten the EXPR_MAP into a dictionary for easier search
-        flat_map = {}
-        for key, data in EXPR_MAP.items():
-            _, values = data
-            for i, (code, _) in enumerate(values):
-                if code is not None:
-                    flat_map[code] = (key, i)
 
-        # Sort the codes by length in descending order for greedy matching
-        sorted_codes = sorted(flat_map.keys(), key=len, reverse=True)
+        pose_cursors = dict()
+        for key, (_, values) in EXPR_MAP.items():
+            # Scan through selector values to check if next bit in
+            # the expression code contains any of them
+            for i, (value, _) in enumerate(values):
+                # Skip None values (they are omitted in exp code)
+                if value is None:
+                    continue
 
-        # Initialize pose_cursors with all keys from EXPR_MAP set to 0
-        pose_cursors = {key: 0 for key in EXPR_MAP.keys()}
-
-        while sprite_code:
-            for code in sorted_codes:
-                if sprite_code.startswith(code):
-                    key, cursor = flat_map[code]
-                    pose_cursors[key] = cursor
-                    sprite_code = sprite_code[len(code):]
+                # Assign selector value if found
+                if sprite_code.startswith(value):
+                    pose_cursors[key] = i
+                    sprite_code = sprite_code[len(value):]
                     break
+
             else:
-                raise ValueError(f"Unknown code in sprite_code: {sprite_code}")
+                # By default, set to 0
+                pose_cursors[key] = 0
 
         return pose_cursors
+
+    def get_random_pose():
+        """
+        Generates a random pose expression.
+
+        OUT:
+            expression code -> str:
+                Random expression code.
+        """
+
+        exp = list()
+        for _, values in EXPR_MAP.values():
+            exp.append(random.choice(values)[0] or "")
+        return "".join(exp)
 
     ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
 
@@ -332,6 +345,9 @@ init 100 python in _fom_saysomething:
 
             # Flag to indicate that any changes were made to ask for confirmation
             self.changed = False
+
+            # Flag to indicate that a random expression was used at least once
+            self.random_exp_used = False
 
 
         ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
@@ -515,16 +531,23 @@ init 100 python in _fom_saysomething:
             self.changed = True
             return RETURN_RENDER
 
-        def copy_to_clipboard(self):
+        def copy_to_clipboard(self, line=False):
             """
             Retrieves sprite code from pickers state and saves it to clipboard.
+
+            IN:
+                line -> bool, default False:
+                    Whether to copy a sprite code or an entire statement.
 
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
             """
 
-            code = get_sprite_code(self.pose_cursors)
+            if line:
+                code = generate_line(self.pose_cursors, self.text)
+            else:
+                code = get_sprite_code(self.pose_cursors)
             pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
             return RETURN_RENDER
 
@@ -955,12 +978,54 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        def on_reset_pose(self):
+            """
+            Callback for Reset Pose button to reset Monika's pose and expression.
+            With Ctrl+Shift pressed, changes pose to randomly generated sprite.
+
+            OUT:
+                RETURN_RENDER -> int:
+                    Always returns RETURN_RENDER.
+            """
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LSHIFT] and keys[pygame.K_LCTRL]:
+                exp = get_random_pose()
+                cur = get_pose_cursors(exp)
+                self._load_pose_cursors(cur)
+                self.changed = True
+                self.random_exp_used = True
+                return RETURN_RENDER
+            else:
+                return self._reset_state()
+
         ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
 
     # Declare picker as a variable.
     picker = None
 
     ## END PICKER OBJECT AND METHODS ------------------------------------------------------------------------------------------------------
+
+
+
+## COMFY UI ADJUSTMENTS -------------------------------------------------------------------------------------------------------------------
+
+# As ComfyUI changes line height, paddings, other style properties etc., we should
+# adjust the style using control flags here.
+
+# VARIABLES:
+# - comfy_ui_adjust: bool - true if Comfy UI is installed and a theme is used
+# - comfy_ui_theme:  str  - <theme id> if Comfy UI theme is used, NOT DEFINED otherise
+
+# init 100 python in _fom_saysomething:
+    # Check if Comfy UI is installed and is not disabled (has installed themes)
+    comfy_ui_adjust = store.mas_submod_utils.isSubmodInstalled("Comfy UI") and \
+        len(store.comfy_ui.theme_mgr.settings["installed_files"]) > 0
+    # Set current theme ID if available
+    if comfy_ui_adjust:
+        comfy_ui_theme = store.comfy_ui.theme_mgr.get_current_theme()["id"]
+
+## END COMFY UI ADJUSTMENTS ---------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1029,12 +1094,19 @@ screen fom_saysomething_picker(say=True):
             if picker.is_show_code():
                 align (0.99, 0.07)
             else:
-                align (0.99, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.99, 0.1)
+                else:
+                    align (0.99, 0.2)
+
         else:
             if picker.is_show_code():
                 align (0.01, 0.07)
             else:
-                align (0.01, 0.2)
+                if _fom_saysomething.comfy_ui_adjust:
+                    align (0.01, 0.1)
+                else:
+                    align (0.01, 0.2)
 
         ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
 
@@ -1051,7 +1123,13 @@ screen fom_saysomething_picker(say=True):
                     padding (10, 10)
 
                     vbox:
-                        spacing 10
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if picker.is_show_code():
+                                spacing 3
+                            else:
+                                spacing 5
+                        else:
+                            spacing 10
 
                         if picker.is_show_code():
                             hbox:
@@ -1240,10 +1318,25 @@ screen fom_saysomething_picker(say=True):
                 fixed:
                     xsize 370
 
+                    # NOTE: the values are hand-picked to match the expression
+                    # picker menu visually; there isn't much logic beside just that.
+
                     if not picker.is_show_code():
-                        ysize 420
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 397
+                            else:
+                                ysize 366
+                        else:
+                            ysize 396
                     else:
-                        ysize 442
+                        if _fom_saysomething.comfy_ui_adjust:
+                            if _fom_saysomething.comfy_ui_theme == "default":
+                                ysize 427
+                            else:
+                                ysize 392
+                        else:
+                            ysize 440
 
                     # Viewport wrapping long list.
 
@@ -1373,22 +1466,25 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            spacing 10
+            spacing 5
 
             textbutton _("Copy"):
-                xysize(100, None)
-                action Function(picker.copy_to_clipboard)
+                xysize(103, None)
+                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
+                    action Function(picker.copy_to_clipboard, line=True)
+                else:
+                    action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(100, None)
+                xysize(102, None)
                 action Function(picker.select_from_clipboard)
 
         textbutton _("Reset Pose"):
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            action Function(picker._reset_state)
+            action Function(picker.on_reset_pose)
 
-        textbutton _("Show Q. Menu"):
+        textbutton _("Show Menu"):
             xysize (210, None)
 
             # Make this persist, so player doesn't have to always toggle it
@@ -1397,18 +1493,6 @@ screen fom_saysomething_picker(say=True):
             action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
                     Function(_fom_saysomething.set_mas_gui_visible,
                             persistent._fom_saysomething_hide_quick_buttons)]
-
-        # textbutton _("Lock Blinking"):
-        #     xysize (210, None)
-        #     selected not persistent._fom_saysomething_allow_winking
-        #     action ToggleField(persistent, "_fom_saysomething_allow_winking")
-
-        # vbox:
-        #     style_prefix "fom_saysomething_confirm"
-        #     textbutton _("Markdown Help"):
-        #         xysize (210, None)
-        #         selected not persistent._fom_saysomething_markdown_enabled
-        #         action ToggleField(persistent, "_fom_saysomething_markdown_enabled")
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent
@@ -1776,12 +1860,6 @@ screen fom_skippable_pause(duration=1.0):
 
     # Wait for timer and return True, since pause went uninterrupted.
     timer duration action Return(True)
-
-    # Add an invisible button to react on clicking.
-    # -- Actually, we don't need that anymore. `key` section below handles it.
-    # button action Return(False):
-    #     xsize config.screen_width
-    #     ysize config.screen_height
 
     # Listen to dismiss keypresses and return False, since pause
     # was interrupted by player keypress.
