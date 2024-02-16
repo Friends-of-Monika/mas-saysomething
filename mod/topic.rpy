@@ -582,6 +582,7 @@ init 10 python in _fom_saysomething_reactions:
 
     curses_mailbox = FOM_CursesMailbox()
     curses_thres = 0.2
+    curses_severe_mul = 5
 
     @register_handler("fom_saysomething_reaction_curses")
     def handle_reaction_curses(session):
@@ -599,19 +600,24 @@ init 10 python in _fom_saysomething_reactions:
             r"\bcoom\b",
             r"\bcum\b",
             r"\bcunt\b",
-            r"\bfaggot\b",
             r"fuck",
-            r"jigolo",
             r"jizz",
-            r"\bnigg(a|er)\b",
-            r"retard\b",
             r"slut",
             r"\bthot\b",
             r"whore"
         ]), re.I)
 
+        # Additional list for severe profanity that would cost 5x more
+        # words and would be most likely to hit the higher limit.
+        severe_re = re.compile("|".join([
+            r"\bfaggot\b",
+            r"\bnigg(a|er)\b",
+            r"retard\b"
+        ]), re.I)
+
         # Count found bad words from the above wordlist
         hits = list(map(lambda it: bool(bad_re.search(it)), words)).count(True)
+        hits += curses_severe_mul * list(map(lambda it: bool(severe_re.search(it)), words)).count(True)
         ratio = hits / len(words)
 
         if ratio >= curses_thres:
