@@ -6,6 +6,7 @@
 define persistent._fom_saysomething_show_code = False
 define persistent._fom_saysomething_hide_quick_buttons = False
 define persistent._fom_saysomething_speech_mode_default = False
+define persistent._fom_saysomething_enable_reactions = True
 
 screen fom_saysomething_settings:
     $ tooltip = renpy.get_screen("submods", "screens").scope["tooltip"]
@@ -29,3 +30,11 @@ screen fom_saysomething_settings:
                 action ToggleField(persistent, "_fom_saysomething_speech_mode_default")
                 hovered SetField(tooltip, "value", _("Always enable speech/session mode without asking."))
                 unhovered SetField(tooltip, "value", tooltip.default)
+
+        if persistent._fom_saysomething_seen_reactions:
+            hbox:
+                textbutton _("Enable Monika's reactions"):
+                    selected persistent._fom_saysomething_enable_reactions
+                    action ToggleField(persistent, "_fom_saysomething_enable_reactions")
+                    hovered SetField(tooltip, "value", _("Allow Monika to react to things you ask her to say."))
+                    unhovered SetField(tooltip, "value", tooltip.default)
