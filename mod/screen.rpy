@@ -346,6 +346,9 @@ init 100 python in _fom_saysomething:
             # Flag to indicate that any changes were made to ask for confirmation
             self.changed = False
 
+            # Flag to indicate that a random expression was used at least once
+            self.random_exp_used = False
+
 
         ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
 
@@ -991,6 +994,7 @@ init 100 python in _fom_saysomething:
                 cur = get_pose_cursors(exp)
                 self._load_pose_cursors(cur)
                 self.changed = True
+                self.random_exp_used = True
                 return RETURN_RENDER
             else:
                 return self._reset_state()
