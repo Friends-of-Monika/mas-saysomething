@@ -694,3 +694,24 @@ label fom_saysomething_reaction_imposter_before:
 label fom_saysomething_reaction_imposter_after:
     m 2mkp "...I hope you're happy now. Geez."
     return
+
+
+init 10 python in _fom_saysomething_reactions:
+    import store
+
+    @register_handler("fom_saysomething_reaction_randexp", priority=-1)
+    def handle_reaction_randexp(session):
+        # Only react when a random expression was used
+        # Priority is -1 so any other reaction goes ahead
+        return store.picker.random_exp_used
+
+label fom_saysomething_reaction_randexp_before:
+    m 2hkbssdlb "Wow, [player], you really made me make quite a face...{w=0.3} Ahaha!"
+    m 5dkbsu "But you know I'll never get tired of posing for you~"
+    m 1eub "Now, let me prepare..."
+    m 2dua "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    return
+
+label fom_saysomething_reaction_randexp_after:
+    m 1hub "Hope you liked it, ahaha~"
+    return

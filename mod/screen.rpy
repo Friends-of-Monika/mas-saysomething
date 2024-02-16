@@ -52,6 +52,7 @@ init 100 python in _fom_saysomething:
     from store import pygame
 
     from collections import OrderedDict
+    import random
 
 
     # Value to return from picker screen to indicate that it has to be called
@@ -202,6 +203,20 @@ init 100 python in _fom_saysomething:
 
         return pose_cursors
 
+    def get_random_pose():
+        """
+        Generates a random pose expression.
+
+        OUT:
+            expression code -> str:
+                Random expression code.
+        """
+
+        exp = list()
+        for _, values in EXPR_MAP.values():
+            exp.append(random.choice(values)[0] or "")
+        return "".join(exp)
+
     ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
 
 
@@ -330,6 +345,9 @@ init 100 python in _fom_saysomething:
 
             # Flag to indicate that any changes were made to ask for confirmation
             self.changed = False
+
+            # Flag to indicate that a random expression was used at least once
+            self.random_exp_used = False
 
 
         ## PICKER STATE MANAGEMENT FUNCTIONS ----------------------------------------------------------------------------------------------
@@ -960,6 +978,27 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        def on_reset_pose(self):
+            """
+            Callback for Reset Pose button to reset Monika's pose and expression.
+            With Ctrl+Shift pressed, changes pose to randomly generated sprite.
+
+            OUT:
+                RETURN_RENDER -> int:
+                    Always returns RETURN_RENDER.
+            """
+
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LSHIFT] and keys[pygame.K_LCTRL]:
+                exp = get_random_pose()
+                cur = get_pose_cursors(exp)
+                self._load_pose_cursors(cur)
+                self.changed = True
+                self.random_exp_used = True
+                return RETURN_RENDER
+            else:
+                return self._reset_state()
+
         ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
 
     # Declare picker as a variable.
@@ -1443,7 +1482,7 @@ screen fom_saysomething_picker(say=True):
         textbutton _("Reset Pose"):
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            action Function(picker._reset_state)
+            action Function(picker.on_reset_pose)
 
         textbutton _("Show Menu"):
             xysize (210, None)
