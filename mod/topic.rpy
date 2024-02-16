@@ -6,6 +6,7 @@
 
 default persistent._fom_saysomething_seen_screenshot_hint = False
 default persistent._fom_saysomething_speeches = dict()
+default persistent._fom_saysomething_seen_reactions = False
 
 init 5 python:
     addEvent(
@@ -286,8 +287,23 @@ label fom_saysomething_speeches_recite:
 label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_caches=True):
     # Put Monika back in center and let her say a preamble.
     show monika 1esb at t11
-    m 1esb "Alright, give me just a moment to prepare."
-    m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+    if say and persistent._fom_saysomething_enable_reactions:
+        $ reaction = _fom_saysomething_reactions.get_speech_reaction(session)
+    else:
+        $ reaction = None
+
+    if reaction is None:
+        m 1esb "Alright, give me just a moment to prepare."
+        m 2dsc"{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    else:
+        if not persistent._fom_saysomething_seen_reactions:
+            # Let the user know what just happened
+            $ renpy.notify(_("You can disable Monika's reactions in settings."))
+            $ persistent._fom_saysomething_seen_reactions = True
+
+        # Call the reaction label and set persistent var
+        $ renpy.call(reaction + "_before")
 
     if not say:
         # 'Import' set_eyes_lock.
@@ -376,8 +392,11 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
         # In all the other cases just immediately change expression
         show monika 3tua at t11
 
-    m 3tua "Well? {w=0.3}Did I do it good enough?"
-    m 1hub "Hope you liked it, ahaha~"
+    if not say or reaction is None:
+        m 3tua "Well? {w=0.3}Did I do it good enough?"
+        m 1hub "Hope you liked it, ahaha~"
+    else:
+        $ renpy.call(reaction + "_after")
 
     if not say:
         $ del set_eyes_lock
@@ -485,4 +504,193 @@ label fom_saysomething_speeches_generate:
 
     # Cleanup.
     $ del session, chosen_speech
+    return
+
+
+# Reactions API. This allows us to inspect the content of say session and
+# depending on what was said (or other conditions, up to implementation)
+# to modify the parts she says before and after the speech.
+# See implementation example in the next 'init ... python' section below.
+
+init 10 python in _fom_saysomething_reactions:
+    REACTION_HANDLERS = list()
+
+    def register_handler(label, priority=0):
+        def decorator(func):
+            REACTION_HANDLERS.append((label, func, priority))
+            def wrapper(session):
+                return func(session)
+
+            return wrapper
+        return decorator
+
+    def get_speech_reaction(session):
+        matches = list()
+
+        for label, match, priority in REACTION_HANDLERS:
+            before, after = label + "_before", label + "_after"
+            if not (renpy.has_label(before) and renpy.has_label(after)):
+                continue
+
+            if match(session):
+                matches.append((label, priority))
+
+        if not matches:
+            return None
+
+        matches.sort(key=lambda it: it[1], reverse=True)
+        return matches[0][0]
+
+# Example implementation of a reaction to a single line "foobar"
+# you ask her to say.
+# Register the handler with @register_handler, which takes label name
+# as a parameter. Note that you have to create *two* labels, <name>_before and
+# <name>_after, otherwise the reaction handler will not be eligible.
+
+init 10 python in _fom_saysomething_reactions:
+    @register_handler("fom_saysomething_reaction_foobar")
+    def handle_reaction_foobar(session):
+        # We only need to make it one line
+        if len(session) > 1:
+            return False
+
+        # Normalize the line
+        line = session[0][2].lower().strip()
+        return line == "foobar" or line == "foo bar"
+
+# This label will be called before the speech and
+# INSTEAD of the default "let me prepare".
+label fom_saysomething_reaction_foobar_before:
+    m 1tuu "Testing something, aren't you, [player]?"
+    m 3hubsa "You know I'm very happy to assist~"
+    m 2dua "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    return
+
+# This label will be called after the speech and
+# INSTEAD of the default "did I say it well?"
+label fom_saysomething_reaction_foobar_after:
+    m 1tua "Well, was it good enough?{w=0.3} Ahaha~"
+    return
+
+
+init 10 python in _fom_saysomething_reactions:
+    from store import MASMailbox
+    import re
+
+    class FOM_CursesMailbox(MASMailbox):
+        WORD_STATS = "__fom_wordstats"
+
+    curses_mailbox = FOM_CursesMailbox()
+    curses_thres = 0.2
+    curses_severe_mul = 5
+
+    @register_handler("fom_saysomething_reaction_curses", priority=10)
+    def handle_reaction_curses(session):
+        # Normalize the lines, lowercase, strip etc and turn to words
+        words = [
+            word.replace(".!?'\"", "")
+            for words in map(lambda it: it[2].lower().strip().split(" "), session)
+            for word in words
+        ]
+
+        # VERY simplified regexp list for sake of simply detecting very
+        # few impolite statements; we don't need any false positives.
+        bad_re = re.compile("|".join([
+            r"\bboob\b",
+            r"\bcoom\b",
+            r"\bcum\b",
+            r"\bcunt\b",
+            r"fuck",
+            r"jizz",
+            r"slut",
+            r"\bthot\b",
+            r"whore"
+        ]), re.I)
+
+        # Additional list for severe profanity that would cost 5x more
+        # words and would be most likely to hit the higher limit.
+        severe_re = re.compile("|".join([
+            r"\bfaggot\b",
+            r"\bnigg(a|er)\b",
+            r"retard\b"
+        ]), re.I)
+
+        # Count found bad words from the above wordlist
+        hits = list(map(lambda it: bool(bad_re.search(it)), words)).count(True)
+        hits += curses_severe_mul * list(map(lambda it: bool(severe_re.search(it)), words)).count(True)
+        ratio = hits / len(words)
+
+        if ratio >= curses_thres:
+            curses_mailbox.send(FOM_CursesMailbox.WORD_STATS, (hits, len(words), ratio))
+            return True
+
+        return False
+
+label fom_saysomething_reaction_curses_before:
+    $ hits, words, ratio = _fom_saysomething_reactions.curses_mailbox          \
+        .read(_fom_saysomething_reactions.FOM_CursesMailbox.WORD_STATS)
+
+    if ratio <= 0.33: # 20% to 33% of words are curses
+        m 1rksdlb "Ahaha, I wouldn't really...{w=0.3} say some of these words..."
+        m 1hksdla "But...{w=0.3} just give me a moment..."
+        m 2dsc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    elif ratio <= 0.5: # 33% to 50% of words are curses
+        m 2dsc "[player]...{w=0.3} that really isn't polite."
+        m 2etd "Do you really want me to say...{w=0.3} that?"
+        m 1dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}alright."
+    else: # 50% and more (more than half)
+        m 2tsx "[player]!{w=0.3} That's disgusting!"
+        m 1dfc "I would never, {i}ever{/i} say that to anyone."
+        m 2efd "Why would you want me to do that?!"
+        m 1dud "...fine.{w=0.5} Fine.{w=0.5} I guess I just have to."
+        m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+
+    $ del hits, words, ratio
+    return
+
+label fom_saysomething_reaction_curses_after:
+    $ hits, words, ratio = _fom_saysomething_reactions.curses_mailbox          \
+        .read(_fom_saysomething_reactions.FOM_CursesMailbox.WORD_STATS)
+    if ratio <= 0.5:
+        m 2dfc "..."
+        m 2efc "Are you happy now?"
+    else:
+        m 2tsc "...Happy now?{w=0.5}{nw} "
+        extend 2dfc "Sheesh."
+
+    $ del hits, words, ratio
+    return
+
+
+init 10 python in _fom_saysomething_reactions:
+    @register_handler("fom_saysomething_reaction_imposter")
+    def handle_reaction_imposter(session):
+        # We only need to make it one line
+        if len(session) > 1:
+            return False
+
+        # Normalize the line
+        line = session[0][2].lower().strip()
+
+        # Check for variations
+        return (
+            line == "'when the imposter is sus'" or
+            line == "'when imposter is sus'" or
+            line == "'when the impostor is sus'" or
+            line == "'when impostor is sus'" or
+            line == "when imposter is sus" or
+            line == "when impostor is sus"
+        )
+
+label fom_saysomething_reaction_imposter_before:
+    # "may the lord forgive me" - dreamscached
+    m 2dfc "Fine...{w=0.3} Fine, [player], I'll say that."
+    m 2dsd "Here goes nothing."
+    m 2dfc "{w=0.3}.{w=0.3}.{w=0.3}.{w=0.5}{nw}"
+    return
+
+# This label will be called after the speech and
+# INSTEAD of the default "did I say it well?"
+label fom_saysomething_reaction_imposter_after:
+    m 2mkp "...I hope you're happy now. Geez."
     return
