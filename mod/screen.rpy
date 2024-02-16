@@ -1501,7 +1501,7 @@ screen fom_saysomething_picker(say=True):
                     if not picker.is_show_code():
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 397
+                                ysize 379
                             else:
                                 ysize 366
                         else:
@@ -1509,9 +1509,9 @@ screen fom_saysomething_picker(say=True):
                     else:
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 427
+                                ysize 407
                             else:
-                                ysize 392
+                                ysize 389
                         else:
                             ysize 440
 
@@ -1638,17 +1638,17 @@ screen fom_saysomething_picker(say=True):
         hbox:
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            spacing 5
+            spacing 10
 
             textbutton _("Copy"):
-                xysize(103, None)
+                xysize(100, None)
                 if pygame.key.get_pressed()[pygame.K_LSHIFT]:
                     action Function(picker.copy_to_clipboard, line=True)
                 else:
                     action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(102, None)
+                xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
         hbox:
