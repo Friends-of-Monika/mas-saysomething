@@ -300,10 +300,10 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
         if not persistent._fom_saysomething_seen_reactions:
             # Let the user know what just happened
             $ renpy.notify(_("You can disable Monika's reactions in settings."))
+            $ persistent._fom_saysomething_seen_reactions = True
 
         # Call the reaction label and set persistent var
         $ renpy.call(reaction + "_before")
-        $ persistent._fom_saysomething_seen_reactions = True
 
     if not say:
         # 'Import' set_eyes_lock.
