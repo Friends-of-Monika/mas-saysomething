@@ -52,6 +52,7 @@ init 100 python in _fom_saysomething:
     from store import pygame
 
     from collections import OrderedDict
+    import random
 
 
     # Value to return from picker screen to indicate that it has to be called
@@ -201,6 +202,20 @@ init 100 python in _fom_saysomething:
                 pose_cursors[key] = 0
 
         return pose_cursors
+
+    def get_random_pose():
+        """
+        Generates a random pose expression.
+
+        OUT:
+            expression code -> str:
+                Random expression code.
+        """
+
+        exp = list()
+        for _, values in EXPR_MAP.values():
+            exp.append(random.choice(values)[0] or "")
+        return "".join(exp)
 
     ## END POSE SELECTORS DICTIONARY ------------------------------------------------------------------------------------------------------
 
@@ -960,6 +975,17 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        def on_reset_pose(self):
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_LSHIFT] and keys[pygame.K_LCTRL]:
+                exp = get_random_pose()
+                cur = get_pose_cursors(exp)
+                self._load_pose_cursors(cur)
+                self.changed = True
+                return RETURN_RENDER
+            else:
+                return self._reset_state()
+
         ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
 
     # Declare picker as a variable.
@@ -1443,7 +1469,7 @@ screen fom_saysomething_picker(say=True):
         textbutton _("Reset Pose"):
             style_prefix "fom_saysomething_confirm"
             xysize (210, None)
-            action Function(picker._reset_state)
+            action Function(picker.on_reset_pose)
 
         textbutton _("Show Menu"):
             xysize (210, None)
