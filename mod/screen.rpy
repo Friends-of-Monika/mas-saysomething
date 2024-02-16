@@ -1650,7 +1650,7 @@ screen fom_saysomething_picker(say=True):
 
             textbutton _("Reset Pose"):
                 xysize (210, None)
-                action Function(picker._reset_state)
+                action Function(picker.on_reset_pose)
 
         hbox:
             # Have to use this to make buttons 'togglable.'
