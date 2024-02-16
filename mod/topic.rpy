@@ -289,7 +289,7 @@ label fom_saysomething_perform(session, say=True, pose_delay=None, cleanup_cache
     show monika 1esb at t11
 
     if say and persistent._fom_saysomething_enable_reactions:
-        $ reaction = _fom_saysomething_reactions.get_random_reaction(session)
+        $ reaction = _fom_saysomething_reactions.get_speech_reaction(session)
     else:
         $ reaction = None
 
@@ -513,33 +513,33 @@ label fom_saysomething_speeches_generate:
 # See implementation example in the next 'init ... python' section below.
 
 init 10 python in _fom_saysomething_reactions:
-    import random
-
     REACTION_HANDLERS = list()
 
-    def register_handler(label):
+    def register_handler(label, priority=0):
         def decorator(func):
-            REACTION_HANDLERS.append((label, func))
+            REACTION_HANDLERS.append((label, func, priority))
             def wrapper(session):
                 return func(session)
 
             return wrapper
         return decorator
 
-    def get_random_reaction(session):
+    def get_speech_reaction(session):
         matches = list()
 
-        for label, match in REACTION_HANDLERS:
+        for label, match, priority in REACTION_HANDLERS:
             before, after = label + "_before", label + "_after"
             if not (renpy.has_label(before) and renpy.has_label(after)):
                 continue
 
             if match(session):
-                matches.append(label)
+                matches.append((label, priority))
 
         if not matches:
             return None
-        return random.choice(matches)
+
+        matches.sort(key=lambda it: it[1], reverse=True)
+        return matches[0][0]
 
 # Example implementation of a reaction to a single line "foobar"
 # you ask her to say.
@@ -584,7 +584,7 @@ init 10 python in _fom_saysomething_reactions:
     curses_thres = 0.2
     curses_severe_mul = 5
 
-    @register_handler("fom_saysomething_reaction_curses")
+    @register_handler("fom_saysomething_reaction_curses", priority=10)
     def handle_reaction_curses(session):
         # Normalize the lines, lowercase, strip etc and turn to words
         words = [
