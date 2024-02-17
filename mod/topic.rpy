@@ -703,7 +703,9 @@ init 10 python in _fom_saysomething_reactions:
     def handle_reaction_randexp(session):
         # Only react when a random expression was used
         # Priority is -1 so any other reaction goes ahead
-        return store.picker.random_exp_used
+        if hasattr(store, "picker") and store.picker is not None:
+            return store.picker.random_exp_used
+        return False
 
 label fom_saysomething_reaction_randexp_before:
     m 2hkbssdlb "Wow, [player], you really made me make quite a face...{w=0.3} Ahaha!"
