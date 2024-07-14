@@ -1171,6 +1171,7 @@ init 100 python in _fom_saysomething:
 # init 100 python in _fom_saysomething:
     # Check if Comfy UI is installed and is not disabled (has installed themes)
     comfy_ui_adjust = store.mas_submod_utils.isSubmodInstalled("Comfy UI") and \
+        hasattr(store.comfy_ui, "theme_mgr") and \
         len(store.comfy_ui.theme_mgr.settings["installed_files"]) > 0
     # Set current theme ID if available
     if comfy_ui_adjust:
