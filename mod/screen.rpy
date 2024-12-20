@@ -1233,6 +1233,7 @@ style fom_saysomething_titlebox_dark is default:
 
 screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
+    zorder 100
 
     # NOTE: This is placed here because in Ren'Py 6 key object affects spacing.
     if picker.preset_cursor is not None:
