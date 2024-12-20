@@ -1634,9 +1634,6 @@ screen fom_saysomething_picker(say=True):
         xsize 210
         spacing 10
 
-        # Have to use this to make buttons 'togglable.'
-        style_prefix "check_scrollable_menu"
-
         hbox:
             style_prefix "fom_saysomething_confirm_fom"
             xysize (210, None)
@@ -1650,10 +1647,11 @@ screen fom_saysomething_picker(say=True):
                 xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
-        textbutton _("Reset Pose"):
+        hbox:
             style_prefix "fom_saysomething_confirm_fom"
-            xysize (210, None)
-            action Function(picker.on_reset_pose)
+            textbutton _("Reset Pose"):
+                xysize (210, None)
+                action Function(picker.on_reset_pose)
 
         hbox:
             # Have to use this to make buttons 'togglable.'
@@ -1661,6 +1659,7 @@ screen fom_saysomething_picker(say=True):
 
             textbutton _("Show Menu"):
                 xysize (210, None)
+                text_align 0.5
 
                 # Make this persist, so player doesn't have to always toggle it
                 selected not persistent._fom_saysomething_hide_quick_buttons
