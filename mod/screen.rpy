@@ -43,6 +43,13 @@ default persistent._fom_saysomething_presets = {
 
 ## PICKER CLASS, CONSTANTS, POSES/POSITIONS -----------------------------------------------------------------------------------------------
 
+init -200 python in mas_ui:
+    import store
+
+    if not hasattr(store.mas_ui, "TEXT_FIELD_BG"):
+        TEXT_FIELD_BG = "#ffaa99aa"
+
+
 init 100 python in _fom_saysomething:
 
     import store
@@ -364,17 +371,11 @@ init 100 python in _fom_saysomething:
                 # default, her usual middle screen position.
                 self.position = POSITIONS[4][0]
 
-                # Adjustment object to define slider properties for position slider
-                # and handle value changes.
-                self.position_adjustment = ui.adjustment(
-                    range=len(POSITIONS) - 1,
-                    value=4,
-                    adjustable=True,
-                    changed=self.on_position_change
-                )
+                # Position cursor, an index to POSITIONS list to pick position by.
+                self.position_cursor = 4
 
                 # Set GUI flip.
-                self.gui_flip = self.position_adjustment.value > 4
+                self.gui_flip = self.position_cursor > 4
 
             if reset_text:
                 # Variable that stores entered user text prompt.
@@ -388,7 +389,7 @@ init 100 python in _fom_saysomething:
         def _save_state(self):
             return (
                 {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_adjustment.value,  #1 - position
+                self.position_cursor,  #1 - position
                 self.text  #2 - text
             )
 
@@ -399,7 +400,7 @@ init 100 python in _fom_saysomething:
             self._load_pose_cursors(pose_cur)
 
             # Load position
-            self.position_adjustment.value = pos
+            self.position_cursor = pos
             self.on_position_change(pos)
 
             # Load text
@@ -474,6 +475,77 @@ init 100 python in _fom_saysomething:
             curr = self.pose_cursors[key][0]
             return EXPR_MAP[key][1][curr][1]
 
+        def position_switch_selector(self, forward):
+            """
+            Switches position forward or backward. If cursor reaches zero or max
+            value, prevents it from going further.
+
+            IN:
+                forward -> bool:
+                    True if to increment, False to decrement.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+
+            new = curr
+            if forward:
+                if curr != _max:
+                    new = curr + 1
+            else:
+                if curr != 0:
+                    new = curr - 1
+
+            self.position_cursor = new
+            self.position = POSITIONS[self.position_cursor][0]
+            self.gui_flip = self.position_cursor > 4
+            return RETURN_RENDER
+
+        def get_position_label(self):
+            """
+            Returns human readable (cursor + 1 or tXX notation depending on
+            user preferences) position label for position.
+
+            OUT:
+                str:
+                    Position label.
+            """
+
+            if self.is_show_code():
+                return POSITIONS[self.position_cursor][1]
+            return "#" + str(self.position_cursor + 1)
+
+        def position_switch_usable(self, forward):
+            """
+            Returns if position switch (backward or forward) is usable and
+            should be sensitive.
+
+            IN:
+                forward -> bool:
+                    True if forward, False if backward.
+
+            OUT:
+                True:
+                    True if can increment/decrement, False otherwise.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+            if forward:
+                return curr < _max
+            else:
+                return curr > 0
+
         def get_sprite_code(self):
             """
             Builds sprite code for the current selectors configuration.
@@ -487,19 +559,75 @@ init 100 python in _fom_saysomething:
 
         def get_position_label(self):
             """
-            Returns human readable (tXX notation) position label for position.
+            Returns human readable (cursor + 1 or tXX notation depending on
+            user preferences) position label for position.
 
             OUT:
                 str:
-                    Position label if user wants to display expression codes.
-
-                None:
-                    If user does not need to display expression codes.
+                    Position label.
             """
 
             if self.is_show_code():
-                return get_position_code(self.position_adjustment.value)
-            return None
+                return POSITIONS[self.position_cursor][1]
+            return "#" + str(self.position_cursor + 1)
+
+        def position_switch_usable(self, forward):
+            """
+            Returns if position switch (backward or forward) is usable and
+            should be sensitive.
+
+            IN:
+                forward -> bool:
+                    True if forward, False if backward.
+
+            OUT:
+                True:
+                    True if can increment/decrement, False otherwise.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+            if forward:
+                return curr < _max
+            else:
+                return curr > 0
+
+        def position_switch_selector(self, forward):
+            """
+            Switches position forward or backward. If cursor reaches zero or max
+            value, prevents it from going further.
+
+            IN:
+                forward -> bool:
+                    True if to increment, False to decrement.
+
+            NOTE:
+                This function (and entire position selector as selector) exists
+                only to provide support for RenPy 6. It will be removed as soon
+                as MAS migrates to RenPy 8.
+            """
+
+            curr = self.position_cursor
+            _max = len(POSITIONS) - 1
+
+            new = curr
+            if forward:
+                if curr != _max:
+                    new = curr + 1
+            else:
+                if curr != 0:
+                    new = curr - 1
+
+            self.position_cursor = new
+            self.position = POSITIONS[self.position_cursor][0]
+            self.gui_flip = self.position_cursor > 4
+            self.changed = True
+            return RETURN_RENDER
 
         def select_from_clipboard(self):
             """
@@ -545,7 +673,7 @@ init 100 python in _fom_saysomething:
                 code = generate_line(self.pose_cursors, self.text)
             else:
                 code = get_sprite_code(self.pose_cursors)
-            pygame.scrap.put(pygame.SCRAP_TEXT, bytes(code, "utf-8"))
+            pygame.scrap.put(pygame.SCRAP_TEXT, code)
             return RETURN_RENDER
 
         ## END POSE/EXPRESSION SELECTOR FUNCTIONS -----------------------------------------------------------------------------------------
@@ -640,6 +768,29 @@ init 100 python in _fom_saysomething:
             """
 
             return name in persistent._fom_saysomething_presets
+
+        def _save_state(self):
+            return (
+                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
+                self.position_cursor,  #1 - position
+                self.text  #2 - text
+            )
+
+        def _load_state(self, state):
+            pose_cur, pos, text = state
+
+            # Load selectors
+            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
+
+            # Load position
+            self.position_cursor = pos
+            self.on_position_change(pos)
+
+            # Load text
+            self.text = text
+            self.on_text_change(text)
+
+            return RETURN_RENDER
 
         def save_preset(self, name):
             """
@@ -1038,19 +1189,23 @@ style fom_saysomething_picker_frame is gui_frame:
 style fom_saysomething_picker_frame_dark is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame_d.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
 
-style fom_saysomething_confirm_button is generic_button_light:
+style fom_saysomething_confirm_fom_prompt is confirm_prompt
+style fom_saysomething_confirm_fom_prompt_text is confirm_prompt_text
+style fom_saysomething_confirm_fom_prompt_text_dark is confirm_prompt_text_dark
+
+style fom_saysomething_confirm_fom_button is generic_button_light:
     xysize (116, None)
     padding (10, 5, 10, 5)
 
-style fom_saysomething_confirm_button_dark is generic_button_dark:
+style fom_saysomething_confirm_fom_button_dark is generic_button_dark:
     xysize (116, None)
     padding (10, 5, 10, 5)
 
-style fom_saysomething_confirm_button_text is generic_button_text_light:
+style fom_saysomething_confirm_fom_button_text is generic_button_text_light:
     text_align 0.5
     layout "subtitle"
 
-style fom_saysomething_confirm_button_text_dark is generic_button_text_dark:
+style fom_saysomething_confirm_fom_button_text_dark is generic_button_text_dark:
     text_align 0.5
     layout "subtitle"
 
@@ -1078,6 +1233,15 @@ style fom_saysomething_titlebox_dark is default:
 
 screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
+    zorder 100
+
+    # NOTE: This is placed here because in Ren'Py 6 key object affects spacing.
+    if picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
+                                    title="Delete this preset?",
+                                    message=picker.preset_name,
+                                    ok_button="Delete",
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
     vbox:
 
@@ -1189,12 +1353,30 @@ screen fom_saysomething_picker(say=True):
                         xmaximum 350
                         xfill True
 
-                        text _("Position")
-                        bar:
+                        # Split into two hboxes to align arrows and labels
+                        # properly, so that one can click them without
+                        # missing if label is too big; this layout preserves
+                        # space for big labels.
+
+                        hbox:
+                            xfill True
+                            xmaximum 110
+                            text "Position"
+
+                        hbox:
+                            xmaximum 240
+                            xfill True
                             xalign 1.0
-                            yalign 0.5
-                            adjustment picker.position_adjustment
-                            released Return(_fom_saysomething.RETURN_RENDER)
+
+                            textbutton "<":
+                                xalign 0.0
+                                action Function(picker.position_switch_selector, forward=False)
+                                sensitive picker.position_switch_usable(forward=False)
+                            text picker.get_position_label() xalign 0.5
+                            textbutton ">":
+                                xalign 1.0
+                                action Function(picker.position_switch_selector, forward=True)
+                                sensitive picker.position_switch_usable(forward=True)
 
                 ## END POSITION SLIDER/SELECTOR -------------------------------------------------------------------------------------------
 
@@ -1207,7 +1389,7 @@ screen fom_saysomething_picker(say=True):
                     padding (0, 0)
 
                     hbox:
-                        style_prefix "fom_saysomething_confirm"
+                        style_prefix "fom_saysomething_confirm_fom"
 
                         xmaximum 350
                         xfill True
@@ -1324,7 +1506,7 @@ screen fom_saysomething_picker(say=True):
                             if _fom_saysomething.comfy_ui_theme == "default":
                                 ysize 397
                             else:
-                                ysize 366
+                                ysize 368
                         else:
                             ysize 396
                     else:
@@ -1332,7 +1514,7 @@ screen fom_saysomething_picker(say=True):
                             if _fom_saysomething.comfy_ui_theme == "default":
                                 ysize 427
                             else:
-                                ysize 392
+                                ysize 393
                         else:
                             ysize 440
 
@@ -1369,7 +1551,10 @@ screen fom_saysomething_picker(say=True):
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        xalign -0.07
+                        if not picker.gui_flip:
+                            xalign -0.07
+                        else:
+                            xalign 1.07
 
                 ## END PRESETS MENU -------------------------------------------------------------------------------------------------------
 
@@ -1380,7 +1565,7 @@ screen fom_saysomething_picker(say=True):
             padding (0, 10, 0, 0)
 
             hbox:
-                style_prefix "fom_saysomething_confirm"
+                style_prefix "fom_saysomething_confirm_fom"
 
                 xmaximum 350
                 xfill True
@@ -1425,12 +1610,6 @@ screen fom_saysomething_picker(say=True):
                                     ok_action=Function(picker.delete_preset, picker.preset_name))
                         sensitive picker.preset_cursor is not None
                         selected False
-                    if picker.preset_cursor is not None:
-                        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
-                                                    title=_("Delete this preset?"),
-                                                    message=picker.preset_name,
-                                                    ok_button=_("Delete"),
-                                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
                 # 'Close' or 'back' is the same for both panels and can share
                 # the logic. For selectors panel it will close the GUI
@@ -1457,48 +1636,62 @@ screen fom_saysomething_picker(say=True):
     vbox:
         align (0.99, 0.977)
         xsize 210
-
-        # Have to use this to make buttons 'togglable.'
-        style_prefix "check_scrollable_menu"
+        spacing 10
 
         hbox:
-            style_prefix "fom_saysomething_confirm"
+            style_prefix "fom_saysomething_confirm_fom"
             xysize (210, None)
-            spacing 5
+            spacing 10
 
             textbutton _("Copy"):
                 xysize(103, None)
                 action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
-                xysize(102, None)
+                xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
-        textbutton _("Reset Pose"):
-            style_prefix "fom_saysomething_confirm"
-            xysize (210, None)
-            action Function(picker.on_reset_pose)
+        hbox:
+            style_prefix "fom_saysomething_confirm_fom"
+            textbutton _("Reset Pose"):
+                xysize (210, None)
+                action Function(picker.on_reset_pose)
 
-        textbutton _("Show Menu"):
-            xysize (210, None)
+        hbox:
+            # Have to use this to make buttons 'togglable.'
+            style_prefix "check_scrollable_menu"
 
-            # Make this persist, so player doesn't have to always toggle it
-            selected not persistent._fom_saysomething_hide_quick_buttons
+            textbutton _("Show Menu"):
+                xysize (210, None)
+                text_align 0.5
 
-            action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
-                    Function(_fom_saysomething.set_mas_gui_visible,
-                            persistent._fom_saysomething_hide_quick_buttons)]
+                # Make this persist, so player doesn't have to always toggle it
+                selected not persistent._fom_saysomething_hide_quick_buttons
+
+                action [ToggleField(persistent, "_fom_saysomething_hide_quick_buttons"),
+                        Function(_fom_saysomething.set_mas_gui_visible,
+                                 persistent._fom_saysomething_hide_quick_buttons)]
 
     # Text input area styled as textbox and key capture so that Shift+Enter key
     # press is the same as pressing 'Say' button. For posing, it is equivalent
     # of pressing 'Pose'. When in session mode, this will add current state to
     # the session.
 
-    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say) capture True
+    key "shift_K_RETURN" action Function(picker.on_shift_enter_press, say)
+
+    ## It's necessary to put keys *here* and not where they're actually used...
+    ## Because thanks to Ren'Py, keys somehow affect spacing.
+
+    if picker.presets_menu and picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
+                                    title=_("Delete this preset?"),
+                                    message=picker.preset_name,
+                                    ok_button=_("Delete"),
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
     if say:
         # This handles Enter key press and adds a new line.
-        key "noshift_K_RETURN" action Function(picker.on_enter_press) capture True
+        key "noshift_K_RETURN" action Function(picker.on_enter_press)
 
         window:
             align (0.5, 0.99)
@@ -1542,6 +1735,15 @@ screen fom_saysomething_picker(say=True):
                 align (0.5, 1.02)
 
                 use quick_menu
+
+    # This is here because 'key' somehow affects spacing.
+
+    if picker.preset_cursor is not None:
+        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
+                                    title="Delete this preset?",
+                                    message=picker.preset_name,
+                                    ok_button="Delete",
+                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
 ## END PICKER GUI LAYOUT AND DEFINITIONS --------------------------------------------------------------------------------------------------
 
