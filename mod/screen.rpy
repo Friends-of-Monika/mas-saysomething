@@ -1514,7 +1514,7 @@ screen fom_saysomething_picker(say=True):
                             if _fom_saysomething.comfy_ui_theme == "default":
                                 ysize 407
                             else:
-                                ysize 389
+                                ysize 393
                         else:
                             ysize 440
 
@@ -1551,7 +1551,10 @@ screen fom_saysomething_picker(say=True):
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        xalign -0.07
+                        if not picker.gui_flip:
+                            xalign -0.07
+                        else:
+                            xalign 1.07
 
                 ## END PRESETS MENU -------------------------------------------------------------------------------------------------------
 
