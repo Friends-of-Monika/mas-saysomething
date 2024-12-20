@@ -1506,7 +1506,7 @@ screen fom_saysomething_picker(say=True):
                             if _fom_saysomething.comfy_ui_theme == "default":
                                 ysize 379
                             else:
-                                ysize 366
+                                ysize 368
                         else:
                             ysize 396
                     else:
