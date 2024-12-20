@@ -1504,7 +1504,7 @@ screen fom_saysomething_picker(say=True):
                     if not picker.is_show_code():
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 379
+                                ysize 397
                             else:
                                 ysize 368
                         else:
@@ -1512,7 +1512,7 @@ screen fom_saysomething_picker(say=True):
                     else:
                         if _fom_saysomething.comfy_ui_adjust:
                             if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 407
+                                ysize 427
                             else:
                                 ysize 393
                         else:
