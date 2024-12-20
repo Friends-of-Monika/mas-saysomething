@@ -531,20 +531,17 @@ init 100 python in _fom_saysomething:
             self.changed = True
             return RETURN_RENDER
 
-        def copy_to_clipboard(self, line=False):
+        def copy_to_clipboard(self):
             """
             Retrieves sprite code from pickers state and saves it to clipboard.
-
-            IN:
-                line -> bool, default False:
-                    Whether to copy a sprite code or an entire statement.
+            If SHIFT is pressed, copies the entire line.
 
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
             """
 
-            if line:
+            if pygame.key.get_pressed()[pygame.K_LSHIFT]:
                 code = generate_line(self.pose_cursors, self.text)
             else:
                 code = get_sprite_code(self.pose_cursors)
@@ -1471,10 +1468,7 @@ screen fom_saysomething_picker(say=True):
 
             textbutton _("Copy"):
                 xysize(103, None)
-                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
-                    action Function(picker.copy_to_clipboard, line=True)
-                else:
-                    action Function(picker.copy_to_clipboard)
+                action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
                 xysize(102, None)
