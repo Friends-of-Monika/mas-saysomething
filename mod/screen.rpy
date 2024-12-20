@@ -659,20 +659,17 @@ init 100 python in _fom_saysomething:
             self.changed = True
             return RETURN_RENDER
 
-        def copy_to_clipboard(self, line=False):
+        def copy_to_clipboard(self):
             """
             Retrieves sprite code from pickers state and saves it to clipboard.
-
-            IN:
-                line -> bool, default False:
-                    Whether to copy a sprite code or an entire statement.
+            If SHIFT is pressed, copies the entire line.
 
             OUT:
                 RETURN_RENDER:
                     Always returns RETURN_RENDER.
             """
 
-            if line:
+            if pygame.key.get_pressed()[pygame.K_LSHIFT]:
                 code = generate_line(self.pose_cursors, self.text)
             else:
                 code = get_sprite_code(self.pose_cursors)
@@ -1192,19 +1189,23 @@ style fom_saysomething_picker_frame is gui_frame:
 style fom_saysomething_picker_frame_dark is gui_frame:
     background Frame(["gui/confirm_frame.png", "gui/frame_d.png"], gui.confirm_frame_borders, tile=gui.frame_tile)
 
-style fom_saysomething_confirm_button is generic_button_light:
+style fom_saysomething_confirm_fom_prompt is confirm_prompt
+style fom_saysomething_confirm_fom_prompt_text is confirm_prompt_text
+style fom_saysomething_confirm_fom_prompt_text_dark is confirm_prompt_text_dark
+
+style fom_saysomething_confirm_fom_button is generic_button_light:
     xysize (116, None)
     padding (10, 5, 10, 5)
 
-style fom_saysomething_confirm_button_dark is generic_button_dark:
+style fom_saysomething_confirm_fom_button_dark is generic_button_dark:
     xysize (116, None)
     padding (10, 5, 10, 5)
 
-style fom_saysomething_confirm_button_text is generic_button_text_light:
+style fom_saysomething_confirm_fom_button_text is generic_button_text_light:
     text_align 0.5
     layout "subtitle"
 
-style fom_saysomething_confirm_button_text_dark is generic_button_text_dark:
+style fom_saysomething_confirm_fom_button_text_dark is generic_button_text_dark:
     text_align 0.5
     layout "subtitle"
 
@@ -1387,7 +1388,7 @@ screen fom_saysomething_picker(say=True):
                     padding (0, 0)
 
                     hbox:
-                        style_prefix "fom_saysomething_confirm"
+                        style_prefix "fom_saysomething_confirm_fom"
 
                         xmaximum 350
                         xfill True
@@ -1560,7 +1561,7 @@ screen fom_saysomething_picker(say=True):
             padding (0, 10, 0, 0)
 
             hbox:
-                style_prefix "fom_saysomething_confirm"
+                style_prefix "fom_saysomething_confirm_fom"
 
                 xmaximum 350
                 xfill True
@@ -1637,27 +1638,22 @@ screen fom_saysomething_picker(say=True):
         style_prefix "check_scrollable_menu"
 
         hbox:
-            style_prefix "fom_saysomething_confirm"
+            style_prefix "fom_saysomething_confirm_fom"
             xysize (210, None)
             spacing 10
 
             textbutton _("Copy"):
-                xysize(100, None)
-                if pygame.key.get_pressed()[pygame.K_LSHIFT]:
-                    action Function(picker.copy_to_clipboard, line=True)
-                else:
-                    action Function(picker.copy_to_clipboard)
+                xysize(103, None)
+                action Function(picker.copy_to_clipboard)
 
             textbutton _("Paste"):
                 xysize(100, None)
                 action Function(picker.select_from_clipboard)
 
-        hbox:
-            style_prefix "fom_saysomething_confirm"
-
-            textbutton _("Reset Pose"):
-                xysize (210, None)
-                action Function(picker._reset_state)
+        textbutton _("Reset Pose"):
+            style_prefix "fom_saysomething_confirm_fom"
+            xysize (210, None)
+            action Function(picker.on_reset_pose)
 
         hbox:
             # Have to use this to make buttons 'togglable.'
