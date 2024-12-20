@@ -13,7 +13,7 @@ init 101 python in _fom_saysomething:
 
     def _get_sane_name(dir_name):
         """
-        Replaces Windows reserved characters (<>:"/\|?*) with an underscore.
+        Replaces Windows reserved characters (<>:\"/\\|?*) with an underscore.
 
         IN:
             dir_name -> str:
@@ -414,7 +414,8 @@ init 101 python in _fom_saysomething:
             return "\n".join(map(lambda it: "    " + it, lines))
 
         # Create speeches directory if not exists, make path for script.
-        os.makedirs(SPEECHES_DIR_PATH, exist_ok=True)
+        if not os.path.exists(SPEECHES_DIR_PATH):
+            os.makedirs(SPEECHES_DIR_PATH)
         path = os.path.join(SPEECHES_DIR_PATH, name + ".rpy.txt")
 
         # Create topic properties
