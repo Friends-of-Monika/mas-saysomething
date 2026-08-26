@@ -504,6 +504,7 @@ init 100 python in _fom_saysomething:
             self.position_cursor = new
             self.position = POSITIONS[self.position_cursor][0]
             self.gui_flip = self.position_cursor > 4
+            self.changed = True
             return RETURN_RENDER
 
         def get_position_label(self):
@@ -556,78 +557,6 @@ init 100 python in _fom_saysomething:
             """
 
             return get_sprite_code(self.pose_cursors)
-
-        def get_position_label(self):
-            """
-            Returns human readable (cursor + 1 or tXX notation depending on
-            user preferences) position label for position.
-
-            OUT:
-                str:
-                    Position label.
-            """
-
-            if self.is_show_code():
-                return POSITIONS[self.position_cursor][1]
-            return "#" + str(self.position_cursor + 1)
-
-        def position_switch_usable(self, forward):
-            """
-            Returns if position switch (backward or forward) is usable and
-            should be sensitive.
-
-            IN:
-                forward -> bool:
-                    True if forward, False if backward.
-
-            OUT:
-                True:
-                    True if can increment/decrement, False otherwise.
-
-            NOTE:
-                This function (and entire position selector as selector) exists
-                only to provide support for RenPy 6. It will be removed as soon
-                as MAS migrates to RenPy 8.
-            """
-
-            curr = self.position_cursor
-            _max = len(POSITIONS) - 1
-            if forward:
-                return curr < _max
-            else:
-                return curr > 0
-
-        def position_switch_selector(self, forward):
-            """
-            Switches position forward or backward. If cursor reaches zero or max
-            value, prevents it from going further.
-
-            IN:
-                forward -> bool:
-                    True if to increment, False to decrement.
-
-            NOTE:
-                This function (and entire position selector as selector) exists
-                only to provide support for RenPy 6. It will be removed as soon
-                as MAS migrates to RenPy 8.
-            """
-
-            curr = self.position_cursor
-            _max = len(POSITIONS) - 1
-
-            new = curr
-            if forward:
-                if curr != _max:
-                    new = curr + 1
-            else:
-                if curr != 0:
-                    new = curr - 1
-
-            self.position_cursor = new
-            self.position = POSITIONS[self.position_cursor][0]
-            self.gui_flip = self.position_cursor > 4
-            self.changed = True
-            return RETURN_RENDER
 
         def select_from_clipboard(self):
             """
@@ -768,29 +697,6 @@ init 100 python in _fom_saysomething:
             """
 
             return name in persistent._fom_saysomething_presets
-
-        def _save_state(self):
-            return (
-                {key: value[0] for key, value in self.pose_cursors.items()},  #0 - pose cursors
-                self.position_cursor,  #1 - position
-                self.text  #2 - text
-            )
-
-        def _load_state(self, state):
-            pose_cur, pos, text = state
-
-            # Load selectors
-            self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cur.items()}
-
-            # Load position
-            self.position_cursor = pos
-            self.on_position_change(pos)
-
-            # Load text
-            self.text = text
-            self.on_text_change(text)
-
-            return RETURN_RENDER
 
         def save_preset(self, name):
             """
