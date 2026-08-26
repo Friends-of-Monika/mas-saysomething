@@ -1145,6 +1145,17 @@ init 100 python in _fom_saysomething:
     # panel not to run into the quick buttons rack in the bottom right corner.
     PANEL_YALIGN = 0.08
 
+    # Height of the textbox image itself. The say window is gui.textbox_height
+    # tall, but the textbox image in it is shorter than that and is aligned to
+    # the bottom of the window, so it is this height (and not the height of the
+    # window) that tells where the visible top edge of the textbox is.
+    TEXTBOX_HEIGHT = 146
+
+    # How deep the say text input title box goes behind the textbox. Kept
+    # small, as the title box is only as tall as the text in it plus a small
+    # padding, and sinking it deeper than that padding cuts the text off.
+    TITLEBOX_OVERLAP = 5
+
 ## END PICKER GUI GEOMETRY -------------------------------------------------------------------------------------------------------------
 
 
@@ -1632,17 +1643,34 @@ screen fom_saysomething_picker(say=True):
         # This handles Enter key press and adds a new line.
         key "noshift_K_RETURN" action Function(picker.on_enter_press)
 
-        window:
-            align (0.5, 0.99)
+        # Title box of the text input. It is a separate component (and not a
+        # part of the textbox window below) so that it does not slide as the
+        # player keeps typing, and it is placed *before* that window so that it
+        # is drawn behind it and tucks behind the top edge of the textbox.
 
-            # This split into two components to prevent title sliding as user keeps
-            # typing the input text.
+        fixed:
+            xfill True
+
+            # NOTE: this box matches the visible textbox and not the window it
+            # is in, so that the title box below is positioned against the edge
+            # the player actually sees.
+            ysize _fom_saysomething.TEXTBOX_HEIGHT
+            align (0.5, 0.99)
 
             window:
                 style "fom_saysomething_titlebox"
-                align (0.5, 0.0)
+
+                xalign 0.5
+
+                # Bottom edge of the title box goes this far below the top edge
+                # of the textbox, hiding it behind the textbox.
+                ypos _fom_saysomething.TITLEBOX_OVERLAP
+                yanchor 1.0
 
                 text _("What do you want me to say?~")
+
+        window:
+            align (0.5, 0.99)
 
             vbox:
                 align (0.5, 0.58)
