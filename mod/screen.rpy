@@ -248,6 +248,11 @@ init 100 python in _fom_saysomething:
         (store.t44, "t44")  #8
     ]
 
+    # Default position cursor, an index in POSITIONS list; this is her usual
+    # middle screen position. Positions past this one are on the right side of
+    # the screen and make the GUI flip to the left.
+    DEFAULT_POSITION = 4
+
     def get_position_code(position_cursor):
         """
         Gets position identifier for given Monika's position (see above for IDs
@@ -316,12 +321,10 @@ init 100 python in _fom_saysomething:
             Creates a new Picker instance.
             """
 
+            # NOTE: this also sets position and gui_flip, a flag value for
+            # flipping selectors/position GUI to left side of screen if it
+            # would mean Monika is behind the GUI and not in user's sight.
             self._reset_state()
-
-            # Flag value for flipping selectors/position GUI to left side of
-            # screen if it would mean Monika is behind the GUI and not in user's
-            # sight.
-            self.gui_flip = False
 
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
@@ -367,15 +370,9 @@ init 100 python in _fom_saysomething:
                 # Initially all cursors are at zero (with corresponding expression names.)
                 self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
 
-                # Position object to use when showing Monika at her table. By
-                # default, her usual middle screen position.
-                self.position = POSITIONS[4][0]
-
-                # Position cursor, an index to POSITIONS list to pick position by.
-                self.position_cursor = 4
-
-                # Set GUI flip.
-                self.gui_flip = self.position_cursor > 4
+                # Set position to her usual middle screen position (also sets
+                # position cursor, an index to POSITIONS list, and GUI flip.)
+                self._set_position(DEFAULT_POSITION)
 
             if reset_text:
                 # Variable that stores entered user text prompt.
@@ -400,7 +397,6 @@ init 100 python in _fom_saysomething:
             self._load_pose_cursors(pose_cur)
 
             # Load position
-            self.position_cursor = pos
             self.on_position_change(pos)
 
             # Load text
@@ -412,6 +408,21 @@ init 100 python in _fom_saysomething:
 
         def _load_pose_cursors(self, pose_cursors):
             self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cursors.items()}
+
+        def _set_position(self, cursor):
+            """
+            Sets position cursor, corresponding position object and GUI flip
+            flag. This is the only place where GUI flip is decided, so that
+            every way of changing position agrees on which side the GUI is on.
+
+            IN:
+                cursor -> int:
+                    Index in POSITIONS list to set position to.
+            """
+
+            self.position_cursor = cursor
+            self.position = POSITIONS[cursor][0]
+            self.gui_flip = cursor > DEFAULT_POSITION
 
         ## END PICKER STATE MANAGEMENT FUNCTIONS ------------------------------------------------------------------------------------------
 
@@ -501,9 +512,7 @@ init 100 python in _fom_saysomething:
                 if curr != 0:
                     new = curr - 1
 
-            self.position_cursor = new
-            self.position = POSITIONS[self.position_cursor][0]
-            self.gui_flip = self.position_cursor > 4
+            self._set_position(new)
             self.changed = True
             return RETURN_RENDER
 
@@ -921,15 +930,15 @@ init 100 python in _fom_saysomething:
             """
             Callback function for position bar.
 
-            If value is greater than 5 the GUI is flipped to left side.
+            If value is greater than the default (middle) position, the GUI is
+            flipped to left side.
 
             IN:
-                value -> float:
-                    New value of position bar slider.
+                value -> int:
+                    New position cursor value.
             """
 
-            self.position = POSITIONS[value][0]
-            self.gui_flip = value > 5
+            self._set_position(value)
             self.changed = True
 
         def on_text_change(self, value):
