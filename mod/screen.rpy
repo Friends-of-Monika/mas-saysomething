@@ -1119,12 +1119,9 @@ init 100 python in _fom_saysomething:
 
 init 100 python in _fom_saysomething:
 
-    # Width of the panel and widths of the columns of a selector row: label on
-    # the left, value with its arrows on the right.
+    # Width of the whole panel, and padding of the framed boxes in it.
     PANEL_WIDTH = 370
-    PANEL_CONTENT_WIDTH = 350
-    PANEL_LABEL_WIDTH = 110
-    PANEL_VALUE_WIDTH = 240
+    PANEL_FRAME_PADDING = 10
 
     # Height of both panels and spacing between elements in them.
     #
@@ -1141,11 +1138,18 @@ init 100 python in _fom_saysomething:
     PANEL_SEARCH_HEIGHT = 40
     PANEL_LIST_HEIGHT = PANEL_HEIGHT - PANEL_SEARCH_HEIGHT - PANEL_SPACING
 
-    # Width of the scrollbar of the preset list (same as MAS vscrollbar style
-    # uses) and width of the list itself, which is inset by that scrollbar so
-    # that the scrollbar sits inside the panel and not outside of it.
+    # Width of the scrollbars of the panel (same as the MAS vscrollbar style
+    # uses) and width of everything else in it, inset by that scrollbar so that
+    # scrollbars sit inside the panel and not outside of it.
     PANEL_SCROLLBAR_WIDTH = 18
-    PANEL_LIST_WIDTH = PANEL_WIDTH - PANEL_SCROLLBAR_WIDTH
+    PANEL_INNER_WIDTH = PANEL_WIDTH - PANEL_SCROLLBAR_WIDTH
+
+    # Width of a selector row (inner width without the padding of the box it is
+    # in) and widths of its columns: label on the left, value with its arrows
+    # on the right.
+    PANEL_CONTENT_WIDTH = PANEL_INNER_WIDTH - PANEL_FRAME_PADDING * 2
+    PANEL_LABEL_WIDTH = 110
+    PANEL_VALUE_WIDTH = PANEL_CONTENT_WIDTH - PANEL_LABEL_WIDTH
 
     # Vertical alignment of the panel on the screen. Kept high enough for the
     # panel not to run into the quick buttons rack in the bottom right corner.
@@ -1259,6 +1263,11 @@ screen fom_saysomething_picker(say=True):
                     xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_HEIGHT)
 
                     viewport:
+                        id "selectors_viewport"
+
+                        # Leaves room for the scrollbar on the right.
+                        xsize _fom_saysomething.PANEL_INNER_WIDTH
+
                         mousewheel True
 
                         # Arrow keys are left to the text input caret.
@@ -1271,7 +1280,8 @@ screen fom_saysomething_picker(say=True):
                             spacing _fom_saysomething.PANEL_SPACING
 
                             frame:
-                                padding (10, 10)
+                                padding (_fom_saysomething.PANEL_FRAME_PADDING,
+                                         _fom_saysomething.PANEL_FRAME_PADDING)
 
                                 vbox:
                                     spacing _fom_saysomething.PANEL_SPACING
@@ -1326,7 +1336,8 @@ screen fom_saysomething_picker(say=True):
                             ## POSITION SELECTOR ----------------------------------------------------------------------------
 
                             frame:
-                                padding (10, 10)
+                                padding (_fom_saysomething.PANEL_FRAME_PADDING,
+                                         _fom_saysomething.PANEL_FRAME_PADDING)
 
                                 hbox:
                                     xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
@@ -1375,7 +1386,7 @@ screen fom_saysomething_picker(say=True):
 
                                     if picker.session is None:
                                         textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
-                                            xysize (_fom_saysomething.PANEL_WIDTH, None)
+                                            xysize (_fom_saysomething.PANEL_INNER_WIDTH, None)
                                             action Show("fom_saysomething_confirm_modal",
                                                         message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
                                                                   "click on {{i}}{1}{{/i}} button.\n\n"
@@ -1425,6 +1436,15 @@ screen fom_saysomething_picker(say=True):
 
                                     ## END SESSION MODE RACK ------------------------------------------------------------------------------------------
 
+                    # Scrollbar of the selectors panel. Sits inside the panel,
+                    # on its right side, in the room left by the viewport.
+
+                    bar:
+                        style "classroom_vscrollbar"
+                        value YScrollValue("selectors_viewport")
+                        xsize _fom_saysomething.PANEL_SCROLLBAR_WIDTH
+                        xalign 1.0
+
                 ## END POSE/EXPRESSION SELECTORS PANEL --------------------------------------------------------------------------------
 
             else:
@@ -1432,7 +1452,7 @@ screen fom_saysomething_picker(say=True):
                 ## PRESETS MENU -------------------------------------------------------------------------------------------------------
 
                 frame:
-                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_SEARCH_HEIGHT)
+                    xysize (_fom_saysomething.PANEL_INNER_WIDTH, _fom_saysomething.PANEL_SEARCH_HEIGHT)
 
                     # Text input.
 
@@ -1442,7 +1462,7 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize _fom_saysomething.PANEL_WIDTH
+                        xsize _fom_saysomething.PANEL_INNER_WIDTH
                         ysize _fom_saysomething.PANEL_SEARCH_HEIGHT - 2
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
@@ -1484,7 +1504,7 @@ screen fom_saysomething_picker(say=True):
                             id "viewport"
 
                             # Leaves room for the scrollbar on the right.
-                            xsize _fom_saysomething.PANEL_LIST_WIDTH
+                            xsize _fom_saysomething.PANEL_INNER_WIDTH
 
                             yfill False
                             mousewheel True
@@ -1500,7 +1520,7 @@ screen fom_saysomething_picker(say=True):
                                 for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (_fom_saysomething.PANEL_LIST_WIDTH, None)
+                                        xysize (_fom_saysomething.PANEL_INNER_WIDTH, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
