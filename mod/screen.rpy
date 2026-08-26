@@ -1051,7 +1051,9 @@ init 100 python in _fom_saysomething:
                 self.random_exp_used = True
                 return RETURN_RENDER
             else:
-                return self._reset_state()
+                # NOTE: only pose and position are reset here; text the player
+                # has typed is left intact as this button is 'Reset Pose'.
+                return self._reset_state(reset_text=False)
 
         ## END GUI CALLBACK FUNCTIONS -----------------------------------------------------------------------------------------------------
 
