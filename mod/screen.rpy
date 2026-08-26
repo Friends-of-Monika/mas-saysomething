@@ -1151,6 +1151,12 @@ init 100 python in _fom_saysomething:
     PANEL_LABEL_WIDTH = 110
     PANEL_VALUE_WIDTH = PANEL_CONTENT_WIDTH - PANEL_LABEL_WIDTH
 
+    # Widths of the buttons of the session control rack: two wide buttons, two
+    # arrow buttons and three gaps between them fill the width of the panel.
+    PANEL_BUTTON_WIDTH = 116
+    PANEL_ARROW_WIDTH = (PANEL_INNER_WIDTH - PANEL_BUTTON_WIDTH * 2
+                         - PANEL_SPACING * 3) // 2
+
     # Vertical alignment of the panel on the screen. Kept high enough for the
     # panel not to run into the quick buttons rack in the bottom right corner.
     PANEL_YALIGN = 0.08
@@ -1377,9 +1383,9 @@ screen fom_saysomething_picker(say=True):
                                 hbox:
                                     style_prefix "fom_saysomething_confirm_fom"
 
-                                    xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                    xmaximum _fom_saysomething.PANEL_INNER_WIDTH
                                     xfill True
-                                    spacing 10
+                                    spacing _fom_saysomething.PANEL_SPACING
 
 
                                     ## ENABLE SPEECH MODE BUTTON --------------------------------------------------------------------------------------
@@ -1404,6 +1410,7 @@ screen fom_saysomething_picker(say=True):
 
                                     else:
                                         textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
+                                            xysize (_fom_saysomething.PANEL_BUTTON_WIDTH, None)
                                             sensitive not say or not picker.is_text_empty()
                                             if picker.is_editing_session_item():
                                                 action Function(picker.edit_session_item)
@@ -1421,16 +1428,17 @@ screen fom_saysomething_picker(say=True):
                                                                 ok_action=Hide("dialog"))
 
                                         textbutton _("Remove"):
+                                            xysize (_fom_saysomething.PANEL_BUTTON_WIDTH, None)
                                             sensitive picker.can_remove_session()
                                             action Function(picker.remove_session_item)
 
                                         textbutton "<":
-                                            xysize (54, None)
+                                            xysize (_fom_saysomething.PANEL_ARROW_WIDTH, None)
                                             sensitive picker.session_switch_usable(forward=False)
                                             action Function(picker.session_switch_cursor, forward=False)
 
                                         textbutton ">":
-                                            xysize (54, None)
+                                            xysize (_fom_saysomething.PANEL_ARROW_WIDTH, None)
                                             sensitive picker.session_switch_usable(forward=True)
                                             action Function(picker.session_switch_cursor, forward=True)
 
