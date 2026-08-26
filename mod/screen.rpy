@@ -1141,6 +1141,12 @@ init 100 python in _fom_saysomething:
     PANEL_SEARCH_HEIGHT = 40
     PANEL_LIST_HEIGHT = PANEL_HEIGHT - PANEL_SEARCH_HEIGHT - PANEL_SPACING
 
+    # Width of the scrollbar of the preset list (same as MAS vscrollbar style
+    # uses) and width of the list itself, which is inset by that scrollbar so
+    # that the scrollbar sits inside the panel and not outside of it.
+    PANEL_SCROLLBAR_WIDTH = 18
+    PANEL_LIST_WIDTH = PANEL_WIDTH - PANEL_SCROLLBAR_WIDTH
+
     # Vertical alignment of the panel on the screen. Kept high enough for the
     # panel not to run into the quick buttons rack in the bottom right corner.
     PANEL_YALIGN = 0.08
@@ -1477,6 +1483,9 @@ screen fom_saysomething_picker(say=True):
                         viewport:
                             id "viewport"
 
+                            # Leaves room for the scrollbar on the right.
+                            xsize _fom_saysomething.PANEL_LIST_WIDTH
+
                             yfill False
                             mousewheel True
                             arrowkeys True
@@ -1491,20 +1500,19 @@ screen fom_saysomething_picker(say=True):
                                 for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (_fom_saysomething.PANEL_WIDTH, None)
+                                        xysize (_fom_saysomething.PANEL_LIST_WIDTH, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
 
-                    # Scrollbar used by list of presets above.
+                    # Scrollbar used by list of presets above. Sits inside the
+                    # panel, on its right side, in the room left by the list.
 
                     bar:
                         style "classroom_vscrollbar"
                         value YScrollValue("viewport")
-                        if not picker.gui_flip:
-                            xalign -0.07
-                        else:
-                            xalign 1.07
+                        xsize _fom_saysomething.PANEL_SCROLLBAR_WIDTH
+                        xalign 1.0
 
                 ## END PRESETS MENU ---------------------------------------------------------------------------------------------------
 
