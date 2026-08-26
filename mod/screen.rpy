@@ -176,7 +176,7 @@ init 100 python in _fom_saysomething:
                 code.append(value)
         return "".join(code)
 
-    def get_pose_cursors(sprite_code):
+    def get_pose_cursors(sprite_code, strict=False):
         """
         Generate pose cursors for a sprite code.
 
@@ -184,9 +184,18 @@ init 100 python in _fom_saysomething:
             sprite_code -> str:
                 MAS sprite code for Monika's pose.
 
+            strict -> bool, default False:
+                True to reject sprite codes that could not be parsed in full,
+                False to silently fall back to default values for the parts
+                that were not recognized.
+
         OUT:
             pose_cursors -> dict[str, int]:
                 Pose cursor dictionary.
+
+        RAISES:
+            ValueError:
+                If strict is True and sprite code is not a valid one.
         """
 
         pose_cursors = dict()
@@ -207,6 +216,11 @@ init 100 python in _fom_saysomething:
             else:
                 # By default, set to 0
                 pose_cursors[key] = 0
+
+        # Anything left unconsumed means this was not a sprite code (or at
+        # least not one we can make sense of.)
+        if strict and len(sprite_code) > 0:
+            raise ValueError("unparsed sprite code remainder: " + sprite_code)
 
         return pose_cursors
 
@@ -579,8 +593,9 @@ init 100 python in _fom_saysomething:
         def select_from_clipboard(self):
             """
             Receives text from clipboard and parses expression code from it.
-            If text is longer than MAX_CLIP_INPUT, returns None.
-            If syntax is incorrect, returns None.
+            Notifies the player and does nothing if clipboard is empty, its
+            content is longer than MAX_CLIP_INPUT or is not a valid expression
+            code.
 
             OUT:
                 None:
@@ -589,17 +604,24 @@ init 100 python in _fom_saysomething:
                     Returns RETURN_RENDER on success.
             """
 
+            # NOTE: this returns None when clipboard is empty or does not hold
+            # any text at all.
             clip = pygame.scrap.get(pygame.SCRAP_TEXT)
-            if len(clip) > MAX_CLIP_INPUT:
+            if not clip:
+                renpy.notify(_("There is nothing to paste."))
                 return
 
-            clip = clip.decode("utf-8")
+            if len(clip) > MAX_CLIP_INPUT:
+                renpy.notify(_("Clipboard content is too long to be an expression code."))
+                return
 
             try:
-                cursors = get_pose_cursors(clip)
-                if not cursors:
-                    return
-            except ValueError:
+                clip = clip.decode("utf-8").strip("\x00").strip()
+                if len(clip) == 0:
+                    raise ValueError("empty sprite code")
+                cursors = get_pose_cursors(clip, strict=True)
+            except (UnicodeDecodeError, ValueError):
+                renpy.notify(_("Clipboard does not contain a valid expression code."))
                 return
 
             self._load_pose_cursors(cursors)
