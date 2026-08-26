@@ -858,22 +858,24 @@ init 100 python in _fom_saysomething:
                     Always returned.
             """
 
-            if self.session_cursor > len(self.session) - 1:
-                self.session.pop(len(self.session) - 1)
-                self.session_cursor = len(self.session)
-                self._load_state(self.session[self.session_cursor])
+            # Cursor may point past the last item (the not yet added entry),
+            # in which case there is nothing to remove.
+            if not self.can_remove_session():
+                return RETURN_RENDER
 
-            elif self.session_cursor < 0:
-                self.session.pop(0)
-                self.session_cursor = 0
-
-            else:
-                self.session.pop(self.session_cursor)
+            self.session.pop(self.session_cursor)
 
             if self.session_cursor < len(self.session):
+                # Another item took the place of the removed one, show it.
                 self._load_state(self.session[self.session_cursor])
             else:
-                self._reset_state()
+                # Removed the last item, so move to the not yet added entry.
+                # NOTE: same as when adding an item, pose is kept and only
+                # text is reset.
+                self.session_cursor = len(self.session)
+                self._reset_state(reset_pose=False, reset_text=True)
+
+            self.changed = True
             return RETURN_RENDER
 
         def can_remove_session(self):
