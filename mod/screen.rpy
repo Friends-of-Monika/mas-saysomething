@@ -356,7 +356,8 @@ init 100 python in _fom_saysomething:
             # Flag to indicate that any changes were made to ask for confirmation
             self.changed = False
 
-            # Flag to indicate that a random expression was used at least once
+            # Flag to indicate that current pose was randomly generated.
+            # NOTE: set by _reset_state above, reassigned here for clarity.
             self.random_exp_used = False
 
 
@@ -369,6 +370,9 @@ init 100 python in _fom_saysomething:
                 #  [1]: current expression human readable name
                 # Initially all cursors are at zero (with corresponding expression names.)
                 self.pose_cursors = {key: (0, EXPR_MAP[key][1][0][1]) for key in EXPR_MAP.keys()}
+
+                # Pose is no longer the randomly generated one (if it was.)
+                self.random_exp_used = False
 
                 # Set position to her usual middle screen position (also sets
                 # position cursor, an index to POSITIONS list, and GUI flip.)
@@ -408,6 +412,11 @@ init 100 python in _fom_saysomething:
 
         def _load_pose_cursors(self, pose_cursors):
             self.pose_cursors = {key: (cur, EXPR_MAP[key][1][cur][1]) for key, cur in pose_cursors.items()}
+
+            # Pose is no longer the randomly generated one (if it was.)
+            # NOTE: on_reset_pose sets this flag back to True right after
+            # loading a random pose through this method.
+            self.random_exp_used = False
 
         def _set_position(self, cursor):
             """
