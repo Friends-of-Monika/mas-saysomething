@@ -1141,14 +1141,6 @@ screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
     zorder 100
 
-    # NOTE: This is placed here because in Ren'Py 6 key object affects spacing.
-    if picker.preset_cursor is not None:
-        key "K_DELETE" action Show("fom_saysomething_preset_confirm_modal",
-                                    title="Delete this preset?",
-                                    message=picker.preset_name,
-                                    ok_button="Delete",
-                                    ok_action=Function(picker.delete_preset, picker.preset_name))
-
     vbox:
 
 
@@ -1641,15 +1633,6 @@ screen fom_saysomething_picker(say=True):
                 align (0.5, 1.02)
 
                 use quick_menu
-
-    # This is here because 'key' somehow affects spacing.
-
-    if picker.preset_cursor is not None:
-        key "K_DELETE" action Show("fom_saysomething_confirm_modal",
-                                    title="Delete this preset?",
-                                    message=picker.preset_name,
-                                    ok_button="Delete",
-                                    ok_action=Function(picker.delete_preset, picker.preset_name))
 
 ## END PICKER GUI LAYOUT AND DEFINITIONS --------------------------------------------------------------------------------------------------
 
