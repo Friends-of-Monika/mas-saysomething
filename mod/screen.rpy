@@ -343,8 +343,9 @@ init 100 python in _fom_saysomething:
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
 
-            # Adjustment object to keep scroll state for preset list and prevent
-            # jumping on re-render.
+            # Adjustment objects to keep scroll state for selectors and preset
+            # list and prevent jumping on re-render.
+            self.selectors_list_adjustment = ui.adjustment()
             self.presets_list_adjustment = ui.adjustment()
 
             # Variable that stores entered preset search text prompt.
@@ -1106,28 +1107,45 @@ init 100 python in _fom_saysomething:
 
 
 
-## COMFY UI ADJUSTMENTS -------------------------------------------------------------------------------------------------------------------
+## PICKER GUI GEOMETRY -----------------------------------------------------------------------------------------------------------------
 
-# As ComfyUI changes line height, paddings, other style properties etc., we should
-# adjust the style using control flags here.
-
-# VARIABLES:
-# - comfy_ui_adjust: bool - true if Comfy UI is installed and a theme is used
-# - comfy_ui_theme:  str  - <theme id> if Comfy UI theme is used, NOT DEFINED otherise
+# Sizes of the picker GUI are defined here, in one place.
+#
+# Both panels of the picker (pose selectors and presets) are always exactly
+# PANEL_WIDTH by PANEL_HEIGHT, and content that does not fit into that is
+# scrolled instead of making the panel grow. This way the layout does not
+# depend on the theme in use (themes may change line height, paddings and
+# other style properties), on the translation, or on the amount of selectors.
 
 init 100 python in _fom_saysomething:
 
-    import store
+    # Width of the panel and widths of the columns of a selector row: label on
+    # the left, value with its arrows on the right.
+    PANEL_WIDTH = 370
+    PANEL_CONTENT_WIDTH = 350
+    PANEL_LABEL_WIDTH = 110
+    PANEL_VALUE_WIDTH = 240
 
-    # Check if Comfy UI is installed and is not disabled (has installed themes)
-    comfy_ui_adjust = store.mas_submod_utils.isSubmodInstalled("Comfy UI") and \
-        hasattr(store.comfy_ui, "theme_mgr") and \
-        len(store.comfy_ui.theme_mgr.settings["installed_files"]) > 0
-    # Set current theme ID if available
-    if comfy_ui_adjust:
-        comfy_ui_theme = store.comfy_ui.theme_mgr.get_current_theme()["id"]
+    # Height of both panels and spacing between elements in them.
+    #
+    # This is picked so that the selectors panel fits without scrolling
+    # with the default MAS theme, both with and without expression code shown
+    # (the old hardcoded preset list heights were 396 and 440 respectively,
+    # plus the search box and spacing above it.) Themes with taller buttons
+    # simply scroll instead of breaking the layout.
+    PANEL_HEIGHT = 480
+    PANEL_SPACING = 10
 
-## END COMFY UI ADJUSTMENTS ---------------------------------------------------------------------------------------------------------------
+    # Height of the preset search box, and height of the preset list, which is
+    # whatever is left of the panel below that search box.
+    PANEL_SEARCH_HEIGHT = 40
+    PANEL_LIST_HEIGHT = PANEL_HEIGHT - PANEL_SEARCH_HEIGHT - PANEL_SPACING
+
+    # Vertical alignment of the panel on the screen. Kept high enough for the
+    # panel not to run into the quick buttons rack in the bottom right corner.
+    PANEL_YALIGN = 0.08
+
+## END PICKER GUI GEOMETRY -------------------------------------------------------------------------------------------------------------
 
 
 
@@ -1190,221 +1208,214 @@ screen fom_saysomething_picker(say=True):
 
     vbox:
 
-
-
-        ## GUI FLIP LOGIC -----------------------------------------------------------------------------------------------------------------
+        ## GUI FLIP LOGIC ---------------------------------------------------------------------------------------------------------------------
 
         # Based on Monika's position, it's necessary to flip GUI
         # to let user fully see Monika's pose and face.
+        #
+        # Vertical alignment is the same for both panels and with any
+        # theme, since panels are always exactly PANEL_HEIGHT tall.
 
         if not picker.gui_flip:
-            if picker.is_show_code():
-                align (0.99, 0.07)
-            else:
-                if _fom_saysomething.comfy_ui_adjust:
-                    align (0.99, 0.1)
-                else:
-                    align (0.99, 0.2)
-
+            align (0.99, _fom_saysomething.PANEL_YALIGN)
         else:
-            if picker.is_show_code():
-                align (0.01, 0.07)
-            else:
-                if _fom_saysomething.comfy_ui_adjust:
-                    align (0.01, 0.1)
-                else:
-                    align (0.01, 0.2)
+            align (0.01, _fom_saysomething.PANEL_YALIGN)
 
-        ## END GUI FLIP LOGIC -------------------------------------------------------------------------------------------------------------
+        ## END GUI FLIP LOGIC -----------------------------------------------------------------------------------------------------------------
 
 
-
-        ## POSE/EXRESSION SELECTORS PANEL -------------------------------------------------------------------------------------------------
 
         vbox:
-            spacing 10
+            spacing _fom_saysomething.PANEL_SPACING
 
             if not picker.presets_menu:
 
-                frame:
-                    padding (10, 10)
+                ## POSE/EXPRESSION SELECTORS PANEL ------------------------------------------------------------------------------------
 
-                    vbox:
-                        if _fom_saysomething.comfy_ui_adjust:
-                            if picker.is_show_code():
-                                spacing 3
-                            else:
-                                spacing 5
-                        else:
-                            spacing 10
+                # Panel is of a fixed size and its content is scrolled
+                # when it does not fit; this may happen with a theme that
+                # uses taller buttons or with a translation that needs more
+                # space for selector labels. This way the layout does not
+                # have to know anything about the theme in use.
 
-                        if picker.is_show_code():
-                            hbox:
-                                xmaximum 350
-                                xfill True
+                fixed:
+                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_HEIGHT)
 
-                                # Split into two hboxes to align arrows and labels
-                                # properly (similar to buttons with the selectors.)
+                    viewport:
+                        mousewheel True
 
-                                hbox:
-                                    xfill True
-                                    xmaximum 110
-                                    text _("Expression")
+                        # Arrow keys are left to the text input caret.
+                        arrowkeys False
 
-                                hbox:
-                                    xmaximum 240
-                                    xfill True
-                                    xalign 1.0
+                        # Keeps scroll position on re-render.
+                        yadjustment picker.selectors_list_adjustment
+
+                        vbox:
+                            spacing _fom_saysomething.PANEL_SPACING
+
+                            frame:
+                                padding (10, 10)
+
+                                vbox:
+                                    spacing _fom_saysomething.PANEL_SPACING
 
                                     if picker.is_show_code():
-                                        text _("{0} at {1}").format(picker.get_sprite_code(), picker.get_position_label()) xalign 0.5
-                                    else:
-                                        text picker.get_sprite_code() xalign 0.5
+                                        hbox:
+                                            xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                            xfill True
 
-                        for key, data in _fom_saysomething.EXPR_MAP.items():
-                            hbox:
-                                xmaximum 350
-                                xfill True
+                                            # Split into two hboxes to align arrows and labels
+                                            # properly (similar to buttons with the selectors.)
 
-                                # Split into two hboxes to align arrows and labels
-                                # properly, so that one can click them without
-                                # missing if label is too big; this layout preserves
-                                # space for big labels.
+                                            hbox:
+                                                xfill True
+                                                xmaximum _fom_saysomething.PANEL_LABEL_WIDTH
+                                                text _("Expression")
+
+                                            hbox:
+                                                xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                                xfill True
+                                                xalign 1.0
+
+                                                if picker.is_show_code():
+                                                    text _("{0} at {1}").format(picker.get_sprite_code(), picker.get_position_label()) xalign 0.5
+                                                else:
+                                                    text picker.get_sprite_code() xalign 0.5
+
+                                    for key, data in _fom_saysomething.EXPR_MAP.items():
+                                        hbox:
+                                            xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                            xfill True
+
+                                            # Split into two hboxes to align arrows and labels
+                                            # properly, so that one can click them without
+                                            # missing if label is too big; this layout preserves
+                                            # space for big labels.
+
+                                            hbox:
+                                                xfill True
+                                                xmaximum _fom_saysomething.PANEL_LABEL_WIDTH
+                                                text data[0]
+
+                                            hbox:
+                                                xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                                xfill True
+                                                xalign 1.0
+
+                                                textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
+                                                text picker.get_pose_label(key) xalign 0.5
+                                                textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
+
+                            ## POSITION SELECTOR ----------------------------------------------------------------------------
+
+                            frame:
+                                padding (10, 10)
 
                                 hbox:
+                                    xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
                                     xfill True
-                                    xmaximum 110
-                                    text data[0]
+
+                                    # Split into two hboxes to align arrows and labels
+                                    # properly, so that one can click them without
+                                    # missing if label is too big; this layout preserves
+                                    # space for big labels.
+
+                                    hbox:
+                                        xfill True
+                                        xmaximum _fom_saysomething.PANEL_LABEL_WIDTH
+                                        text "Position"
+
+                                    hbox:
+                                        xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                        xfill True
+                                        xalign 1.0
+
+                                        textbutton "<":
+                                            xalign 0.0
+                                            action Function(picker.position_switch_selector, forward=False)
+                                            sensitive picker.position_switch_usable(forward=False)
+                                        text picker.get_position_label() xalign 0.5
+                                        textbutton ">":
+                                            xalign 1.0
+                                            action Function(picker.position_switch_selector, forward=True)
+                                            sensitive picker.position_switch_usable(forward=True)
+
+                            ## SPEECH MODE BUTTON/SESSION CONTROL RACK ------------------------------------------------------
+
+                            frame:
+                                background None
+                                padding (0, 0)
 
                                 hbox:
-                                    xmaximum 240
+                                    style_prefix "fom_saysomething_confirm_fom"
+
+                                    xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
                                     xfill True
-                                    xalign 1.0
-
-                                    textbutton "<" action Function(picker.pose_switch_selector, key, forward=False) xalign 0.0
-                                    text picker.get_pose_label(key) xalign 0.5
-                                    textbutton ">" action Function(picker.pose_switch_selector, key, forward=True) xalign 1.0
-
-                ## END POSE/EXPRESSION SELECTORS PANEL ------------------------------------------------------------------------------------
+                                    spacing 10
 
 
+                                    ## ENABLE SPEECH MODE BUTTON --------------------------------------------------------------------------------------
 
-                ## POSITION SLIDER/SELECTOR -----------------------------------------------------------------------------------------------
+                                    if picker.session is None:
+                                        textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
+                                            xysize (_fom_saysomething.PANEL_WIDTH, None)
+                                            action Show("fom_saysomething_confirm_modal",
+                                                        message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
+                                                                  "click on {{i}}{1}{{/i}} button.\n\n"
+                                                                  "{{i}}You can enable {1} mode by default in submod settings.{{/i}}")
+                                                                  .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
+                                                                          _fom_saysomething.MAX_SESSION_SIZE),
+                                                        ok_button=_("Yes"),
+                                                        ok_action=Function(picker.enable_session_mode))
 
-                frame:
-                    padding (10, 10)
-
-                    hbox:
-                        xmaximum 350
-                        xfill True
-
-                        # Split into two hboxes to align arrows and labels
-                        # properly, so that one can click them without
-                        # missing if label is too big; this layout preserves
-                        # space for big labels.
-
-                        hbox:
-                            xfill True
-                            xmaximum 110
-                            text "Position"
-
-                        hbox:
-                            xmaximum 240
-                            xfill True
-                            xalign 1.0
-
-                            textbutton "<":
-                                xalign 0.0
-                                action Function(picker.position_switch_selector, forward=False)
-                                sensitive picker.position_switch_usable(forward=False)
-                            text picker.get_position_label() xalign 0.5
-                            textbutton ">":
-                                xalign 1.0
-                                action Function(picker.position_switch_selector, forward=True)
-                                sensitive picker.position_switch_usable(forward=True)
-
-                ## END POSITION SLIDER/SELECTOR -------------------------------------------------------------------------------------------
+                                    ## END ENABLE SPEECH MODE BUTTON ----------------------------------------------------------------------------------
 
 
 
-                ## ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK -------------------------------------------------------------------------
-
-                frame:
-                    background None
-                    padding (0, 0)
-
-                    hbox:
-                        style_prefix "fom_saysomething_confirm_fom"
-
-                        xmaximum 350
-                        xfill True
-                        spacing 10
-
-
-                        ## ENABLE SPEECH MODE BUTTON --------------------------------------------------------------------------------------
-
-                        if picker.session is None:
-                            textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
-                                xysize (370, None)
-                                action Show("fom_saysomething_confirm_modal",
-                                            message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
-                                                      "click on {{i}}{1}{{/i}} button.\n\n"
-                                                      "{{i}}You can enable {1} mode by default in submod settings.{{/i}}")
-                                                      .format(_("sentences") if say else _("poses"), _("Say") if say else _("Pose"),
-                                                              _fom_saysomething.MAX_SESSION_SIZE),
-                                            ok_button=_("Yes"),
-                                            ok_action=Function(picker.enable_session_mode))
-
-                        ## END ENABLE SPEECH MODE BUTTON ----------------------------------------------------------------------------------
-
-
-
-                        ## SESSION MODE RACK ----------------------------------------------------------------------------------------------
-
-                        else:
-                            textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
-                                sensitive not say or not picker.is_text_empty()
-                                if picker.is_editing_session_item():
-                                    action Function(picker.edit_session_item)
-
-                                else:
-                                    if not picker.is_session_maximum_reached():
-                                        # While limit is not reached, keep adding iteams
-                                        action Function(picker.add_session_item)
+                                    ## SESSION MODE RACK ----------------------------------------------------------------------------------------------
 
                                     else:
-                                        # When reached, show a nice message about it.
-                                        action Show("dialog",
-                                                    message=_("You have reached the maximum amount\nof {0}.")
-                                                            .format(_("phrases for Monika to say") if say else _("poses for Monika to do")),
-                                                    ok_action=Hide("dialog"))
+                                        textbutton (_("Add") if not picker.is_editing_session_item() else _("Edit")):
+                                            sensitive not say or not picker.is_text_empty()
+                                            if picker.is_editing_session_item():
+                                                action Function(picker.edit_session_item)
 
-                            textbutton _("Remove"):
-                                sensitive picker.can_remove_session()
-                                action Function(picker.remove_session_item)
+                                            else:
+                                                if not picker.is_session_maximum_reached():
+                                                    # While limit is not reached, keep adding iteams
+                                                    action Function(picker.add_session_item)
 
-                            textbutton "<":
-                                xysize (54, None)
-                                sensitive picker.session_switch_usable(forward=False)
-                                action Function(picker.session_switch_cursor, forward=False)
+                                                else:
+                                                    # When reached, show a nice message about it.
+                                                    action Show("dialog",
+                                                                message=_("You have reached the maximum amount\nof {0}.")
+                                                                        .format(_("phrases for Monika to say") if say else _("poses for Monika to do")),
+                                                                ok_action=Hide("dialog"))
 
-                            textbutton ">":
-                                xysize (54, None)
-                                sensitive picker.session_switch_usable(forward=True)
-                                action Function(picker.session_switch_cursor, forward=True)
+                                        textbutton _("Remove"):
+                                            sensitive picker.can_remove_session()
+                                            action Function(picker.remove_session_item)
 
-                        ## END SESSION MODE RACK ------------------------------------------------------------------------------------------
+                                        textbutton "<":
+                                            xysize (54, None)
+                                            sensitive picker.session_switch_usable(forward=False)
+                                            action Function(picker.session_switch_cursor, forward=False)
 
+                                        textbutton ">":
+                                            xysize (54, None)
+                                            sensitive picker.session_switch_usable(forward=True)
+                                            action Function(picker.session_switch_cursor, forward=True)
 
-                ## END ENABLE SPEECH MODE BUTTON/SESSION CONTROL RACK ---------------------------------------------------------------------
+                                    ## END SESSION MODE RACK ------------------------------------------------------------------------------------------
+
+                ## END POSE/EXPRESSION SELECTORS PANEL --------------------------------------------------------------------------------
 
             else:
 
-                ## PRESETS MENU -----------------------------------------------------------------------------------------------------------
+                ## PRESETS MENU -------------------------------------------------------------------------------------------------------
 
                 frame:
-                    xsize 370
-                    ysize 40
+                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_SEARCH_HEIGHT)
 
                     # Text input.
 
@@ -1414,8 +1425,8 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize 370
-                        ysize 38
+                        xsize _fom_saysomething.PANEL_WIDTH
+                        ysize _fom_saysomething.PANEL_SEARCH_HEIGHT - 2
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
                         input:
@@ -1439,29 +1450,12 @@ screen fom_saysomething_picker(say=True):
                             outlines []
 
                 # List of presets.
+                #
+                # Height here is what is left of the panel below the
+                # search box, so that both panels are of the same height.
 
                 fixed:
-                    xsize 370
-
-                    # NOTE: the values are hand-picked to match the expression
-                    # picker menu visually; there isn't much logic beside just that.
-
-                    if not picker.is_show_code():
-                        if _fom_saysomething.comfy_ui_adjust:
-                            if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 397
-                            else:
-                                ysize 368
-                        else:
-                            ysize 396
-                    else:
-                        if _fom_saysomething.comfy_ui_adjust:
-                            if _fom_saysomething.comfy_ui_theme == "default":
-                                ysize 427
-                            else:
-                                ysize 393
-                        else:
-                            ysize 440
+                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_LIST_HEIGHT)
 
                     # Viewport wrapping long list.
 
@@ -1486,7 +1480,7 @@ screen fom_saysomething_picker(say=True):
                                 for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (370, None)
+                                        xysize (_fom_saysomething.PANEL_WIDTH, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
@@ -1501,7 +1495,7 @@ screen fom_saysomething_picker(say=True):
                         else:
                             xalign 1.07
 
-                ## END PRESETS MENU -------------------------------------------------------------------------------------------------------
+                ## END PRESETS MENU ---------------------------------------------------------------------------------------------------
 
         # Confirmation buttons area.
 
