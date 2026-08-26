@@ -343,10 +343,15 @@ init 100 python in _fom_saysomething:
             # Flag value for showing presets menu instead of selectors panel.
             self.presets_menu = False
 
+            # Flags telling if the panels have more content than they can show
+            # and therefore need a scrollbar. Set from the adjustments below.
+            self.selectors_scrollable = False
+            self.presets_scrollable = False
+
             # Adjustment objects to keep scroll state for selectors and preset
             # list and prevent jumping on re-render.
-            self.selectors_list_adjustment = ui.adjustment()
-            self.presets_list_adjustment = ui.adjustment()
+            self.selectors_list_adjustment = ui.adjustment(ranged=self.on_selectors_ranged)
+            self.presets_list_adjustment = ui.adjustment(ranged=self.on_presets_ranged)
 
             # Variable that stores entered preset search text prompt.
             self.presets_search = ""
@@ -681,6 +686,26 @@ init 100 python in _fom_saysomething:
             """
 
             return len(self.preset_name.strip()) == 0
+
+        def get_panel_width(self):
+            """
+            Returns width available to the content of the panel that is
+            currently shown. When the panel has no scrollbar, its content
+            stretches over the room the scrollbar would have taken.
+
+            OUT:
+                int:
+                    Width available to the panel content.
+            """
+
+            if self.presets_menu:
+                scrollable = self.presets_scrollable
+            else:
+                scrollable = self.selectors_scrollable
+
+            if scrollable:
+                return PANEL_INNER_WIDTH
+            return PANEL_WIDTH
 
         def is_show_code(self):
             """
@@ -1075,6 +1100,48 @@ init 100 python in _fom_saysomething:
             # when they enter text
             adjustment.change(adjustment.range * caret_relative_pos)
 
+        def _set_scrollable(self, key, adjustment):
+            """
+            Sets the scrollable flag by the provided key from the range of the
+            provided adjustment, and re-renders the screen if it has changed,
+            as panel content is laid out differently with and without a
+            scrollbar.
+
+            IN:
+                key -> str:
+                    Name of the flag attribute to set.
+
+                adjustment -> ui.adjustment:
+                    Adjustment to read the range from.
+            """
+
+            scrollable = adjustment.range > 0
+            if getattr(self, key) != scrollable:
+                setattr(self, key, scrollable)
+                renpy.restart_interaction()
+
+        def on_selectors_ranged(self, adjustment):
+            """
+            Callback for the selectors panel adjustment.
+
+            IN:
+                adjustment -> ui.adjustment:
+                    Adjustment that has changed.
+            """
+
+            self._set_scrollable("selectors_scrollable", adjustment)
+
+        def on_presets_ranged(self, adjustment):
+            """
+            Callback for the preset list adjustment.
+
+            IN:
+                adjustment -> ui.adjustment:
+                    Adjustment that has changed.
+            """
+
+            self._set_scrollable("presets_scrollable", adjustment)
+
         def on_reset_pose(self):
             """
             Callback for Reset Pose button to reset Monika's pose and expression.
@@ -1144,18 +1211,61 @@ init 100 python in _fom_saysomething:
     PANEL_SCROLLBAR_WIDTH = 18
     PANEL_INNER_WIDTH = PANEL_WIDTH - PANEL_SCROLLBAR_WIDTH
 
-    # Width of a selector row (inner width without the padding of the box it is
-    # in) and widths of its columns: label on the left, value with its arrows
-    # on the right.
-    PANEL_CONTENT_WIDTH = PANEL_INNER_WIDTH - PANEL_FRAME_PADDING * 2
+    # Width of the label column of a selector row; the value column with its
+    # arrows takes whatever is left of the row.
     PANEL_LABEL_WIDTH = 110
-    PANEL_VALUE_WIDTH = PANEL_CONTENT_WIDTH - PANEL_LABEL_WIDTH
 
-    # Widths of the buttons of the session control rack: two wide buttons, two
+    # Width of the wide buttons of the session control rack; two of them, two
     # arrow buttons and three gaps between them fill the width of the panel.
     PANEL_BUTTON_WIDTH = 116
-    PANEL_ARROW_WIDTH = (PANEL_INNER_WIDTH - PANEL_BUTTON_WIDTH * 2
-                         - PANEL_SPACING * 3) // 2
+
+    def get_row_width(panel_width):
+        """
+        Returns width of a row inside a framed box of the panel, which is the
+        width of the panel without the padding of that box.
+
+        IN:
+            panel_width -> int:
+                Width available to the panel content.
+
+        OUT:
+            int:
+                Width of a row.
+        """
+
+        return panel_width - PANEL_FRAME_PADDING * 2
+
+    def get_value_width(panel_width):
+        """
+        Returns width of the value column (the one with the arrows) of a
+        selector row, which is what the label column leaves of the row.
+
+        IN:
+            panel_width -> int:
+                Width available to the panel content.
+
+        OUT:
+            int:
+                Width of the value column.
+        """
+
+        return get_row_width(panel_width) - PANEL_LABEL_WIDTH
+
+    def get_arrow_width(panel_width):
+        """
+        Returns width of the arrow buttons of the session control rack, which
+        is what the two wide buttons and the gaps leave of the panel width.
+
+        IN:
+            panel_width -> int:
+                Width available to the panel content.
+
+        OUT:
+            int:
+                Width of an arrow button.
+        """
+
+        return (panel_width - PANEL_BUTTON_WIDTH * 2 - PANEL_SPACING * 3) // 2
 
     # Vertical alignment of the panel on the screen. Kept high enough for the
     # panel not to run into the quick buttons rack in the bottom right corner.
@@ -1233,6 +1343,14 @@ screen fom_saysomething_picker(say=True):
     style_prefix "fom_saysomething_picker"
     zorder 100
 
+    # Widths of the content of the panel that is currently shown. When there is
+    # no scrollbar in it, the content takes the room it would have used.
+
+    $ panel_width = picker.get_panel_width()
+    $ row_width = _fom_saysomething.get_row_width(panel_width)
+    $ value_width = _fom_saysomething.get_value_width(panel_width)
+    $ arrow_width = _fom_saysomething.get_arrow_width(panel_width)
+
     vbox:
 
         ## GUI FLIP LOGIC ---------------------------------------------------------------------------------------------------------------------
@@ -1271,8 +1389,9 @@ screen fom_saysomething_picker(say=True):
                     viewport:
                         id "selectors_viewport"
 
-                        # Leaves room for the scrollbar on the right.
-                        xsize _fom_saysomething.PANEL_INNER_WIDTH
+                        # Leaves room for the scrollbar on the right when
+                        # there is one.
+                        xsize panel_width
 
                         mousewheel True
 
@@ -1294,7 +1413,7 @@ screen fom_saysomething_picker(say=True):
 
                                     if picker.is_show_code():
                                         hbox:
-                                            xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                            xmaximum row_width
                                             xfill True
 
                                             # Split into two hboxes to align arrows and labels
@@ -1306,7 +1425,7 @@ screen fom_saysomething_picker(say=True):
                                                 text _("Expression")
 
                                             hbox:
-                                                xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                                xmaximum value_width
                                                 xfill True
                                                 xalign 1.0
 
@@ -1317,7 +1436,7 @@ screen fom_saysomething_picker(say=True):
 
                                     for key, data in _fom_saysomething.EXPR_MAP.items():
                                         hbox:
-                                            xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                            xmaximum row_width
                                             xfill True
 
                                             # Split into two hboxes to align arrows and labels
@@ -1331,7 +1450,7 @@ screen fom_saysomething_picker(say=True):
                                                 text data[0]
 
                                             hbox:
-                                                xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                                xmaximum value_width
                                                 xfill True
                                                 xalign 1.0
 
@@ -1346,7 +1465,7 @@ screen fom_saysomething_picker(say=True):
                                          _fom_saysomething.PANEL_FRAME_PADDING)
 
                                 hbox:
-                                    xmaximum _fom_saysomething.PANEL_CONTENT_WIDTH
+                                    xmaximum row_width
                                     xfill True
 
                                     # Split into two hboxes to align arrows and labels
@@ -1360,7 +1479,7 @@ screen fom_saysomething_picker(say=True):
                                         text "Position"
 
                                     hbox:
-                                        xmaximum _fom_saysomething.PANEL_VALUE_WIDTH
+                                        xmaximum value_width
                                         xfill True
                                         xalign 1.0
 
@@ -1383,7 +1502,7 @@ screen fom_saysomething_picker(say=True):
                                 hbox:
                                     style_prefix "fom_saysomething_confirm_fom"
 
-                                    xmaximum _fom_saysomething.PANEL_INNER_WIDTH
+                                    xmaximum panel_width
                                     xfill True
                                     spacing _fom_saysomething.PANEL_SPACING
 
@@ -1392,7 +1511,7 @@ screen fom_saysomething_picker(say=True):
 
                                     if picker.session is None:
                                         textbutton _("Enable {0} mode").format(_("speech") if say else _("session")):
-                                            xysize (_fom_saysomething.PANEL_INNER_WIDTH, None)
+                                            xysize (panel_width, None)
                                             action Show("fom_saysomething_confirm_modal",
                                                         message=_("You will be able to save up to {2} {0} for Monika to do them one after another in a row. When done,\n"
                                                                   "click on {{i}}{1}{{/i}} button.\n\n"
@@ -1433,12 +1552,12 @@ screen fom_saysomething_picker(say=True):
                                             action Function(picker.remove_session_item)
 
                                         textbutton "<":
-                                            xysize (_fom_saysomething.PANEL_ARROW_WIDTH, None)
+                                            xysize (arrow_width, None)
                                             sensitive picker.session_switch_usable(forward=False)
                                             action Function(picker.session_switch_cursor, forward=False)
 
                                         textbutton ">":
-                                            xysize (_fom_saysomething.PANEL_ARROW_WIDTH, None)
+                                            xysize (arrow_width, None)
                                             sensitive picker.session_switch_usable(forward=True)
                                             action Function(picker.session_switch_cursor, forward=True)
 
@@ -1460,7 +1579,7 @@ screen fom_saysomething_picker(say=True):
                 ## PRESETS MENU -------------------------------------------------------------------------------------------------------
 
                 frame:
-                    xysize (_fom_saysomething.PANEL_INNER_WIDTH, _fom_saysomething.PANEL_SEARCH_HEIGHT)
+                    xysize (panel_width, _fom_saysomething.PANEL_SEARCH_HEIGHT)
 
                     # Text input.
 
@@ -1470,7 +1589,7 @@ screen fom_saysomething_picker(say=True):
                         draggable False
                         arrowkeys False
                         mousewheel "horizontal"
-                        xsize _fom_saysomething.PANEL_INNER_WIDTH
+                        xsize panel_width
                         ysize _fom_saysomething.PANEL_SEARCH_HEIGHT - 2
                         xadjustment ui.adjustment(ranged=picker.on_search_adjustment_range)
 
@@ -1511,8 +1630,9 @@ screen fom_saysomething_picker(say=True):
                         viewport:
                             id "viewport"
 
-                            # Leaves room for the scrollbar on the right.
-                            xsize _fom_saysomething.PANEL_INNER_WIDTH
+                            # Leaves room for the scrollbar on the right when
+                            # there is one.
+                            xsize panel_width
 
                             yfill False
                             mousewheel True
@@ -1528,7 +1648,7 @@ screen fom_saysomething_picker(say=True):
                                 for _key in sorted(picker.get_presets(picker.presets_search)):
                                     textbutton _key:
                                         style "twopane_scrollable_menu_button"
-                                        xysize (_fom_saysomething.PANEL_INNER_WIDTH, None)
+                                        xysize (panel_width, None)
 
                                         action Function(picker.load_preset, _key)
                                         selected picker.preset_cursor == _key
