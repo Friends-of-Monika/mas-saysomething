@@ -71,6 +71,9 @@ label fom_saysomething_event_retry:
     else:
         m 1eua "Tell me how do you want me to pose~"
 
+    # Drop session left over from the previous attempt when retrying.
+    $ picker.reset_session_mode()
+
     # If player wants speech/session mode by default, enable it now.
     if persistent._fom_saysomething_speech_mode_default:
         $ picker.enable_session_mode()

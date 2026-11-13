@@ -847,6 +847,15 @@ init 100 python in _fom_saysomething:
             self.session = list()
             self.session_cursor = 0
 
+        def reset_session_mode(self):
+            """
+            Deactivates session mode and drops all session states, e.g. left
+            over from a previous picker interaction.
+            """
+
+            self.session = None
+            self.session_cursor = 0
+
         def session_switch_usable(self, forward):
             """
             Checks if session state switch is usable for backward/forward
