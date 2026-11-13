@@ -935,6 +935,23 @@ init 100 python in _fom_saysomething:
 
             self.session[self.session_cursor] = self._save_state()
 
+        def submit_session_item(self):
+            """
+            Saves current session state the same way 'Add'/'Edit' button does:
+            overwrites the state under cursor when editing, appends a new one
+            otherwise. Does nothing if session is full.
+
+            OUT:
+                RETURN_RENDER:
+                    Always returned.
+            """
+
+            if self.is_editing_session_item():
+                self.edit_session_item()
+            elif not self.is_session_maximum_reached():
+                self.add_session_item()
+            return RETURN_RENDER
+
         def remove_session_item(self):
             """
             Removes current session state.
@@ -1067,7 +1084,7 @@ init 100 python in _fom_saysomething:
                 if not self.is_text_empty():
                     # When in session mode, save session state and re-render.
                     if self.session is not None:
-                        self.add_session_item()
+                        self.submit_session_item()
                         return RETURN_RENDER
 
                     # Say something.
@@ -1077,7 +1094,7 @@ init 100 python in _fom_saysomething:
             else:
                 # If in session mode, add session state and re-render.
                 if self.session is not None:
-                    self.add_session_item()
+                    self.submit_session_item()
                     return RETURN_RENDER
 
                 # If not, just pose.
