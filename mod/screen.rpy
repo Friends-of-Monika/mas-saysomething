@@ -707,6 +707,25 @@ init 100 python in _fom_saysomething:
                 return PANEL_INNER_WIDTH
             return PANEL_WIDTH
 
+        def get_panel_height(self):
+            """
+            Returns height of the selectors panel as it was last laid out. The
+            selectors panel is as tall as its content (but no taller than
+            PANEL_HEIGHT), and the presets panel takes the same height so that
+            the buttons below do not jump when switching between them.
+
+            OUT:
+                int:
+                    Height of the panel.
+            """
+
+            # Page of the adjustment is the height of the selectors viewport;
+            # it is unset until the selectors panel is rendered for once.
+            height = self.selectors_list_adjustment._page
+            if not height:
+                return PANEL_HEIGHT
+            return min(int(height), PANEL_HEIGHT)
+
         def is_show_code(self):
             """
             Checks if player has requested code display.
@@ -1178,11 +1197,13 @@ init 100 python in _fom_saysomething:
 
 # Sizes of the picker GUI are defined here, in one place.
 #
-# Both panels of the picker (pose selectors and presets) are always exactly
-# PANEL_WIDTH by PANEL_HEIGHT, and content that does not fit into that is
-# scrolled instead of making the panel grow. This way the layout does not
-# depend on the theme in use (themes may change line height, paddings and
-# other style properties), on the translation, or on the amount of selectors.
+# Both panels of the picker (pose selectors and presets) are PANEL_WIDTH wide.
+# The selectors panel is as tall as its content, but no taller than
+# PANEL_HEIGHT, and content that does not fit into that is scrolled instead of
+# making the panel grow; the presets panel takes the same height. This way the
+# layout does not depend on the theme in use (themes may change line height,
+# paddings and other style properties), on the translation, or on the amount
+# of selectors.
 
 init 100 python in _fom_saysomething:
 
@@ -1190,20 +1211,19 @@ init 100 python in _fom_saysomething:
     PANEL_WIDTH = 370
     PANEL_FRAME_PADDING = 10
 
-    # Height of both panels and spacing between elements in them.
+    # Maximum height of the panels and spacing between elements in them.
     #
     # This is picked so that the selectors panel fits without scrolling
     # with the default MAS theme, both with and without expression code shown
     # (the old hardcoded preset list heights were 396 and 440 respectively,
-    # plus the search box and spacing above it.) Themes with taller buttons
-    # simply scroll instead of breaking the layout.
-    PANEL_HEIGHT = 480
+    # plus the search box and spacing above it), with some room to spare.
+    # Themes with taller buttons simply scroll instead of breaking the layout.
+    PANEL_HEIGHT = 520
     PANEL_SPACING = 10
 
-    # Height of the preset search box, and height of the preset list, which is
-    # whatever is left of the panel below that search box.
+    # Height of the preset search box; the preset list takes whatever is left
+    # of the panel below it.
     PANEL_SEARCH_HEIGHT = 40
-    PANEL_LIST_HEIGHT = PANEL_HEIGHT - PANEL_SEARCH_HEIGHT - PANEL_SPACING
 
     # Width of the scrollbars of the panel (same as the MAS vscrollbar style
     # uses) and width of everything else in it, inset by that scrollbar so that
@@ -1358,8 +1378,8 @@ screen fom_saysomething_picker(say=True):
         # Based on Monika's position, it's necessary to flip GUI
         # to let user fully see Monika's pose and face.
         #
-        # Vertical alignment is the same for both panels and with any
-        # theme, since panels are always exactly PANEL_HEIGHT tall.
+        # Vertical alignment is the same for both panels, since the presets
+        # panel always takes the height of the selectors panel.
 
         if not picker.gui_flip:
             align (0.99, _fom_saysomething.PANEL_YALIGN)
@@ -1384,7 +1404,11 @@ screen fom_saysomething_picker(say=True):
                 # have to know anything about the theme in use.
 
                 fixed:
-                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_HEIGHT)
+                    # Panel is as tall as the viewport, which is as tall as
+                    # its content up to PANEL_HEIGHT.
+                    xsize _fom_saysomething.PANEL_WIDTH
+                    ymaximum _fom_saysomething.PANEL_HEIGHT
+                    fit_first "height"
 
                     viewport:
                         id "selectors_viewport"
@@ -1392,6 +1416,7 @@ screen fom_saysomething_picker(say=True):
                         # Leaves room for the scrollbar on the right when
                         # there is one.
                         xsize panel_width
+                        yfill False
 
                         mousewheel True
 
@@ -1619,7 +1644,8 @@ screen fom_saysomething_picker(say=True):
                 # search box, so that both panels are of the same height.
 
                 fixed:
-                    xysize (_fom_saysomething.PANEL_WIDTH, _fom_saysomething.PANEL_LIST_HEIGHT)
+                    xysize (_fom_saysomething.PANEL_WIDTH,
+                            picker.get_panel_height() - _fom_saysomething.PANEL_SEARCH_HEIGHT - _fom_saysomething.PANEL_SPACING)
 
                     # Viewport wrapping long list.
 
