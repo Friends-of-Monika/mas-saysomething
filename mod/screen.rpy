@@ -845,6 +845,7 @@ init 100 python in _fom_saysomething:
             """
 
             self.session = list()
+            self.session_cursor = 0
 
         def session_switch_usable(self, forward):
             """
